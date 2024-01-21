@@ -13,6 +13,9 @@ class MemoInputField extends ConsumerWidget {
     final provider = ref.read(tBL001RecordNotifierProvider);
     final TextEditingController memoInputController =
         TextEditingController(text: provider.memo);
+    memoInputController.selection = TextSelection.fromPosition(
+      TextPosition(offset: memoInputController.text.length),
+    );
 
     return SizedBox(
       height: 40,
@@ -57,7 +60,7 @@ class MemoInputField extends ConsumerWidget {
 
           // },
           //キーボードを閉じる
-          onTapOutside: (event) => FocusScope.of(context).unfocus(),
+          // onTapOutside: (event) => FocusScope.of(context).unfocus(),
 
           onChanged: (value) {
             final memo = memoInputController.text;

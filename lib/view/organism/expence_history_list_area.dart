@@ -49,44 +49,54 @@ class ExpenceHistoryArea extends HookConsumerWidget {
             AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
           Widget children;
 
-          
-
           if (snapshot.hasData) {
             //snapShotのリストを分割する
-          final groupedList =
-              snapshot.data!.groupListsBy<String>((e) => e['stringDate']);
+            final groupedList =
+                snapshot.data!.groupListsBy<String>((e) => e['stringDate']);
 
-          return SizedBox(
-            height: 300,
-            child: ListView.builder(
-
-              itemCount: groupedList.length,
-              itemBuilder: (BuildContext context, int index) {
-                String stringDate = groupedList.keys.elementAt(index);
-                List itemsInADay = groupedList[stringDate]!;
-                return Column(
-                  children: [
-                    Text(stringDate,
-                        style: TextStyle(color:MyColors.white, fontWeight: FontWeight.bold)),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      itemCount: itemsInADay.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        final item = itemsInADay[index];
-                        // Return a widget representing the item
-                        return ListTile(
-                          title: Row(
-                            children: [Text(item['_id'].toString(),style: TextStyle(color: MyColors.white),), Text('：',style: TextStyle(color: MyColors.white)), Text(item['price'].toString(),style: TextStyle(color: MyColors.white),)],
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                );
-              },
-            ),
-          );
+            return SizedBox(
+              height: 300,
+              child: ListView.builder(
+                itemCount: groupedList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  String stringDate = groupedList.keys.elementAt(index);
+                  List itemsInADay = groupedList[stringDate]!;
+                  return Column(
+                    children: [
+                      Text(stringDate,
+                          style: const TextStyle(
+                              color: MyColors.white,
+                              fontWeight: FontWeight.bold)),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: ClampingScrollPhysics(),
+                        itemCount: itemsInADay.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final item = itemsInADay[index];
+                          // Return a widget representing the item
+                          return ListTile(
+                            title: Row(
+                              children: [
+                                Text(
+                                  item['_id'].toString(),
+                                  style: const TextStyle(color: MyColors.white),
+                                ),
+                                const Text('：',
+                                    style: TextStyle(color: MyColors.white)),
+                                Text(
+                                  item['price'].toString(),
+                                  style: const TextStyle(color: MyColors.white),
+                                )
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
+            );
           } else if (snapshot.hasError) {
             children = Container();
           } else {

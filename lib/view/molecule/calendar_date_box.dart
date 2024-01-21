@@ -6,8 +6,6 @@ Container vacantDateBox(int weekday, String dateLabel, String? expenceLabel) {
   return Container(
     width: 50,
     height: 46,
-    decoration: BoxDecoration(
-        border: Border.all(color: MyColors.lightGray), color: Colors.black),
     child: Center(
       child: Column(
         children: [
@@ -56,6 +54,7 @@ Container activeDateBox(int weekday, String dateLabel, String? expenceLabel) {
     width: 50,
     height: 46,
     decoration: BoxDecoration(
+        borderRadius: const BorderRadius.all(Radius.circular(6)),
         border: Border.all(color: MyColors.richBlack, width: 1),
         color: MyColors.jet),
     child: Center(

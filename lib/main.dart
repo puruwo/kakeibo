@@ -7,10 +7,11 @@ void main() {
 
 
   runApp(
-    const ProviderScope(
+    ProviderScope(
       child: MaterialApp(
-        home: Foundation(),
+        home: const Foundation(),
         debugShowCheckedModeBanner: false,
+        darkTheme: ThemeData.dark(),
       ),
     ),
   );
