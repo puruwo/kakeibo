@@ -6,7 +6,8 @@ import 'package:kakeibo/model/tableNameKey.dart';
 
 Widget groupSeparator(Map separateLabelMap) {
   //⚪︎⚪︎年⚪︎⚪︎月⚪︎⚪︎日の形で取得
-  final label = separateLabelMap[SeparateLabelMapKey().stringDate];
+  final dateTime = separateLabelMap[SeparateLabelMapKey().dateTime];
+  final label = '${dateTime.year}年${dateTime.month}月${dateTime.day}日';
 
   return SizedBox(
     height: 50,

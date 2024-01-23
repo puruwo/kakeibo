@@ -30,7 +30,7 @@ class TBL001Impl {
     final immutable = db.queryRowsWhere(where, whereArgs);
     final mutable = makeMutable(immutable);
 
-    final addedDateInformationMap = addDateLabelToMap(mutable);
+    final addedDateInformationMap = addDateTimeLabelToMap(mutable);
 
     //tbl001_recordのカラム(_id,year,month,day,price,category,memo)に加えて
     //'stringDate' もある
@@ -95,16 +95,13 @@ class TBL001Impl {
   }
 }
 
-Future<List<Map<String, dynamic>>> addDateLabelToMap(
+Future<List<Map<String, dynamic>>> addDateTimeLabelToMap(
     Future<List<Map<String, dynamic>>> list) async {
-  final newList = list;
-  for (var map in await newList) {
-    final year = map[DatabaseHelper.columnYear].toString();
-    final month = map[DatabaseHelper.columnMonth].toString();
-    final day = map[DatabaseHelper.columnDay].toString();
-    map.addAll({SeparateLabelMapKey().stringDate: '$year年$month月$day日'});
+  for (var map in await list) {
+    final dateTime = DateTime(map[DatabaseHelper.columnYear],map[DatabaseHelper.columnMonth],map[DatabaseHelper.columnDay]);
+    map.addAll({SeparateLabelMapKey().dateTime: dateTime});
   }
-  return newList;
+  return list;
 }
 
 Future<List<Map<String, dynamic>>> makeMutable(

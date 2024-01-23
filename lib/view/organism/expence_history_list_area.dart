@@ -1,6 +1,7 @@
 import 'package:kakeibo/constant/colors.dart';
 import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 import 'package:flutter/material.dart';
+import 'dart:collection';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:collection/collection.dart';
 
@@ -51,16 +52,21 @@ class ExpenceHistoryArea extends HookConsumerWidget {
 
           if (snapshot.hasData) {
             //snapShotのリストを分割する
-            final groupedList =
-                snapshot.data!.groupListsBy<String>((e) => e['stringDate']);
+            final groupedMap =
+                snapshot.data!.groupListsBy<DateTime>((e) => e['dateTime']);
+            //Mapのキーで昇順に並び替える
+            //型指定してやらんとエラーになる、Object型で判定されるため
+            final sortedGroupedMap = SplayTreeMap.from(groupedMap, (DateTime key1,DateTime key2) => key1.compareTo(key2));
 
             return SizedBox(
               height: 300,
               child: ListView.builder(
-                itemCount: groupedList.length,
+                itemCount: sortedGroupedMap.length,
                 itemBuilder: (BuildContext context, int index) {
-                  String stringDate = groupedList.keys.elementAt(index);
-                  List itemsInADay = groupedList[stringDate]!;
+                  DateTime dateTime = sortedGroupedMap.keys.elementAt(index);
+                  List itemsInADay = sortedGroupedMap[dateTime]!;
+
+                  final stringDate = '${dateTime.year}年${dateTime.month}月${dateTime.day}日';
                   return Column(
                     children: [
                       Text(stringDate,

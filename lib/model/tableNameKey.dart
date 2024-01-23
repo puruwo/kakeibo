@@ -24,7 +24,7 @@ class SeparateLabelMapKey {
   final String _price = 'price';
   final String _category = 'category';
   final String _memo = 'memo';
-  final String _stringDate = 'stringDate';
+  final String _dateTime = 'dateTime';
 
   String get id => _id;
   String get year => _year;
@@ -33,6 +33,6 @@ class SeparateLabelMapKey {
   String get price => _price;
   String get category => _category;
   String get memo => _memo;
-  String get stringDate => _stringDate;
+  String get dateTime => _dateTime;
 }
 
