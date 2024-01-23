@@ -54,9 +54,9 @@ class ExpenceHistoryArea extends HookConsumerWidget {
             //snapShotのリストを分割する
             final groupedMap =
                 snapshot.data!.groupListsBy<DateTime>((e) => e['dateTime']);
-            //Mapのキーで昇順に並び替える
+            //Mapのキーで上から降順に並び替える
             //型指定してやらんとエラーになる、Object型で判定されるため
-            final sortedGroupedMap = SplayTreeMap.from(groupedMap, (DateTime key1,DateTime key2) => key1.compareTo(key2));
+            final sortedGroupedMap = SplayTreeMap.from(groupedMap, (DateTime key1,DateTime key2) => key2.compareTo(key1));
 
             return SizedBox(
               height: 300,
