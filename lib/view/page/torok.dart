@@ -14,6 +14,8 @@ import 'package:kakeibo/view/organism/torok_selected_segment.dart';
 import 'package:kakeibo/view_model/provider/selected_segment_status.dart';
 import 'package:kakeibo/view_model/provider/home_datetime/torok_button.dart';
 import 'package:kakeibo/view_model/provider/is_registerable.dart';
+import 'package:kakeibo/view_model/provider/update_DB_count.dart';
+
 import 'package:kakeibo/view/organism/date_input_field.dart';
 import 'package:kakeibo/view_model/provider/category.dart';
 import 'package:kakeibo/view_model/provider/tbl001_state/tbl001_state.dart';
@@ -116,6 +118,11 @@ class _TorokState extends ConsumerState<Torok> {
                     behavior: SnackBarBehavior.floating,
                     duration: Duration(seconds: 2),
                   ));
+                  //DB更新のnotifier
+                  //DBが更新されたことをグローバルなproviderに反映
+                  final notifier2 = ref.read(updateDBCountNotifierProvider.notifier);
+                  notifier2.incrementState();
+
               } else if (isRegisterableProvider == false) {
                 //エラーハンドル
                 ScaffoldMessenger.of(context)
@@ -180,36 +187,6 @@ class _TorokState extends ConsumerState<Torok> {
             children: [
               const SizedBox(height: 5),
       
-              // CupertinoSlidingSegmentedControl<SelectedEnum>(
-              //   backgroundColor: MyColors.jet,
-              //   thumbColor: MyColors.dimGray,
-              //   // This represents the currently selected segmented control.
-              //   groupValue: selectedSegmentedStatus,
-              //   // Callback that sets the selected segmented control.
-              //   onValueChanged: (SelectedEnum? value) {
-              //     if (value != null) {
-              //       final notifier =
-              //           ref.read(selectedSegmentStatusNotifierProvider.notifier);
-              //       notifier.updateState(value);
-              //     }
-              //   },
-              //   children: const <SelectedEnum, Widget>{
-              //     SelectedEnum.sisyt: Padding(
-              //       padding: EdgeInsets.symmetric(horizontal: 20),
-              //       child: Text(
-              //         '支出',
-              //         style: TextStyle(color: CupertinoColors.white),
-              //       ),
-              //     ),
-              //     SelectedEnum.syunyu: Padding(
-              //       padding: EdgeInsets.symmetric(horizontal: 20),
-              //       child: Text(
-              //         '収入',
-              //         style: TextStyle(color: CupertinoColors.white),
-              //       ),
-              //     ),
-              //   },
-              // ),
               const TorokSelectedSegment(),
               const SizedBox(height: 5),
               PriceInputField(

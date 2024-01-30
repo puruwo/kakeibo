@@ -1,14 +1,15 @@
 import 'package:kakeibo/constant/colors.dart';
-import 'package:sticky_grouped_list/sticky_grouped_list.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'dart:collection';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:collection/collection.dart';
 
-import 'package:kakeibo/view/molecule/expence_history_list_tile.dart';
-import 'package:kakeibo/view/molecule/group_separator.dart';
+import 'package:kakeibo/view/page/torok.dart';
 
 import 'package:kakeibo/view_model/provider/active_datetime.dart';
+import 'package:kakeibo/view_model/provider/update_DB_count.dart';
+
 import 'package:kakeibo/view_model/reference_day_impl.dart';
 
 import 'package:kakeibo/model/tbl001_impl.dart';
@@ -18,17 +19,13 @@ class ExpenceHistoryArea extends HookConsumerWidget {
   const ExpenceHistoryArea({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // //スクロールビューコントローラーの宣言
-    // final controller = GroupedItemScrollController();
 
 //状態管理---------------------------------------------------------------------------------------
 
-    final activeDateTime = ref.watch(activeDatetimeNotifierProvider);
+    //databaseに操作がされた場合にカウントアップされるprovider
+    ref.watch(updateDBCountNotifierProvider);
 
-    //使えそうにない、、、、TT
-    //'0000年00月'の形式のラベルを取得
-    // final stringDate = '2023年11月17日';
-    // final stringDate = '${activeDateTime.year}年${activeDateTime.month}月${activeDateTime.day}日';
+    final activeDateTime = ref.watch(activeDatetimeNotifierProvider);
 
 //----------------------------------------------------------------------------------------------
 //データ取得--------------------------------------------------------------------------------------
@@ -56,7 +53,8 @@ class ExpenceHistoryArea extends HookConsumerWidget {
                 snapshot.data!.groupListsBy<DateTime>((e) => e['dateTime']);
             //Mapのキーで上から降順に並び替える
             //型指定してやらんとエラーになる、Object型で判定されるため
-            final sortedGroupedMap = SplayTreeMap.from(groupedMap, (DateTime key1,DateTime key2) => key2.compareTo(key1));
+            final sortedGroupedMap = SplayTreeMap.from(groupedMap,
+                (DateTime key1, DateTime key2) => key2.compareTo(key1));
 
             return SizedBox(
               height: 300,
@@ -66,7 +64,7 @@ class ExpenceHistoryArea extends HookConsumerWidget {
                   DateTime dateTime = sortedGroupedMap.keys.elementAt(index);
                   List itemsInADay = sortedGroupedMap[dateTime]!;
 
-                  final stringDate = '${dateTime.year}年${dateTime.month}月${dateTime.day}日';
+                  final stringDate ='${dateTime.year}年${dateTime.month}月${dateTime.day}日';
                   return Column(
                     children: [
                       Text(stringDate,
@@ -81,6 +79,13 @@ class ExpenceHistoryArea extends HookConsumerWidget {
                           final item = itemsInADay[index];
                           // Return a widget representing the item
                           return ListTile(
+                            onTap: () {
+                              showCupertinoModalBottomSheet(
+                                context: context,
+                                builder: (_) => const Torok(),
+                                isDismissible: true,
+                              );
+                            },
                             title: Row(
                               children: [
                                 Text(

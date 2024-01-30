@@ -1,22 +1,20 @@
-import 'dart:isolate';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import 'package:kakeibo/constant/colors.dart';
-import 'package:kakeibo/view/page/torok.dart';
 import 'package:kakeibo/view/organism/calendar_area.dart';
 import 'package:kakeibo/view/organism/expence_history_list_area.dart';
-import 'package:kakeibo/view_model/provider/initial_open.dart';
 
-class Home extends ConsumerWidget {
-  const Home({
-    super.key,
-  });
+class Home extends ConsumerStatefulWidget {
+  const Home({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => _HomeState();
+}
+
+class _HomeState extends ConsumerState<Home> {
+  @override
+  Widget build(BuildContext context) {
 
     return const Scaffold(
       backgroundColor: MyColors.richBlack,

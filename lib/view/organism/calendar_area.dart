@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:kakeibo/view_model/provider/active_datetime.dart';
+import 'package:kakeibo/view_model/provider/update_DB_count.dart';
+
 import 'package:kakeibo/view_model/calendar_builder.dart';
 import 'package:kakeibo/view_model/reference_day_impl.dart';
 
@@ -18,6 +20,9 @@ class CalendarArea extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
 //状態管理---------------------------------------------------------------------------------------
 
+    //databaseに操作がされた場合にカウントアップされるprovider
+    ref.watch(updateDBCountNotifierProvider);
+
     final activeDateTime = ref.watch(activeDatetimeNotifierProvider);
 
 //----------------------------------------------------------------------------------------------
@@ -26,7 +31,6 @@ class CalendarArea extends HookConsumerWidget {
     //表示する年月のラベルを取得
     final calendarMonthDisplayLabel = getYYDDLabel(activeDateTime);
 
-    // final calendarData = CalendarBuilder().build(DateTime(2023,1,25));
     final calendarData = CalendarBuilder().build(activeDateTime);
 
 //描写-------------------------------------------------------------------------------------------
@@ -80,8 +84,6 @@ Row _weekRow(
         } else {
           label = '$day';
         }
-
-        String mmdd = gettermmdd(dateInformationList, weekIndex, dayIndex);
 
         int weekday = dayIndex + 1;
 

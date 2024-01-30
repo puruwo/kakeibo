@@ -7,16 +7,21 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import 'package:kakeibo/view_model/provider/navigation_bar.dart';
 import 'package:kakeibo/view_model/provider/initial_open.dart';
+import 'package:kakeibo/view_model/provider/update_DB_count.dart';
+
 import 'package:kakeibo/view/page/torok.dart';
 import 'package:kakeibo/view/page/home.dart';
 
-class Foundation extends HookConsumerWidget {
-  const Foundation({
-    super.key,
-  });
+class Foundation extends StatefulHookConsumerWidget {
+  const Foundation({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => _FoundationState();
+}
+
+class _FoundationState extends ConsumerState<Foundation> {
+  @override
+  Widget build(BuildContext context) {
     //navigationBarの状態管理
     final navigationBarState = ref.watch(navigationBarNotifierProvider);
 
@@ -38,7 +43,6 @@ class Foundation extends HookConsumerWidget {
         notifier.updateState();
       }
     });
-
 
     //navigationBarに設定するbodyのpageリスト
     List<Widget> pageList = [const Home(), const Third()];
@@ -64,14 +68,6 @@ class Foundation extends HookConsumerWidget {
         ),
       ),
       body: MaterialApp(
-        //   onGenerateRoute: (settings) {
-        //   return MaterialWithModalsPageRoute(
-        //     settings: settings,
-        //     builder: (context) => pageList[navigationBarState],
-        //   );
-        // },
-        //ここにroutesを設定することによって、navigationBarを除いてページ遷移できる
-        // routes: routes,
         home: pageList[navigationBarState],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
