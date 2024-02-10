@@ -9,13 +9,10 @@ class MemoInputField extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     //recordの値を取得
-    //TextFieldのonTapOutsideが呼び出された時にリビルドがかかり、controllerが初期化されるため同期する必要がある
-    final provider = ref.read(tBL001RecordNotifierProvider);
-    final TextEditingController memoInputController =
-        TextEditingController(text: provider.memo);
-    memoInputController.selection = TextSelection.fromPosition(
-      TextPosition(offset: memoInputController.text.length),
-    );
+    final provider = ref.watch(tBL001RecordNotifierProvider);
+
+    final TextEditingController memoInputController = TextEditingController(text: provider.memo);
+    memoInputController.selection = TextSelection.fromPosition(TextPosition(offset: memoInputController.text.length));
 
     return SizedBox(
       height: 40,
@@ -26,6 +23,7 @@ class MemoInputField extends ConsumerWidget {
           borderRadius: BorderRadius.circular(8),
         ),
         child: TextField(
+          controller: memoInputController,
           textAlign: TextAlign.right,
           textAlignVertical: TextAlignVertical.top,
           style: const TextStyle(color: MyColors.white, fontSize: 17),
@@ -56,23 +54,15 @@ class MemoInputField extends ConsumerWidget {
             ),
           ),
 
-          // onChanged: (value) {
-
-          // },
-          //キーボードを閉じる
-          // onTapOutside: (event) => FocusScope.of(context).unfocus(),
-
-          onChanged: (value) {
+          //領域外をタップでproviderを更新する
+          onTapOutside: (event) {
+            //providerを更新
             final memo = memoInputController.text;
-
-            //tbl001_recordのnotifierを取得
             final notifier = ref.read(tBL001RecordNotifierProvider.notifier);
-
-            //更新
             notifier.updateMemo(memo);
+            //キーボードを閉じる
+            FocusScope.of(context).unfocus();
           },
-
-          controller: memoInputController,
         ),
       ),
     );

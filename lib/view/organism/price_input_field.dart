@@ -12,8 +12,8 @@ class PriceInputField extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     //recordの値を取得
-    //TextFieldのonTapOutsideが呼び出された時にリビルドがかかり、controllerが初期化されるため同期する必要がある
-    final provider = ref.read(tBL001RecordNotifierProvider);
+    final provider = ref.watch(tBL001RecordNotifierProvider);
+
     final TextEditingController priceInputController = TextEditingController(text: '${provider.price}');
     priceInputController.selection = TextSelection.fromPosition(TextPosition(offset: priceInputController.text.length), );
 
@@ -27,6 +27,7 @@ class PriceInputField extends ConsumerWidget {
           borderRadius: BorderRadius.circular(8),
         ),
         child: TextField(
+          controller: priceInputController,
           textAlign: TextAlign.right,
           textAlignVertical: TextAlignVertical.top,
           style: const TextStyle(color: MyColors.white, fontSize: 17),
@@ -58,29 +59,16 @@ class PriceInputField extends ConsumerWidget {
             ),
           ),
 
-          //キーボードを閉じる
-          // onTapOutside: (event) => FocusScope.of(context).unfocus(),
-
-          onChanged: (value) {
-            // テキストが変更されたときに呼ばれる関数
-
-            //コントローラーの値が変わるたびに
-            //コントローラーの値をtbl001recordに代入する
-            //watchにしやんのはtextEditingControllerが変化した時にリビルドされてるから
-
-            final price;
-
-            //priceがnullじゃなければ更新
-            if (priceInputController.text != '') {
-              price = int.parse(priceInputController.text);
-              //tbl001_recordのnotifierを取得
-              final notifier = ref.read(tBL001RecordNotifierProvider.notifier);
-              //更新
-              notifier.updatePrice(price);
-            }
+          //領域外をタップでproviderを更新する
+          onTapOutside: (event) {
+            final price = int.parse(priceInputController.text);
+            //tbl001_recordのnotifierを取得
+            final notifier = ref.read(tBL001RecordNotifierProvider.notifier);
+            //更新
+            notifier.updatePrice(price);
+            //キーボードを閉じる
+            FocusScope.of(context).unfocus();
           },
-          //controllerチェック、数値入力されているか
-          controller: priceInputController,
         ),
       ),
     );

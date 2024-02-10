@@ -30,7 +30,9 @@ class _FoundationState extends ConsumerState<Foundation> {
     ref.listen(initialOpenNotifierProvider, (oldState, newState) {
       //なんもしやん
     });
+
     final isInitialOpen = ref.read(initialOpenNotifierProvider);
+
     //WidgetsBindingで囲むことで、ビルドが終わったタイミングで中の処理が走る
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (isInitialOpen == true) {
@@ -61,12 +63,6 @@ class _FoundationState extends ConsumerState<Foundation> {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: MyColors.jet,
-        title: const SizedBox(
-          child: Text('kakeibo'),
-        ),
-      ),
       body: MaterialApp(
         home: pageList[navigationBarState],
       ),

@@ -1,5 +1,7 @@
 import 'package:kakeibo/constant/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:kakeibo/repository/tbl001_record.dart';
+import 'package:kakeibo/view_model/provider/tbl001_state/tbl001_state.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'dart:collection';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -12,6 +14,7 @@ import 'package:kakeibo/view_model/provider/update_DB_count.dart';
 
 import 'package:kakeibo/view_model/reference_day_impl.dart';
 
+import 'package:kakeibo/model/database_helper.dart';
 import 'package:kakeibo/model/tbl001_impl.dart';
 import 'package:kakeibo/model/tableNameKey.dart';
 
@@ -19,7 +22,6 @@ class ExpenceHistoryArea extends HookConsumerWidget {
   const ExpenceHistoryArea({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
 //状態管理---------------------------------------------------------------------------------------
 
     //databaseに操作がされた場合にカウントアップされるprovider
@@ -64,7 +66,8 @@ class ExpenceHistoryArea extends HookConsumerWidget {
                   DateTime dateTime = sortedGroupedMap.keys.elementAt(index);
                   List itemsInADay = sortedGroupedMap[dateTime]!;
 
-                  final stringDate ='${dateTime.year}年${dateTime.month}月${dateTime.day}日';
+                  final stringDate =
+                      '${dateTime.year}年${dateTime.month}月${dateTime.day}日';
                   return Column(
                     children: [
                       Text(stringDate,
@@ -77,12 +80,36 @@ class ExpenceHistoryArea extends HookConsumerWidget {
                         itemCount: itemsInADay.length,
                         itemBuilder: (BuildContext context, int index) {
                           final item = itemsInADay[index];
-                          // Return a widget representing the item
                           return ListTile(
                             onTap: () {
+                              // final notifier = ref
+                              //     .read(tBL001RecordNotifierProvider.notifier);
+                              // notifier.setData(TBL001Record(
+                              //   year: item[SeparateLabelMapKey().year],
+                              //   month: item[SeparateLabelMapKey().month],
+                              //   day: item[SeparateLabelMapKey().day],
+                              //   id: item[SeparateLabelMapKey().id],
+                              //   price: item[SeparateLabelMapKey().price],
+                              //   memo: item[SeparateLabelMapKey().memo],
+                              //   category: item[SeparateLabelMapKey().category]
+                              // ));
+
                               showCupertinoModalBottomSheet(
+                                //sccafoldの上に出すか
+                                useRootNavigator: true,
                                 context: context,
-                                builder: (_) => const Torok(),
+                                builder: (_) => Torok(
+                                  tBL001Record: TBL001Record(
+                                      year: item[SeparateLabelMapKey().year],
+                                      month: item[SeparateLabelMapKey().month],
+                                      day: item[SeparateLabelMapKey().day],
+                                      id: item[SeparateLabelMapKey().id],
+                                      price: item[SeparateLabelMapKey().price],
+                                      memo: item[SeparateLabelMapKey().memo],
+                                      category:
+                                          item[SeparateLabelMapKey().category]),
+                                  screenMode: 1,
+                                ),
                                 isDismissible: true,
                               );
                             },

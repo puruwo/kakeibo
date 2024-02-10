@@ -13,8 +13,16 @@ class TBL001RecordNotifier extends _$TBL001RecordNotifier {
 
   //tbl001Recordのメソッドにアクセス
   //stateからアクセスして下記のようにラップする必要がある
-  void insertToTable(){
+  void insert(){
     state.insert();
+  }
+
+  void setData(TBL001Record tbl001record){
+    state = tbl001record;
+  }
+
+  void update(){
+    state.update();
   }
 
   void updateDateTime(DateTime dt) {
@@ -49,5 +57,9 @@ class TBL001RecordNotifier extends _$TBL001RecordNotifier {
       memo: memo
     );
     state = newState;
+  }
+
+  void delete(){
+    state.delete();
   }
 }

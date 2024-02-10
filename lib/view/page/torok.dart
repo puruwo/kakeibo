@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kakeibo/constant/colors.dart';
+import 'package:kakeibo/repository/tbl001_record.dart';
 
 import 'package:kakeibo/view/test_all_row_get_button.dart';
 import 'package:kakeibo/view/organism/price_input_field.dart';
@@ -12,7 +13,6 @@ import 'package:kakeibo/view/organism/memo_input_field.dart';
 import 'package:kakeibo/view/organism/category_area.dart';
 import 'package:kakeibo/view/organism/torok_selected_segment.dart';
 import 'package:kakeibo/view_model/provider/selected_segment_status.dart';
-import 'package:kakeibo/view_model/provider/home_datetime/torok_button.dart';
 import 'package:kakeibo/view_model/provider/is_registerable.dart';
 import 'package:kakeibo/view_model/provider/update_DB_count.dart';
 
@@ -20,9 +20,15 @@ import 'package:kakeibo/view/organism/date_input_field.dart';
 import 'package:kakeibo/view_model/provider/category.dart';
 import 'package:kakeibo/view_model/provider/tbl001_state/tbl001_state.dart';
 
-class Torok extends StatefulHookConsumerWidget {
-  const Torok({super.key});
+class Torok extends ConsumerStatefulWidget {
+  const Torok(
+      {this.screenMode,
+      this.tBL001Record,
+      super.key});
 
+  //0:登録モード、1:編集モード
+  final int? screenMode;
+  final TBL001Record? tBL001Record;
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _TorokState();
 }
@@ -35,6 +41,14 @@ class _TorokState extends ConsumerState<Torok> {
   @override
   Widget build(BuildContext context) {
     //状態管理---------------------------------------------------------------------------------------
+
+    //前画面からレコードを受け取っていればそれを設定する
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.tBL001Record != null) {
+      final notifier = ref.read(tBL001RecordNotifierProvider.notifier);
+      notifier.setData(widget.tBL001Record!);
+      }
+    });
 
     final selectedSegmentedStatus =
         ref.watch(selectedSegmentStatusNotifierProvider);
@@ -77,11 +91,19 @@ class _TorokState extends ConsumerState<Torok> {
     //レイアウト------------------------------------------------------------------------------------
 
     return Scaffold(
-      // backgroundColor: MyColors.richBlack,
+      backgroundColor: MyColors.richBlack,
+
       appBar: AppBar(
         //ヘッダー右のアイコンボタン
         actions: [
           IconButton(
+            
+            icon: const Icon(
+              //完了チェックマーク
+              Icons.done_rounded,
+              color: MyColors.white,
+            ),
+
             onPressed: () {
               //登録可非の状態管理
               final isRegisterableNotifier =
@@ -92,6 +114,7 @@ class _TorokState extends ConsumerState<Torok> {
                   ref.read(tBL001RecordNotifierProvider);
               final price = tbl001StateProvider.price;
 
+              //エラーチェック
               //金額分岐でisRegisterableの更新とメッセージ定義
               if (price <= 0) {
                 isRegisterableNotifier.updateState(false);
@@ -100,30 +123,47 @@ class _TorokState extends ConsumerState<Torok> {
               } else {
                 isRegisterableNotifier.updateState(true);
               }
-
               final isRegisterableProvider =
                   ref.read(isRegisterableNotifierProvider);
 
+              //登録できるなら
               if (isRegisterableProvider == true) {
                 //挿入
                 final notifier =
                     ref.read(tBL001RecordNotifierProvider.notifier);
-                notifier.insertToTable();
-                Navigator.of(context).pop();
-                //スナックバーやとfloatingactionbuttonが浮いてしまうので他の方法を考える
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(const SnackBar(
-                    content: Text('登録が完了しました'),
-                    behavior: SnackBarBehavior.floating,
-                    duration: Duration(seconds: 2),
-                  ));
-                  //DB更新のnotifier
-                  //DBが更新されたことをグローバルなproviderに反映
-                  final notifier2 = ref.read(updateDBCountNotifierProvider.notifier);
-                  notifier2.incrementState();
 
-              } else if (isRegisterableProvider == false) {
+                //登録モード
+                if (widget.screenMode == 0) {
+                  notifier.insert();
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(const SnackBar(
+                      content: Text('登録が完了しました'),
+                      behavior: SnackBarBehavior.floating,
+                      duration: Duration(seconds: 2),
+                    ));
+                } 
+                //編集モード
+                else if (widget.screenMode == 1) {
+                  notifier.update();
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(const SnackBar(
+                      content: Text('変更が完了しました'),
+                      behavior: SnackBarBehavior.floating,
+                      duration: Duration(seconds: 2),
+                    ));
+                }
+                //DB更新のnotifier
+                //DBが更新されたことをグローバルなproviderに反映
+                final notifier2 =
+                    ref.read(updateDBCountNotifierProvider.notifier);
+                notifier2.incrementState();
+              } 
+              //登録できないなら
+              else if (isRegisterableProvider == false) {
                 //エラーハンドル
                 ScaffoldMessenger.of(context)
                   ..hideCurrentSnackBar()
@@ -131,29 +171,8 @@ class _TorokState extends ConsumerState<Torok> {
                       content: Text('正しく入力してください'),
                       behavior: SnackBarBehavior.floating,
                       duration: Duration(seconds: 2)));
-                // showAdaptiveDialog(
-                //   context: context,
-                //   builder: (dialogContext) {
-                //     return AlertDialog.adaptive(
-                //       title: const Text("エラーテキスト1"),
-                //       content: Text('エラーテキスト2'),
-                //       actions: [
-                //         TextButton(
-                //           child: const Text("OK"),
-                //           onPressed: () {
-                //             Navigator.of(dialogContext).pop();
-                //           },
-                //         ),
-                //       ],
-                //     );
-                //   },
-                // );
               }
             },
-            icon: const Icon(
-              Icons.done_rounded,
-              color: MyColors.white,
-            ),
           ),
         ],
 
@@ -161,6 +180,7 @@ class _TorokState extends ConsumerState<Torok> {
         leading: IconButton(
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(
+            //バッテン
             Icons.close_rounded,
             color: MyColors.white,
           ),
@@ -175,18 +195,16 @@ class _TorokState extends ConsumerState<Torok> {
           ),
         ),
         title: const SizedBox(
-          child: Text('Torok'),
+          child: Text('登録画面'),
         ),
       ),
 
-      backgroundColor: MyColors.richBlack,
       //body
       body: SingleChildScrollView(
         child: Center(
           child: Column(
             children: [
               const SizedBox(height: 5),
-      
               const TorokSelectedSegment(),
               const SizedBox(height: 5),
               PriceInputField(

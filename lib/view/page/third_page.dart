@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:kakeibo/constant/colors.dart';
+
 import 'package:kakeibo/view/test_all_row_get_button.dart';
 import 'package:kakeibo/view/organism/price_input_field.dart';
 import 'package:kakeibo/view/organism/memo_input_field.dart';
 import 'package:kakeibo/view/organism/category_area.dart';
-import 'package:kakeibo/view_model/provider/home_datetime/torok_button.dart';
 import 'package:kakeibo/view/organism/date_input_field.dart';
 import 'package:kakeibo/view_model/provider/category.dart';
 import 'package:kakeibo/view_model/provider/tbl001_state/tbl001_state.dart';
@@ -38,8 +39,14 @@ class Third extends HookConsumerWidget {
     //--------------------------------------------------------------------------------------------
     //レイアウト------------------------------------------------------------------------------------
 
-    return const Scaffold(
-      body: Center(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: MyColors.jet,
+        title: const SizedBox(
+          child: Text('kakeibo'),
+        ),
+      ),
+      body: const Center(
         child: Column(
           children: [
             Text('This is third_page')

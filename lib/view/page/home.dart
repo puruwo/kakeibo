@@ -16,9 +16,15 @@ class _HomeState extends ConsumerState<Home> {
   @override
   Widget build(BuildContext context) {
 
-    return const Scaffold(
+    return  Scaffold(
+      appBar: AppBar(
+        backgroundColor: MyColors.jet,
+        title: const SizedBox(
+          child: Text('Home'),
+        ),
+      ),
       backgroundColor: MyColors.richBlack,
-      body: Center(
+      body: const Center(
         child: Column(
           children: [
             Center(
