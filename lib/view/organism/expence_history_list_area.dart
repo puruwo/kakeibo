@@ -1,24 +1,26 @@
 import 'package:kakeibo/constant/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:kakeibo/repository/tbl001_record.dart';
-import 'package:kakeibo/view_model/provider/tbl001_state/tbl001_state.dart';
+import 'package:kakeibo/repository/torok_record/torok_record.dart';
+import 'package:kakeibo/view_model/provider/torok_state/torok_state.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'dart:collection';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:collection/collection.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
+
+import 'package:kakeibo/assets_conecter/category_handler.dart';
 
 import 'package:kakeibo/view/page/torok.dart';
 
 import 'package:kakeibo/view_model/provider/active_datetime.dart';
 import 'package:kakeibo/view_model/provider/update_DB_count.dart';
-
 import 'package:kakeibo/view_model/reference_day_impl.dart';
 
 import 'package:kakeibo/model/database_helper.dart';
-import 'package:kakeibo/model/tbl001_impl.dart';
+import 'package:kakeibo/model/tbl_impl.dart';
 import 'package:kakeibo/model/tableNameKey.dart';
 
-class ExpenceHistoryArea extends HookConsumerWidget {
+class ExpenceHistoryArea extends ConsumerWidget {
   const ExpenceHistoryArea({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,6 +30,8 @@ class ExpenceHistoryArea extends HookConsumerWidget {
     ref.watch(updateDBCountNotifierProvider);
 
     final activeDateTime = ref.watch(activeDatetimeNotifierProvider);
+
+    AutoScrollController _scrollController = AutoScrollController();
 
 //----------------------------------------------------------------------------------------------
 //データ取得--------------------------------------------------------------------------------------
@@ -58,79 +62,141 @@ class ExpenceHistoryArea extends HookConsumerWidget {
             final sortedGroupedMap = SplayTreeMap.from(groupedMap,
                 (DateTime key1, DateTime key2) => key2.compareTo(key1));
 
-            return SizedBox(
-              height: 300,
+            //DateTimeで並べ替えたMapのKeyをリストとして取得
+            final keys = List.from(sortedGroupedMap.keys);
+            _scrollToItem(activeDateTime,keys,_scrollController);
+
+            return Expanded(
               child: ListView.builder(
+                controller: _scrollController,
                 itemCount: sortedGroupedMap.length,
                 itemBuilder: (BuildContext context, int index) {
                   DateTime dateTime = sortedGroupedMap.keys.elementAt(index);
                   List itemsInADay = sortedGroupedMap[dateTime]!;
-
+              
                   final stringDate =
                       '${dateTime.year}年${dateTime.month}月${dateTime.day}日';
-                  return Column(
-                    children: [
-                      Text(stringDate,
-                          style: const TextStyle(
-                              color: MyColors.white,
-                              fontWeight: FontWeight.bold)),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: ClampingScrollPhysics(),
-                        itemCount: itemsInADay.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          final item = itemsInADay[index];
-                          return ListTile(
-                            onTap: () {
-                              // final notifier = ref
-                              //     .read(tBL001RecordNotifierProvider.notifier);
-                              // notifier.setData(TBL001Record(
-                              //   year: item[SeparateLabelMapKey().year],
-                              //   month: item[SeparateLabelMapKey().month],
-                              //   day: item[SeparateLabelMapKey().day],
-                              //   id: item[SeparateLabelMapKey().id],
-                              //   price: item[SeparateLabelMapKey().price],
-                              //   memo: item[SeparateLabelMapKey().memo],
-                              //   category: item[SeparateLabelMapKey().category]
-                              // ));
-
-                              showCupertinoModalBottomSheet(
-                                //sccafoldの上に出すか
-                                useRootNavigator: true,
-                                context: context,
-                                builder: (_) => Torok(
-                                  tBL001Record: TBL001Record(
-                                      year: item[SeparateLabelMapKey().year],
-                                      month: item[SeparateLabelMapKey().month],
-                                      day: item[SeparateLabelMapKey().day],
-                                      id: item[SeparateLabelMapKey().id],
-                                      price: item[SeparateLabelMapKey().price],
-                                      memo: item[SeparateLabelMapKey().memo],
-                                      category:
-                                          item[SeparateLabelMapKey().category]),
-                                  screenMode: 1,
-                                ),
-                                isDismissible: true,
-                              );
-                            },
-                            title: Row(
+                  return AutoScrollTag(
+                    key: ValueKey(index),
+                    index: index,
+                    controller: _scrollController,
+                    child: Column(
+                      children: [
+                        //日付ラベル
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Text(stringDate,
+                                style: const TextStyle(
+                                    color: MyColors.dimGray,
+                                    fontWeight: FontWeight.bold)),
+                            //右余白
+                            const SizedBox(
+                              height: 25,
+                              width: 250,
+                            )
+                          ],
+                        ),
+                                
+                        //区切り線
+                        const Divider(
+                          thickness: 1,
+                          height: 1,
+                          color: MyColors.dimGray,
+                        ),
+                                
+                        //タイル
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const ClampingScrollPhysics(),
+                          itemCount: itemsInADay.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final item = itemsInADay[index];
+                            return Column(
                               children: [
-                                Text(
-                                  item['_id'].toString(),
-                                  style: const TextStyle(color: MyColors.white),
+                                Container(
+                                  height: 49,
+                                  width: double.infinity,
+                                  color: MyColors.eerieBlack,
+                                  child: ListTile(
+                                    contentPadding: const EdgeInsets.only(
+                                        left: 0.0, right: 0.0),
+                                    title: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        CategoryHandler().iconGetter(
+                                            item[TBL001RecordKey().category]),
+                                        Text(
+                                          item['_id'].toString(),
+                                          style: const TextStyle(
+                                              color: MyColors.white),
+                                        ),
+                                        SizedBox(
+                                          width: 192,
+                                          child: Text(
+                                            CategoryHandler().categoryNameGetter(
+                                                item[TBL001RecordKey().category]),
+                                            textAlign: TextAlign.end,
+                                            style: const TextStyle(
+                                                color: MyColors.white),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 87,
+                                          child: Text(
+                                            item['price'].toString(),
+                                            textAlign: TextAlign.end,
+                                            style: const TextStyle(
+                                                color: MyColors.white),
+                                          ),
+                                        ),
+                                        const Icon(
+                                            Icons.arrow_forward_ios_rounded,
+                                            color: MyColors.blue,)
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      showCupertinoModalBottomSheet(
+                                        //sccafoldの上に出すか
+                                        useRootNavigator: true,
+                                        context: context,
+                                        builder: (_) => Torok(
+                                          torokRecord: TorokRecord(
+                                              year: item[
+                                                  SeparateLabelMapKey().year],
+                                              month: item[
+                                                  SeparateLabelMapKey().month],
+                                              day:
+                                                  item[SeparateLabelMapKey().day],
+                                              id: item[SeparateLabelMapKey().id],
+                                              price: item[
+                                                  SeparateLabelMapKey().price],
+                                              memo: item[
+                                                  SeparateLabelMapKey().memo],
+                                              category: item[SeparateLabelMapKey()
+                                                  .category]),
+                                          screenMode: 1,
+                                        ),
+                                        isDismissible: true,
+                                      );
+                                    },
+                                  ),
                                 ),
-                                const Text('：',
-                                    style: TextStyle(color: MyColors.white)),
-                                Text(
-                                  item['price'].toString(),
-                                  style: const TextStyle(color: MyColors.white),
+                                
+                                //区切り線
+                                const Divider(
+                                  thickness: 1,
+                                  height: 1,
+                                  color: MyColors.dimGray,
                                 )
                               ],
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   );
                 },
               ),
@@ -143,5 +209,15 @@ class ExpenceHistoryArea extends HookConsumerWidget {
 
           return children;
         });
+  }
+
+    void _scrollToItem(DateTime dt, List keysList,AutoScrollController controller) async {
+    final specificItem = dt;
+    final index = keysList.indexOf(specificItem);
+    await controller.scrollToIndex(
+      index,
+      // preferPosition: AutoScrollPosition.begin,
+    );
+    await controller.highlight(index);
   }
 }

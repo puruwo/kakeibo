@@ -1,30 +1,38 @@
-import 'package:kakeibo/repository/tbl002_record/tbl002_record.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:kakeibo/repository/tbl001_record/tbl001_record.dart';
 import 'package:kakeibo/repository/tbl002_record/tbl002_record.dart';
+import 'package:kakeibo/repository/torok_record/torok_record.dart';
 
-part 'tbl001_state.g.dart';
+part 'torok_state.g.dart';
+
+// class TorokRecord {
+//   const TorokRecord(
+//       {this.id = 0,
+//       this.price = 0,
+//       this.category = 1,
+//       this.memo = '',
+//       required this.year,
+//       required this.month,
+//       required this.day});
+//   final int id;
+//   final int year;
+//   final int month;
+//   final int day;
+//   final int price;
+//   final int category;
+//   final String memo;
+// }
 
 @riverpod
-class TBL001RecordNotifier extends _$TBL001RecordNotifier {
+class TorokRecordNotifier extends _$TorokRecordNotifier {
   @override
-  TBL001Record build() {
+  TorokRecord build() {
     DateTime dt = DateTime.now();
-    return TBL001Record(year: dt.year, month: dt.month, day: dt.day);
+    return TorokRecord(year: dt.year, month: dt.month, day: dt.day);
   }
 
-  //tbl001Recordのメソッドにアクセス
-  //stateからアクセスして下記のようにラップする必要がある
-  void insert() {
-    state.insert();
-  }
-
-  void setData(TBL001Record tbl001record) {
-    state = tbl001record;
-  }
-
-  void update() {
-    state.update();
+  void setData(TorokRecord torokRecord) {
+    state = torokRecord;
   }
 
   void updateDateTime(DateTime dt) {
@@ -51,16 +59,23 @@ class TBL001RecordNotifier extends _$TBL001RecordNotifier {
     final newState = oldState.copyWith(memo: memo);
     state = newState;
   }
-
-  void delete() {
-    state.delete();
+  
+  TBL001Record setToTBL001() {
+    return TBL001Record(
+      id: state.id,
+      category: state.category,
+      price: state.price,
+      memo: state.memo,
+      year: state.year,
+      month: state.month,
+      day: state.day,
+    );
   }
 
-  TBL002Record convertTo002() {
-    //idは0で設定、お互いの登録済みのレコードに影響を与えないようにするため
+  TBL002Record setToTBL002() {
     return TBL002Record(
-      id: 0,
-      category: 0,
+      id: state.id,
+      category: state.category,
       price: state.price,
       memo: state.memo,
       year: state.year,

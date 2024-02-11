@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:kakeibo/constant/colors.dart';
-import 'package:kakeibo/view_model/provider/tbl001_state/tbl001_state.dart';
+import 'package:kakeibo/view_model/provider/torok_state/torok_state.dart';
 
 class MemoInputField extends ConsumerWidget {
   const MemoInputField({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     //recordの値を取得
-    final provider = ref.watch(tBL001RecordNotifierProvider);
+    final provider = ref.watch(torokRecordNotifierProvider);
 
     final TextEditingController memoInputController = TextEditingController(text: provider.memo);
     memoInputController.selection = TextSelection.fromPosition(TextPosition(offset: memoInputController.text.length));
@@ -58,7 +58,7 @@ class MemoInputField extends ConsumerWidget {
           onTapOutside: (event) {
             //providerを更新
             final memo = memoInputController.text;
-            final notifier = ref.read(tBL001RecordNotifierProvider.notifier);
+            final notifier = ref.read(torokRecordNotifierProvider.notifier);
             notifier.updateMemo(memo);
             //キーボードを閉じる
             FocusScope.of(context).unfocus();

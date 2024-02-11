@@ -1,27 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'tbl001_state.dart';
+part of 'torok_state.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$tBL001RecordNotifierHash() =>
-    r'c752ffc37c0af73cf0791d43d6884cd4d07d20a5';
+String _$torokRecordNotifierHash() =>
+    r'c796e953c7f8068ec7abf32e888c21fae98d0f97';
 
-/// See also [TBL001RecordNotifier].
-@ProviderFor(TBL001RecordNotifier)
-final tBL001RecordNotifierProvider =
-    AutoDisposeNotifierProvider<TBL001RecordNotifier, TBL001Record>.internal(
-  TBL001RecordNotifier.new,
-  name: r'tBL001RecordNotifierProvider',
+/// See also [TorokRecordNotifier].
+@ProviderFor(TorokRecordNotifier)
+final torokRecordNotifierProvider =
+    AutoDisposeNotifierProvider<TorokRecordNotifier, TorokRecord>.internal(
+  TorokRecordNotifier.new,
+  name: r'torokRecordNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$tBL001RecordNotifierHash,
+      : _$torokRecordNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$TBL001RecordNotifier = AutoDisposeNotifier<TBL001Record>;
+typedef _$TorokRecordNotifier = AutoDisposeNotifier<TorokRecord>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

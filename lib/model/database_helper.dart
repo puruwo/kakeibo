@@ -7,17 +7,7 @@ import 'package:kakeibo/model/tableNameKey.dart';
 
 class DatabaseHelper {
   static final _databaseName = "kakeibo5.db"; // DB名
-  static final _databaseVersion = 1; // スキーマのバージョン指定
-
-  static final table = 'Payment'; // テーブル名
-
-  static final columnId = TBL001RecordKey().id; // カラム名：_id
-  static final columnYear = TBL001RecordKey().year; // カラム名:year
-  static final columnMonth = TBL001RecordKey().month; // カラム名:month
-  static final columnDay = TBL001RecordKey().day; // カラム名:day
-  static final columnPrice = TBL001RecordKey().price; // カラム名：price
-  static final columnCategory = TBL001RecordKey().category; // カラム名：category
-  static final columnMemo = TBL001RecordKey().memo; // カラム名：memo
+  static final _databaseVersion = 2; // スキーマのバージョン指定
 
   //読み出しデータ(Map)はImmutable!!!!!!!!!!
   //なので'Unsupported operation: read-only'が出た時はmakeMutable関数で返す必要がある
@@ -52,63 +42,78 @@ class DatabaseHelper {
     // 取得パスを基に、データベースのパスを生成
     String path = join(documentsDirectory.path, _databaseName);
     // データベース接続
-    return await openDatabase(path, version: _databaseVersion,
-        // テーブル作成メソッドの呼び出し
-        onCreate: (Database db, int version) async {
-      await db.execute('''
-          CREATE TABLE $table (
-            $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
-            $columnYear INTEGER NOT NULL,
-            $columnMonth INTEGER NOT NULL,
-            $columnDay INTEGER NOT NULL,
-            $columnPrice INTEGER NOT NULL,
-            $columnCategory INTEGER NOT NULL,
-            $columnMemo TEXT
+    return await openDatabase(
+      path, version: _databaseVersion,
+      // テーブル作成メソッドの呼び出し
+      onCreate: (Database db, int version) async {
+        await db.execute('''
+          CREATE TABLE ${TBL001RecordKey().tableName} (
+            ${TBL001RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL001RecordKey().year} INTEGER NOT NULL,
+            ${TBL001RecordKey().month} INTEGER NOT NULL,
+            ${TBL001RecordKey().day} INTEGER NOT NULL,
+            ${TBL001RecordKey().price} INTEGER NOT NULL,
+            ${TBL001RecordKey().category} INTEGER NOT NULL,
+            ${TBL001RecordKey().memo} TEXT
           )
           ''');
-    });
+      },
+
+      // DBアップグッレード時に一度だけ呼び出す
+      onUpgrade: (db, oldVersion, newVersion) async {
+        await db.execute('''
+          CREATE TABLE ${TBL002RecordKey().tableName} (
+            ${TBL002RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL002RecordKey().year} INTEGER NOT NULL,
+            ${TBL002RecordKey().month} INTEGER NOT NULL,
+            ${TBL002RecordKey().day} INTEGER NOT NULL,
+            ${TBL002RecordKey().price} INTEGER NOT NULL,
+            ${TBL002RecordKey().category} INTEGER NOT NULL,
+            ${TBL002RecordKey().memo} TEXT
+          )
+          ''');
+      },
+    );
   }
 
   //挿入メソッド
   //dictionary形式でレコードを変数として入力
   //戻り値はid?を返す
-  Future<int> insert(Map<String, dynamic> row) async {
+  Future<int> insert(String table, Map<String, dynamic> row) async {
     Database? db = await instance.database;
     return await db!.insert(table, row);
   }
 
   //クエリメソッド
   //全行取得
-  Future<List<Map<String, dynamic>>> queryRows() async {
+  Future<List<Map<String, dynamic>>> queryRows(String table) async {
     Database? db = await instance.database;
     return await db!.query(table);
   }
+
   //条件指定
   Future<List<Map<String, dynamic>>> queryRowsWhere(
-      String where, List whereArgs) async {
+      String table, String where, List whereArgs) async {
     Database? db = await instance.database;
     return await db!.query(table, where: where, whereArgs: whereArgs);
   }
 
-
   // レコード数を確認
-  Future<int?> queryRowCount() async {
+  Future<int?> queryRowCount(String table) async {
     Database? db = await instance.database;
     return Sqflite.firstIntValue(
         await db!.rawQuery('SELECT COUNT(*) FROM $table'));
   }
 
   //　更新処理
-  Future<int> update(Map<String, dynamic> row) async {
+  Future<int> update(String table, Map<String, dynamic> row, int id) async {
     Database? db = await instance.database;
-    int id = row[columnId];
-    return await db!
-        .update(table, row, where: '$columnId = ?', whereArgs: [id]);
+    return await db!.update(table, row, where: '_Id = ?', whereArgs: [id]);
   }
 
   //　削除処理
-  Future<int> delete(int id) async {
+  Future<int> delete(String table, int id) async {
     Database? db = await instance.database;
-    return await db!.delete(table, where: '$columnId = ?', whereArgs: [id]);
+    return await db!.delete(table, where: '_Id = ?', whereArgs: [id]);
   }
 }

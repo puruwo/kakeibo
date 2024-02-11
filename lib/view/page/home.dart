@@ -25,16 +25,10 @@ class _HomeState extends ConsumerState<Home> {
       ),
       backgroundColor: MyColors.richBlack,
       body: const Center(
-        child: Column(
-          children: [
-            Center(
-                child: Column(children: [
-              CalendarArea(),
-              ExpenceHistoryArea(),
-            ])),
-            // testButton2
-          ],
-        ),
+        child: Column(children: [
+          CalendarArea(),
+          ExpenceHistoryArea(),
+        ]),
       ),
     );
   }

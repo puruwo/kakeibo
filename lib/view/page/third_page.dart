@@ -9,7 +9,7 @@ import 'package:kakeibo/view/organism/price_input_field.dart';
 import 'package:kakeibo/view/organism/memo_input_field.dart';
 import 'package:kakeibo/view/organism/category_area.dart';
 import 'package:kakeibo/view/organism/date_input_field.dart';
-import 'package:kakeibo/view_model/provider/category.dart';
+
 import 'package:kakeibo/view_model/provider/tbl001_state/tbl001_state.dart';
 
 class Third extends HookConsumerWidget {

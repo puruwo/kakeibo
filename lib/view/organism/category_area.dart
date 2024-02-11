@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:kakeibo/view/molecule/icon_button.dart';
-import 'package:kakeibo/view_model/provider/tbl001_state/tbl001_state.dart';
+import 'package:kakeibo/view_model/provider/torok_state/torok_state.dart';
 
 class CategoryArea extends HookConsumerWidget {
   const CategoryArea({super.key});
@@ -12,9 +12,9 @@ class CategoryArea extends HookConsumerWidget {
 //状態管理---------------------------------------------------------------------------------------
 
     final activeButtonNumberProvider = ref.watch(
-        tBL001RecordNotifierProvider.select((record) => record.category));
+        torokRecordNotifierProvider.select((record) => record.category));
     final activeButtonNumberNotifier =
-        ref.watch(tBL001RecordNotifierProvider.notifier);
+        ref.watch(torokRecordNotifierProvider.notifier);
 
 //----------------------------------------------------------------------------------------------
 

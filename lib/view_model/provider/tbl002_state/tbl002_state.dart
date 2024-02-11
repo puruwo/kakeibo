@@ -1,26 +1,25 @@
-import 'package:kakeibo/repository/tbl002_record/tbl002_record.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:kakeibo/repository/tbl001_record/tbl001_record.dart';
 import 'package:kakeibo/repository/tbl002_record/tbl002_record.dart';
+import 'package:kakeibo/repository/tbl001_record/tbl001_record.dart';
 
-part 'tbl001_state.g.dart';
+part 'tbl002_state.g.dart';
 
 @riverpod
-class TBL001RecordNotifier extends _$TBL001RecordNotifier {
+class TBL002RecordNotifier extends _$TBL002RecordNotifier {
   @override
-  TBL001Record build() {
+  TBL002Record build() {
     DateTime dt = DateTime.now();
-    return TBL001Record(year: dt.year, month: dt.month, day: dt.day);
+    return TBL002Record(year: dt.year, month: dt.month, day: dt.day);
   }
 
-  //tbl001Recordのメソッドにアクセス
+  //tbl002Recordのメソッドにアクセス
   //stateからアクセスして下記のようにラップする必要がある
   void insert() {
     state.insert();
   }
 
-  void setData(TBL001Record tbl001record) {
-    state = tbl001record;
+  void setData(TBL002Record tbl002record) {
+    state = tbl002record;
   }
 
   void update() {
@@ -56,9 +55,9 @@ class TBL001RecordNotifier extends _$TBL001RecordNotifier {
     state.delete();
   }
 
-  TBL002Record convertTo002() {
+  TBL001Record convertTo001() {
     //idは0で設定、お互いの登録済みのレコードに影響を与えないようにするため
-    return TBL002Record(
+    return TBL001Record(
       id: 0,
       category: 0,
       price: state.price,

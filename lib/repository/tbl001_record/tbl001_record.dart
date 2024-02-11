@@ -42,7 +42,7 @@ class TBL001Record with _$TBL001Record {
   }
 
   update(){
-    print('$category,$year,$month,$day,$price,$memo,にこうしんしました');
+    print('id: $id,category:$category,$year年$month月$day日,$price円,$memo,にこうしんしました');
     db.update(TBL001RecordKey().tableName, {
       TBL001RecordKey().year: year,
       TBL001RecordKey().month: month,

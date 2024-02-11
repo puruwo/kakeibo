@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:kakeibo/constant/colors.dart';
-import 'package:kakeibo/view_model/provider/tbl001_state/tbl001_state.dart';
+import 'package:kakeibo/view_model/provider/torok_state/torok_state.dart';
 
 class DateDisplay extends ConsumerWidget {
   const DateDisplay({
@@ -13,12 +13,12 @@ class DateDisplay extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(tBL001RecordNotifierProvider);
+    final provider = ref.watch(torokRecordNotifierProvider);
 
     return GestureDetector(
       onTap: () async {
         //providerを取得
-        final provider = ref.read(tBL001RecordNotifierProvider);
+        final provider = ref.read(torokRecordNotifierProvider);
         //現在の選択日付を取得
         final dt = DateTime(provider.year,provider.month,provider.day);
 
@@ -33,7 +33,7 @@ class DateDisplay extends ConsumerWidget {
         );
 
         //notifierを取得
-        final notifier = ref.read(tBL001RecordNotifierProvider.notifier);
+        final notifier = ref.read(torokRecordNotifierProvider.notifier);
         //nullチェックせなあかん
         if (picked != null) {
           notifier.updateDateTime(picked);

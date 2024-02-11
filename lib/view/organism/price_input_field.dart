@@ -3,7 +3,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter/services.dart';
 
 import 'package:kakeibo/constant/colors.dart';
-import 'package:kakeibo/view_model/provider/tbl001_state/tbl001_state.dart';
+import 'package:kakeibo/view_model/provider/torok_state/torok_state.dart';
 
 class PriceInputField extends ConsumerWidget {
   const PriceInputField({required this.label, super.key});
@@ -12,7 +12,7 @@ class PriceInputField extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     //recordの値を取得
-    final provider = ref.watch(tBL001RecordNotifierProvider);
+    final provider = ref.watch(torokRecordNotifierProvider);
 
     final TextEditingController priceInputController = TextEditingController(text: '${provider.price}');
     priceInputController.selection = TextSelection.fromPosition(TextPosition(offset: priceInputController.text.length), );
@@ -62,8 +62,8 @@ class PriceInputField extends ConsumerWidget {
           //領域外をタップでproviderを更新する
           onTapOutside: (event) {
             final price = int.parse(priceInputController.text);
-            //tbl001_recordのnotifierを取得
-            final notifier = ref.read(tBL001RecordNotifierProvider.notifier);
+            //torok_recordのnotifierを取得
+            final notifier = ref.read(torokRecordNotifierProvider.notifier);
             //更新
             notifier.updatePrice(price);
             //キーボードを閉じる

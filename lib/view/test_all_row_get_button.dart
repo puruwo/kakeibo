@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kakeibo/model/tbl001_impl.dart';
+import 'package:kakeibo/model/tbl_impl.dart';
 
 testbutton() {
   return ElevatedButton(
