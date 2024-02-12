@@ -9,10 +9,7 @@ Container vacantDateBox(int weekday, String dateLabel, String? expenceLabel) {
     child: Center(
       child: Column(
         children: [
-          Text(dateLabel),
-          Text(
-            expenceLabel ??= '',
-          )
+          Text(dateLabel,style: const TextStyle(color: MyColors.dimGray)),
         ],
       ),
     ),
@@ -41,7 +38,7 @@ Container normalDateBox(int weekday, String dateLabel, String? expenceLabel) {
           ),
           Text(
             expenceLabel ??= '',
-            style: const TextStyle(color: MyColors.white),
+            style: const TextStyle(color: MyColors.white,fontSize: 10),
           )
         ],
       ),
@@ -72,7 +69,7 @@ Container activeDateBox(int weekday, String dateLabel, String? expenceLabel) {
           ),
           Text(
             expenceLabel ??= '',
-            style: TextStyle(color: MyColors.white),
+            style: const TextStyle(color: MyColors.white,fontSize: 10),
           )
         ],
       ),

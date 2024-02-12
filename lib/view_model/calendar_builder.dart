@@ -27,7 +27,7 @@ class CalendarBuilder {
 
     //1週間目だけ作成
     final firstweek = List.generate(7, (index) {
-      final i = index + 1; //index==0から始まるので
+      final i = index; //index==0から始まるので
       // 基準日の曜日からの差分
       final offset = referenceDayWeekday - i;
 
