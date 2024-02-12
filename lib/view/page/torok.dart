@@ -89,7 +89,7 @@ class _TorokState extends ConsumerState<Torok> {
     //レイアウト------------------------------------------------------------------------------------
 
     return Scaffold(
-      backgroundColor: MyColors.richBlack,
+      backgroundColor: MyColors.eerieBlack,
 
       appBar: AppBar(
         //ヘッダー右のアイコンボタン

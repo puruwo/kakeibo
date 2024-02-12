@@ -24,8 +24,8 @@ Container normalDateBox(int weekday, String dateLabel, String? expenceLabel) {
     width: 50,
     height: 46,
     decoration: BoxDecoration(
-        border: Border.all(color: MyColors.richBlack, width: 1),
-        color: MyColors.richBlack),
+        border: Border.all(color: MyColors.eerieBlack, width: 1),
+        color: MyColors.eerieBlack),
     child: Center(
       child: Column(
         children: [

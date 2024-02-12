@@ -1,5 +1,6 @@
 import 'package:kakeibo/constant/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:kakeibo/repository/tbl001_record/tbl001_record.dart';
 import 'package:kakeibo/repository/torok_record/torok_record.dart';
 import 'package:kakeibo/view_model/provider/torok_state/torok_state.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -64,7 +65,7 @@ class ExpenceHistoryArea extends ConsumerWidget {
 
             //DateTimeで並べ替えたMapのKeyをリストとして取得
             final keys = List.from(sortedGroupedMap.keys);
-            _scrollToItem(activeDateTime,keys,_scrollController);
+            _scrollToItem(activeDateTime, keys, _scrollController);
 
             return Expanded(
               child: ListView.builder(
@@ -72,8 +73,10 @@ class ExpenceHistoryArea extends ConsumerWidget {
                 itemCount: sortedGroupedMap.length,
                 itemBuilder: (BuildContext context, int index) {
                   DateTime dateTime = sortedGroupedMap.keys.elementAt(index);
-                  List itemsInADay = sortedGroupedMap[dateTime]!;
-              
+                  List<Map> itemsInADay = sortedGroupedMap[dateTime]!;
+                  List<Map> descendingOrderItems =
+                      descendingOrderSort(itemsInADay);
+
                   final stringDate =
                       '${dateTime.year}年${dateTime.month}月${dateTime.day}日';
                   return AutoScrollTag(
@@ -97,101 +100,160 @@ class ExpenceHistoryArea extends ConsumerWidget {
                             )
                           ],
                         ),
-                                
+
                         //区切り線
                         const Divider(
                           thickness: 1,
                           height: 1,
                           color: MyColors.dimGray,
                         ),
-                                
+
                         //タイル
                         ListView.builder(
                           shrinkWrap: true,
                           physics: const ClampingScrollPhysics(),
-                          itemCount: itemsInADay.length,
+                          itemCount: descendingOrderItems.length,
                           itemBuilder: (BuildContext context, int index) {
                             final item = itemsInADay[index];
-                            return Column(
-                              children: [
-                                Container(
-                                  height: 49,
-                                  width: double.infinity,
-                                  color: MyColors.eerieBlack,
-                                  child: ListTile(
-                                    contentPadding: const EdgeInsets.only(
-                                        left: 0.0, right: 0.0),
-                                    title: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        CategoryHandler().iconGetter(
-                                            item[TBL001RecordKey().category]),
-                                        Text(
-                                          item['_id'].toString(),
-                                          style: const TextStyle(
-                                              color: MyColors.white),
-                                        ),
-                                        SizedBox(
-                                          width: 192,
-                                          child: Text(
-                                            CategoryHandler().categoryNameGetter(
-                                                item[TBL001RecordKey().category]),
-                                            textAlign: TextAlign.end,
+                            return Dismissible(
+                              key: Key(item[TBL001RecordKey().id].toString()),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    height: 49,
+                                    width: double.infinity,
+                                    color: MyColors.eerieBlack,
+                                    child: ListTile(
+                                      contentPadding: const EdgeInsets.only(
+                                          left: 0.0, right: 0.0),
+                                      title: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          CategoryHandler().iconGetter(
+                                              item[TBL001RecordKey().category]),
+                                          Text(
+                                            item['_id'].toString(),
                                             style: const TextStyle(
                                                 color: MyColors.white),
                                           ),
-                                        ),
-                                        SizedBox(
-                                          width: 87,
-                                          child: Text(
-                                            item['price'].toString(),
-                                            textAlign: TextAlign.end,
-                                            style: const TextStyle(
-                                                color: MyColors.white),
+                                          SizedBox(
+                                            width: 192,
+                                            child: Text(
+                                              CategoryHandler()
+                                                  .categoryNameGetter(item[
+                                                      TBL001RecordKey()
+                                                          .category]),
+                                              textAlign: TextAlign.end,
+                                              style: const TextStyle(
+                                                  color: MyColors.white),
+                                            ),
                                           ),
-                                        ),
-                                        const Icon(
+                                          SizedBox(
+                                            width: 87,
+                                            child: Text(
+                                              item['price'].toString(),
+                                              textAlign: TextAlign.end,
+                                              style: const TextStyle(
+                                                  color: MyColors.white),
+                                            ),
+                                          ),
+                                          const Icon(
                                             Icons.arrow_forward_ios_rounded,
-                                            color: MyColors.blue,)
-                                      ],
+                                            color: MyColors.blue,
+                                          )
+                                        ],
+                                      ),
+                                      onTap: () {
+                                        showCupertinoModalBottomSheet(
+                                          //sccafoldの上に出すか
+                                          useRootNavigator: true,
+                                          //縁タップで閉じる
+                                          isDismissible: true,
+                                          context: context,
+                                          builder: (_) => Torok(
+                                            torokRecord: TorokRecord(
+                                                year: item[
+                                                    SeparateLabelMapKey().year],
+                                                month: item[
+                                                    SeparateLabelMapKey()
+                                                        .month],
+                                                day: item[
+                                                    SeparateLabelMapKey().day],
+                                                id: item[
+                                                    SeparateLabelMapKey().id],
+                                                price: item[
+                                                    SeparateLabelMapKey()
+                                                        .price],
+                                                memo: item[
+                                                    SeparateLabelMapKey().memo],
+                                                category: item[
+                                                    SeparateLabelMapKey()
+                                                        .category]),
+                                            screenMode: 1,
+                                          ),
+                                        );
+                                      },
                                     ),
-                                    onTap: () {
-                                      showCupertinoModalBottomSheet(
-                                        //sccafoldの上に出すか
-                                        useRootNavigator: true,
-                                        context: context,
-                                        builder: (_) => Torok(
-                                          torokRecord: TorokRecord(
-                                              year: item[
-                                                  SeparateLabelMapKey().year],
-                                              month: item[
-                                                  SeparateLabelMapKey().month],
-                                              day:
-                                                  item[SeparateLabelMapKey().day],
-                                              id: item[SeparateLabelMapKey().id],
-                                              price: item[
-                                                  SeparateLabelMapKey().price],
-                                              memo: item[
-                                                  SeparateLabelMapKey().memo],
-                                              category: item[SeparateLabelMapKey()
-                                                  .category]),
-                                          screenMode: 1,
-                                        ),
-                                        isDismissible: true,
-                                      );
-                                    },
                                   ),
-                                ),
-                                
-                                //区切り線
-                                const Divider(
-                                  thickness: 1,
-                                  height: 1,
-                                  color: MyColors.dimGray,
-                                )
-                              ],
+
+                                  //区切り線
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: MyColors.dimGray,
+                                  )
+                                ],
+                              ),
+
+                              //タイルを横にスライドした時の処理
+                              confirmDismiss: (direction) async {
+                                return await showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text("Confirm"), // ダイアログのタイトル
+                                      content: Text(
+                                          "Are you sure you wish to delete this item?"), // ダイアログのメッセージ
+                                      actions: <Widget>[
+                                        TextButton(
+                                          onPressed: () => Navigator.of(context)
+                                              .pop(false), // キャンセルボタンを押したときの処理
+                                          child: Text("CANCEL"),
+                                        ),
+                                        TextButton(
+                                          onPressed: () => Navigator.of(context)
+                                              .pop(true), // 削除ボタンを押したときの処理
+                                          child: Text("DELETE"),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+
+                              //ダイアログでOKを押したら処理
+                              onDismissed: (direction) {
+                                final record = TBL001Record(
+                                  id: item[TBL001RecordKey().id],
+                                  category: item[TBL001RecordKey().category],
+                                  price: item[TBL001RecordKey().price],
+                                  memo: item[TBL001RecordKey().memo],
+                                  year: item[TBL001RecordKey().year],
+                                  month: item[TBL001RecordKey().month],
+                                  day: item[TBL001RecordKey().day],
+                                );
+                                record.delete();
+                                print('削除されました id:${item[TBL001RecordKey().id]}'
+                                    'category:${item[TBL001RecordKey().category]}'
+                                    'price:${item[TBL001RecordKey().price]}'
+                                    'memo:${item[TBL001RecordKey().memo]}'
+                                    '${item[TBL001RecordKey().year]}年'
+                                    '${item[TBL001RecordKey().month]}月'
+                                    '${item[TBL001RecordKey().day]}日');
+                              },
                             );
                           },
                         ),
@@ -211,7 +273,8 @@ class ExpenceHistoryArea extends ConsumerWidget {
         });
   }
 
-    void _scrollToItem(DateTime dt, List keysList,AutoScrollController controller) async {
+  void _scrollToItem(
+      DateTime dt, List keysList, AutoScrollController controller) async {
     final specificItem = dt;
     final index = keysList.indexOf(specificItem);
     await controller.scrollToIndex(
@@ -219,5 +282,13 @@ class ExpenceHistoryArea extends ConsumerWidget {
       // preferPosition: AutoScrollPosition.begin,
     );
     await controller.highlight(index);
+  }
+
+  descendingOrderSort(List<Map> itemsInADay) {
+    //sortはvoid関数
+    itemsInADay.sort(
+        ((a, b) => b[TBL001RecordKey().id].compareTo(a[TBL001RecordKey().id])));
+    final sorted = itemsInADay;
+    return sorted;
   }
 }

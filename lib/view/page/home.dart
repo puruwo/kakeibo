@@ -23,7 +23,7 @@ class _HomeState extends ConsumerState<Home> {
           child: Text('Home'),
         ),
       ),
-      backgroundColor: MyColors.richBlack,
+      backgroundColor: MyColors.eerieBlack,
       body: const Center(
         child: Column(children: [
           CalendarArea(),
