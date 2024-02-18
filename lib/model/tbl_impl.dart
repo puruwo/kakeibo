@@ -58,6 +58,41 @@ class TBL001Impl {
     return mutable;
   }
 
+  //category指定で一ヶ月分のレコードの取得
+  //月またぎ、1月分取得(Mutable)
+  // Future<List<Map<String, dynamic>>> queryCrossMonthMutableRowsByCategory(
+  //     int category,DateTime fromDate, DateTime toDate) async {
+  //   //where句の作成
+  //   //一周期の条件指定が難しいのでここで作成
+  //   //ex)
+  //   //from 2023-06-25 to 2023-07-24なら
+  //   //(year = 2023 and month = 6 and day >= 25 and day <= 31) or (year = 2023 and month = 7 and day >= 1 and day <25)
+  //   final where =
+  //       '(${TBL001RecordKey().payentCategoryId} = ?) and (${TBL001RecordKey().year} = ? and ${TBL001RecordKey().month} = ? and  ${TBL001RecordKey().day} >= ? and ${TBL001RecordKey().day} <= ?) or (${TBL001RecordKey().year} = ? and ${TBL001RecordKey().month} = ?  and ${TBL001RecordKey().day} >= ? and ${TBL001RecordKey().day} < ?)';
+  //   final whereArgs = [
+  //     category,
+  //     fromDate.year,
+  //     fromDate.month,
+  //     fromDate.day,
+  //     DateTime(fromDate.year, fromDate.month + 1, 0).day, //fromDateの最終日
+  //     toDate.year,
+  //     toDate.month,
+  //     1,
+  //     toDate.day
+  //   ];
+
+  //   final immutable =
+  //       db.queryRowsWhere(TBL001RecordKey().tableName, where, whereArgs);
+  //   final mutable = makeMutable(immutable);
+
+  //   for (var item in mutable)
+
+  //   final addedDateInformationMap = addDateTimeLabelToMap(mutable);
+
+  //   //tbl001_recordのカラム(_id,year,month,day,price,category,memo)に加えて
+  //   //'stringDate' もある
+  //   return addedDateInformationMap;
+  // }
 
   //全データ取得
   Future<List<Map<String, dynamic>>> queryAllRows() async {

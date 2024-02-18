@@ -41,7 +41,6 @@ class PriceInputField extends ConsumerWidget {
             style: const TextStyle(color: MyColors.white, fontSize: 17),
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             keyboardType: TextInputType.number,
-            
             decoration: InputDecoration(
               //境界線を設定しないとアンダーラインが表示されるので透明でもいいから境界線を設定
               //何もしていない時の境界線
@@ -70,7 +69,9 @@ class PriceInputField extends ConsumerWidget {
 
             //領域外をタップでproviderを更新する
             onTapOutside: (event) {
-              final price = int.parse(priceInputController.text);
+              final price = priceInputController.text != ''
+                  ? int.parse(priceInputController.text)
+                  : 0;
               //torok_recordのnotifierを取得
               final notifier = ref.read(torokRecordNotifierProvider.notifier);
               //更新

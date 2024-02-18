@@ -9,7 +9,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:collection/collection.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
-import 'package:kakeibo/assets_conecter/category_handler.dart';
+import 'package:kakeibo/model/assets_conecter/category_handler.dart';
 
 import 'package:kakeibo/view/page/torok.dart';
 
@@ -132,25 +132,35 @@ class ExpenceHistoryArea extends ConsumerWidget {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.center,
                                         children: [
-                                          CategoryHandler().iconGetter(
-                                              item[TBL001RecordKey().category]),
+                                          CategoryHandler().iconGetter(item[
+                                              TBL001RecordKey()
+                                                  .paymentCategoryId]),
                                           Text(
                                             item['_id'].toString(),
                                             style: const TextStyle(
                                                 color: MyColors.white),
                                           ),
                                           SizedBox(
-                                            width: 192,
-                                            child: Text(
-                                              CategoryHandler()
-                                                  .categoryNameGetter(item[
-                                                      TBL001RecordKey()
-                                                          .category]),
-                                              textAlign: TextAlign.end,
-                                              style: const TextStyle(
-                                                  color: MyColors.white),
-                                            ),
-                                          ),
+                                              width: 192,
+                                              child: FutureBuilder(
+                                                  future: CategoryHandler()
+                                                      .categoryNameGetter(item[
+                                                          TBL001RecordKey()
+                                                              .paymentCategoryId]),
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot.data != null) {
+                                                      return Text(
+                                                        snapshot.data!,
+                                                        textAlign:
+                                                            TextAlign.end,
+                                                        style: const TextStyle(
+                                                            color:
+                                                                MyColors.white),
+                                                      );
+                                                    } else {
+                                                      return const Text('');
+                                                    }
+                                                  })),
                                           SizedBox(
                                             width: 87,
                                             child: Text(
@@ -238,7 +248,8 @@ class ExpenceHistoryArea extends ConsumerWidget {
                               onDismissed: (direction) {
                                 final record = TBL001Record(
                                   id: item[TBL001RecordKey().id],
-                                  category: item[TBL001RecordKey().category],
+                                  category:
+                                      item[TBL001RecordKey().paymentCategoryId],
                                   price: item[TBL001RecordKey().price],
                                   memo: item[TBL001RecordKey().memo],
                                   year: item[TBL001RecordKey().year],
@@ -247,7 +258,7 @@ class ExpenceHistoryArea extends ConsumerWidget {
                                 );
                                 record.delete();
                                 print('削除されました id:${item[TBL001RecordKey().id]}'
-                                    'category:${item[TBL001RecordKey().category]}'
+                                    'category:${item[TBL001RecordKey().paymentCategoryId]}'
                                     'price:${item[TBL001RecordKey().price]}'
                                     'memo:${item[TBL001RecordKey().memo]}'
                                     '${item[TBL001RecordKey().year]}年'

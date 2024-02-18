@@ -36,7 +36,7 @@ class TBL002Record with _$TBL002Record {
       TBL002RecordKey().month: month,
       TBL002RecordKey().day: day,
       TBL002RecordKey().price: price,
-      TBL002RecordKey().category: category,
+      TBL002RecordKey().incomeCategoryId: category,
       TBL002RecordKey().memo: memo
     }));
   }
@@ -48,7 +48,7 @@ class TBL002Record with _$TBL002Record {
       TBL002RecordKey().month: month,
       TBL002RecordKey().day: day,
       TBL002RecordKey().price: price,
-      TBL002RecordKey().category: category,
+      TBL002RecordKey().incomeCategoryId: category,
       TBL002RecordKey().memo: memo
     }, id);
   }

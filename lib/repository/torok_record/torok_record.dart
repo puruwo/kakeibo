@@ -36,7 +36,7 @@ class TorokRecord with _$TorokRecord {
           TBL001RecordKey().month: month,
           TBL001RecordKey().day: day,
           TBL001RecordKey().price: price,
-          TBL001RecordKey().category: category,
+          TBL001RecordKey().paymentCategoryId: category,
           TBL001RecordKey().memo: memo
         },
         id);

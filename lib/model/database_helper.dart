@@ -4,10 +4,12 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:kakeibo/model/tableNameKey.dart';
+import 'package:kakeibo/model/sql_sentence.dart';
+import 'package:kakeibo/model/initial_data_create.dart';
 
 class DatabaseHelper {
   static final _databaseName = "kakeibo5.db"; // DB名
-  static final _databaseVersion = 2; // スキーマのバージョン指定
+  static final _databaseVersion = 14; // スキーマのバージョン指定
 
   //読み出しデータ(Map)はImmutable!!!!!!!!!!
   //なので'Unsupported operation: read-only'が出た時はmakeMutable関数で返す必要がある
@@ -44,34 +46,31 @@ class DatabaseHelper {
     // データベース接続
     return await openDatabase(
       path, version: _databaseVersion,
-      // テーブル作成メソッドの呼び出し
+
+      // テーブル作成
       onCreate: (Database db, int version) async {
-        await db.execute('''
-          CREATE TABLE ${TBL001RecordKey().tableName} (
-            ${TBL001RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
-            ${TBL001RecordKey().year} INTEGER NOT NULL,
-            ${TBL001RecordKey().month} INTEGER NOT NULL,
-            ${TBL001RecordKey().day} INTEGER NOT NULL,
-            ${TBL001RecordKey().price} INTEGER NOT NULL,
-            ${TBL001RecordKey().category} INTEGER NOT NULL,
-            ${TBL001RecordKey().memo} TEXT
-          )
-          ''');
+        for (var sentence in SQLSentence().initialCreateList) {
+          await db.execute(sentence);
+        }
+
+        //レコードを挿入
+        for(var record in InitialDataCreate().tBL003RecordsMap){
+          insert(TBL003RecordKey().tableName, record);
+        }
+        for(var record in InitialDataCreate().tBL004RecordsMap){
+          insert(TBL004RecordKey().tableName, record);
+        }
       },
 
       // DBアップグッレード時に一度だけ呼び出す
       onUpgrade: (db, oldVersion, newVersion) async {
-        await db.execute('''
-          CREATE TABLE ${TBL002RecordKey().tableName} (
-            ${TBL002RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
-            ${TBL002RecordKey().year} INTEGER NOT NULL,
-            ${TBL002RecordKey().month} INTEGER NOT NULL,
-            ${TBL002RecordKey().day} INTEGER NOT NULL,
-            ${TBL002RecordKey().price} INTEGER NOT NULL,
-            ${TBL002RecordKey().category} INTEGER NOT NULL,
-            ${TBL002RecordKey().memo} TEXT
-          )
-          ''');
+        //テーブルの作成
+        if (SQLSentence().batchCreateList.isNotEmpty) {
+          for (var sentence in SQLSentence().batchCreateList) {
+            await db.execute(sentence);
+          }
+          print('バッチ処理が終了しました。');
+        }        
       },
     );
   }
@@ -103,6 +102,12 @@ class DatabaseHelper {
     Database? db = await instance.database;
     return Sqflite.firstIntValue(
         await db!.rawQuery('SELECT COUNT(*) FROM $table'));
+  }
+
+  // SQL入力のクエリ処理
+  Future<List<Map<String, dynamic>>> query(String sql) async {
+    Database? db = await instance.database;
+    return await db!.rawQuery(sql);
   }
 
   //　更新処理

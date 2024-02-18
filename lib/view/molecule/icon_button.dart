@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kakeibo/assets_conecter/category_handler.dart';
+import 'package:kakeibo/model/assets_conecter/category_handler.dart';
 
 import 'package:kakeibo/constant/colors.dart';
 
@@ -69,10 +69,18 @@ class CategoryIconButton extends ConsumerWidget {
               ),
 
         //テキストラベル
-        Text(
-          CategoryHandler().categoryNameGetter(buttonNumber),
-          style: const TextStyle(color: MyColors.white),
-        ),
+        FutureBuilder(
+            future: CategoryHandler().categoryNameGetter(buttonNumber),
+            builder: (context, snapshot) {
+              if (snapshot.data != null) {
+                return Text(
+                  snapshot.data!,
+                  style: const TextStyle(color: MyColors.white),
+                );
+              } else {
+                return const Text('');
+              }
+            })
       ],
     );
   }
