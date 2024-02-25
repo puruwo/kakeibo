@@ -67,8 +67,19 @@ class PriceInputField extends ConsumerWidget {
               ),
             ),
 
-            //領域外をタップでproviderを更新する
+            // //領域外をタップでproviderを更新する
             onTapOutside: (event) {
+              final price = priceInputController.text != ''
+                  ? int.parse(priceInputController.text)
+                  : 0;
+              //torok_recordのnotifierを取得
+              final notifier = ref.read(torokRecordNotifierProvider.notifier);
+              //更新
+              notifier.updatePrice(price);
+              //キーボードを閉じる
+              FocusScope.of(context).unfocus();
+            },
+            onEditingComplete: () {
               final price = priceInputController.text != ''
                   ? int.parse(priceInputController.text)
                   : 0;

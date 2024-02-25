@@ -49,5 +49,32 @@ class SQLSentence {
   ];
 
   final batchCreateList = [
+    '''          
+          CREATE TABLE ${TBL005RecordKey().tableName} (
+            ${TBL005RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL005RecordKey().yyyy} INTEGER NOT NULL,
+            ${TBL005RecordKey().mm} INTEGER NOT NULL,
+            ${TBL005RecordKey().bigCategoryId} INTEGER NOT NULL,
+            ${TBL005RecordKey().price} INTEGER
+          )
+          ;
+    '''
+    ,
+    '''
+          INSERT INTO TBL005 (
+            ${TBL005RecordKey().id},
+            ${TBL005RecordKey().yyyy},
+            ${TBL005RecordKey().mm},
+            ${TBL005RecordKey().bigCategoryId},
+            ${TBL005RecordKey().price}) 
+            VALUES(0,2024,1,0,35000),
+            (1,2024,1,1,5000),
+            (2,2024,1,2,32000),
+            (3,2024,1,3,9000),
+            (4,2024,1,4,15000),
+            (5,2024,1,5,0),
+            (6,2024,1,6,5000)
+            ;
+      '''
   ];
 }

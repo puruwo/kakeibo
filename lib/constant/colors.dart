@@ -12,3 +12,7 @@ class MyColors {
   static const red = Color(0xFFED112B);
   static const blue = Color(0xFF2596FF);
 }
+
+class ColorName{
+  
+}

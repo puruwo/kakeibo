@@ -35,6 +35,29 @@ class CategoryHandler {
         });
   }
 
+  Widget iconGetterFromPath(String path, {double? height, double? width}) {
+            String url = path;
+            Widget icon = FittedBox(
+              fit: BoxFit.scaleDown,
+              child: SvgPicture.asset(
+                url,
+                semanticsLabel: 'categoryIcon',
+                width: width,
+                height: height,
+              ),
+            );
+            return icon;
+        }
+
+  Future<String> bigCategoryNameGetter(int categoryId) async {
+    final futureListMap = await db.query('''
+    SELECT ${TBL004RecordKey().bigCategoryName} FROM ${TBL004RecordKey().tableName} a
+    WHERE a.${TBL004RecordKey().id} = $categoryId
+    ''');
+    String categoryName = futureListMap[0][TBL004RecordKey().bigCategoryName];
+    return categoryName;
+  }
+
   Future<String> categoryNameGetter(int categoryId) async {
     final futureListMap = await db.query('''
     SELECT ${TBL003RecordKey().categoryName} FROM ${TBL003RecordKey().tableName} a

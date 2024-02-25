@@ -8,18 +8,18 @@ part of 'tbl003_record.dart';
 
 _$TBL003RecordImpl _$$TBL003RecordImplFromJson(Map<String, dynamic> json) =>
     _$TBL003RecordImpl(
-      id: json['_id'] as int,
-      smallCategoryKey: json['small_category_key'] as int,
-      bigCategoryKey: json['big_category_key'] as int,
-      categoryName: json['category_name'] as String,
-      defaultDisplayed: json['default_displayed'] as int,
+      id: json['id'] as int,
+      smallCategoryKey: json['smallCategoryKey'] as int,
+      bigCategoryKey: json['bigCategoryKey'] as int,
+      categoryName: json['categoryName'] as String,
+      defaultDisplayed: json['defaultDisplayed'] as int,
     );
 
 Map<String, dynamic> _$$TBL003RecordImplToJson(_$TBL003RecordImpl instance) =>
     <String, dynamic>{
-      '_id': instance.id,
-      'small_category_key': instance.smallCategoryKey,
-      'big_category_key': instance.bigCategoryKey,
-      'category_name': instance.categoryName,
-      'default_displayed': instance.defaultDisplayed,
+      'id': instance.id,
+      'smallCategoryKey': instance.smallCategoryKey,
+      'bigCategoryKey': instance.bigCategoryKey,
+      'categoryName': instance.categoryName,
+      'defaultDisplayed': instance.defaultDisplayed,
     };

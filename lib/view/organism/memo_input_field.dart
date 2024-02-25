@@ -54,8 +54,17 @@ class MemoInputField extends ConsumerWidget {
             ),
           ),
 
+          //キーボードcloseで再描画が走っているので変更を更新してあげる必要あり
           //領域外をタップでproviderを更新する
           onTapOutside: (event) {
+            //providerを更新
+            final memo = memoInputController.text;
+            final notifier = ref.read(torokRecordNotifierProvider.notifier);
+            notifier.updateMemo(memo);
+            //キーボードを閉じる
+            FocusScope.of(context).unfocus();
+          },
+          onEditingComplete: () {
             //providerを更新
             final memo = memoInputController.text;
             final notifier = ref.read(torokRecordNotifierProvider.notifier);

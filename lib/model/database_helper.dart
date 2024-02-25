@@ -9,7 +9,7 @@ import 'package:kakeibo/model/initial_data_create.dart';
 
 class DatabaseHelper {
   static final _databaseName = "kakeibo5.db"; // DB名
-  static final _databaseVersion = 14; // スキーマのバージョン指定
+  static final _databaseVersion = 15; // スキーマのバージョン指定
 
   //読み出しデータ(Map)はImmutable!!!!!!!!!!
   //なので'Unsupported operation: read-only'が出た時はmakeMutable関数で返す必要がある

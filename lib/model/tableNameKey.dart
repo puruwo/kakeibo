@@ -76,6 +76,23 @@ class TBL004RecordKey {
   String get isDisplayed => _isDisplayed;
 }
 
+class TBL005RecordKey {
+  final String _tableName = 'TBL005';
+
+  final String _id = '_id';
+  final String _yyyy = 'yyyy';
+  final String _mm = 'mm';
+  final String _bigCategoryId = 'big_category_id';
+  final String _price = 'price';
+
+  String get tableName => _tableName;
+  String get id => _id;
+  String get yyyy => _yyyy;
+  String get mm => _mm;
+  String get bigCategoryId => _bigCategoryId;
+  String get price => _price;
+}
+
 class SeparateLabelMapKey {
   final String _id = '_id';
   final String _year = 'year';
