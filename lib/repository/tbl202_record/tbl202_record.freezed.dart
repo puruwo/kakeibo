@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'tbl004_record.dart';
+part of 'tbl202_record.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -14,12 +14,12 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
-TBL004Record _$TBL004RecordFromJson(Map<String, dynamic> json) {
-  return _TBL004Record.fromJson(json);
+TBL202Record _$TBL202RecordFromJson(Map<String, dynamic> json) {
+  return _TBL202Record.fromJson(json);
 }
 
 /// @nodoc
-mixin _$TBL004Record {
+mixin _$TBL202Record {
   int get id => throw _privateConstructorUsedError;
   String get colorCode => throw _privateConstructorUsedError;
   String get bigCategoryName => throw _privateConstructorUsedError;
@@ -29,15 +29,15 @@ mixin _$TBL004Record {
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
-  $TBL004RecordCopyWith<TBL004Record> get copyWith =>
+  $TBL202RecordCopyWith<TBL202Record> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $TBL004RecordCopyWith<$Res> {
-  factory $TBL004RecordCopyWith(
-          TBL004Record value, $Res Function(TBL004Record) then) =
-      _$TBL004RecordCopyWithImpl<$Res, TBL004Record>;
+abstract class $TBL202RecordCopyWith<$Res> {
+  factory $TBL202RecordCopyWith(
+          TBL202Record value, $Res Function(TBL202Record) then) =
+      _$TBL202RecordCopyWithImpl<$Res, TBL202Record>;
   @useResult
   $Res call(
       {int id,
@@ -49,9 +49,9 @@ abstract class $TBL004RecordCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$TBL004RecordCopyWithImpl<$Res, $Val extends TBL004Record>
-    implements $TBL004RecordCopyWith<$Res> {
-  _$TBL004RecordCopyWithImpl(this._value, this._then);
+class _$TBL202RecordCopyWithImpl<$Res, $Val extends TBL202Record>
+    implements $TBL202RecordCopyWith<$Res> {
+  _$TBL202RecordCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
@@ -98,11 +98,11 @@ class _$TBL004RecordCopyWithImpl<$Res, $Val extends TBL004Record>
 }
 
 /// @nodoc
-abstract class _$$TBL004RecordImplCopyWith<$Res>
-    implements $TBL004RecordCopyWith<$Res> {
-  factory _$$TBL004RecordImplCopyWith(
-          _$TBL004RecordImpl value, $Res Function(_$TBL004RecordImpl) then) =
-      __$$TBL004RecordImplCopyWithImpl<$Res>;
+abstract class _$$TBL202RecordImplCopyWith<$Res>
+    implements $TBL202RecordCopyWith<$Res> {
+  factory _$$TBL202RecordImplCopyWith(
+          _$TBL202RecordImpl value, $Res Function(_$TBL202RecordImpl) then) =
+      __$$TBL202RecordImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -115,11 +115,11 @@ abstract class _$$TBL004RecordImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$TBL004RecordImplCopyWithImpl<$Res>
-    extends _$TBL004RecordCopyWithImpl<$Res, _$TBL004RecordImpl>
-    implements _$$TBL004RecordImplCopyWith<$Res> {
-  __$$TBL004RecordImplCopyWithImpl(
-      _$TBL004RecordImpl _value, $Res Function(_$TBL004RecordImpl) _then)
+class __$$TBL202RecordImplCopyWithImpl<$Res>
+    extends _$TBL202RecordCopyWithImpl<$Res, _$TBL202RecordImpl>
+    implements _$$TBL202RecordImplCopyWith<$Res> {
+  __$$TBL202RecordImplCopyWithImpl(
+      _$TBL202RecordImpl _value, $Res Function(_$TBL202RecordImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -132,7 +132,7 @@ class __$$TBL004RecordImplCopyWithImpl<$Res>
     Object? displayOrder = null,
     Object? isDisplayed = null,
   }) {
-    return _then(_$TBL004RecordImpl(
+    return _then(_$TBL202RecordImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -163,8 +163,8 @@ class __$$TBL004RecordImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$TBL004RecordImpl extends _TBL004Record {
-  const _$TBL004RecordImpl(
+class _$TBL202RecordImpl extends _TBL202Record {
+  const _$TBL202RecordImpl(
       {required this.id,
       required this.colorCode,
       required this.bigCategoryName,
@@ -173,8 +173,8 @@ class _$TBL004RecordImpl extends _TBL004Record {
       required this.isDisplayed})
       : super._();
 
-  factory _$TBL004RecordImpl.fromJson(Map<String, dynamic> json) =>
-      _$$TBL004RecordImplFromJson(json);
+  factory _$TBL202RecordImpl.fromJson(Map<String, dynamic> json) =>
+      _$$TBL202RecordImplFromJson(json);
 
   @override
   final int id;
@@ -191,14 +191,14 @@ class _$TBL004RecordImpl extends _TBL004Record {
 
   @override
   String toString() {
-    return 'TBL004Record(id: $id, colorCode: $colorCode, bigCategoryName: $bigCategoryName, resourcePath: $resourcePath, displayOrder: $displayOrder, isDisplayed: $isDisplayed)';
+    return 'TBL202Record(id: $id, colorCode: $colorCode, bigCategoryName: $bigCategoryName, resourcePath: $resourcePath, displayOrder: $displayOrder, isDisplayed: $isDisplayed)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$TBL004RecordImpl &&
+            other is _$TBL202RecordImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.colorCode, colorCode) ||
                 other.colorCode == colorCode) &&
@@ -220,29 +220,29 @@ class _$TBL004RecordImpl extends _TBL004Record {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$TBL004RecordImplCopyWith<_$TBL004RecordImpl> get copyWith =>
-      __$$TBL004RecordImplCopyWithImpl<_$TBL004RecordImpl>(this, _$identity);
+  _$$TBL202RecordImplCopyWith<_$TBL202RecordImpl> get copyWith =>
+      __$$TBL202RecordImplCopyWithImpl<_$TBL202RecordImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$TBL004RecordImplToJson(
+    return _$$TBL202RecordImplToJson(
       this,
     );
   }
 }
 
-abstract class _TBL004Record extends TBL004Record {
-  const factory _TBL004Record(
+abstract class _TBL202Record extends TBL202Record {
+  const factory _TBL202Record(
       {required final int id,
       required final String colorCode,
       required final String bigCategoryName,
       required final String resourcePath,
       required final int displayOrder,
-      required final int isDisplayed}) = _$TBL004RecordImpl;
-  const _TBL004Record._() : super._();
+      required final int isDisplayed}) = _$TBL202RecordImpl;
+  const _TBL202Record._() : super._();
 
-  factory _TBL004Record.fromJson(Map<String, dynamic> json) =
-      _$TBL004RecordImpl.fromJson;
+  factory _TBL202Record.fromJson(Map<String, dynamic> json) =
+      _$TBL202RecordImpl.fromJson;
 
   @override
   int get id;
@@ -258,6 +258,6 @@ abstract class _TBL004Record extends TBL004Record {
   int get isDisplayed;
   @override
   @JsonKey(ignore: true)
-  _$$TBL004RecordImplCopyWith<_$TBL004RecordImpl> get copyWith =>
+  _$$TBL202RecordImplCopyWith<_$TBL202RecordImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

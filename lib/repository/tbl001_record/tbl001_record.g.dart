@@ -9,9 +9,7 @@ part of 'tbl001_record.dart';
 _$TBL001RecordImpl _$$TBL001RecordImplFromJson(Map<String, dynamic> json) =>
     _$TBL001RecordImpl(
       id: json['id'] as int? ?? 0,
-      year: json['year'] as int,
-      month: json['month'] as int,
-      day: json['day'] as int,
+      date: json['date'] as String,
       price: json['price'] as int? ?? 0,
       category: json['category'] as int? ?? 0,
       memo: json['memo'] as String? ?? '',
@@ -20,9 +18,7 @@ _$TBL001RecordImpl _$$TBL001RecordImplFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$$TBL001RecordImplToJson(_$TBL001RecordImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'year': instance.year,
-      'month': instance.month,
-      'day': instance.day,
+      'date': instance.date,
       'price': instance.price,
       'category': instance.category,
       'memo': instance.memo,

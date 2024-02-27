@@ -1,64 +1,73 @@
 class TBL001RecordKey {
-  final String _tableName = 'Payment';
+  final String _tableName = 'TBL001';
 
   final String _id = '_id';
-  final String _year = 'year';
-  final String _month = 'month';
-  final String _day = 'day';
+  final String _date = 'date';
   final String _price = 'price';
   final String _paymentCategoryId = 'payment_category_id';
   final String _memo = 'memo';
   
   String get tableName => _tableName;
   String get id => _id;
-  String get year => _year;
-  String get month => _month;
-  String get day => _day;
+  String get date => _date;
   String get price => _price;
   String get paymentCategoryId => _paymentCategoryId;
   String get memo => _memo;
 }
 
 class TBL002RecordKey {
-  final String _tableName = 'Income';
+  final String _tableName = 'TBL002';
 
   final String _id = '_id';
-  final String _year = 'year';
-  final String _month = 'month';
-  final String _day = 'day';
+  final String _date = 'date';
   final String _price = 'price';
   final String _incomeCategoryId = 'income_category_id';
   final String _memo = 'memo';
 
   String get tableName => _tableName;
   String get id => _id;
-  String get year => _year;
-  String get month => _month;
-  String get day => _day;
+  String get date => _date;
   String get price => _price;
   String get incomeCategoryId => _incomeCategoryId;
   String get memo => _memo;
 }
 
 class TBL003RecordKey {
-  final String _tableName = 'Category';
+  final String _tableName = 'TBL003';
 
   final String _id = '_id';
-  final String _smallCategoryKey = 'small_category_key';
+  final String _date = 'date';
+  final String _bigCategoryId = 'big_category_id';
+  final String _price = 'price';
+
+  String get tableName => _tableName;
+  String get id => _id;
+  String get date => _date;
+  String get bigCategoryId => _bigCategoryId;
+  String get price => _price;
+}
+
+class TBL201RecordKey {
+  final String _tableName = 'TBL201';
+
+  final String _id = '_id';
+  final String _smallCategoryOrderKey = 'small_category_order_key';
   final String _bigCategoryKey = 'big_category_key';
+  final String _displayedOrderInBig = 'displayed_order_in_big';
   final String _categoryName = 'category_name';
   final String _defaultDisplayed = 'default_displayed';
 
   String get tableName => _tableName;
   String get id => _id;
-  String get smallCategoryKey => _smallCategoryKey;
+  String get smallCategoryOrderKey => _smallCategoryOrderKey;
   String get bigCategoryKey => _bigCategoryKey;
+  String get displayedOrderInBig => _displayedOrderInBig;
   String get categoryName => _categoryName;
   String get defaultDisplayed => _defaultDisplayed;
 }
 
-class TBL004RecordKey {
-  final String _tableName = 'BigCategoryInfo';
+class TBL202RecordKey {
+  final String _tableName = 'TBL202';
 
   final String _id = '_id';
   final String _colorCode = 'color_code';
@@ -76,37 +85,16 @@ class TBL004RecordKey {
   String get isDisplayed => _isDisplayed;
 }
 
-class TBL005RecordKey {
-  final String _tableName = 'TBL005';
-
-  final String _id = '_id';
-  final String _yyyy = 'yyyy';
-  final String _mm = 'mm';
-  final String _bigCategoryId = 'big_category_id';
-  final String _price = 'price';
-
-  String get tableName => _tableName;
-  String get id => _id;
-  String get yyyy => _yyyy;
-  String get mm => _mm;
-  String get bigCategoryId => _bigCategoryId;
-  String get price => _price;
-}
-
 class SeparateLabelMapKey {
   final String _id = '_id';
-  final String _year = 'year';
-  final String _month = 'month';
-  final String _day = 'day';
+  final String _date = 'date';
   final String _price = 'price';
   final String _category = 'payment_category_id';
   final String _memo = 'memo';
   final String _dateTime = 'dateTime';
 
   String get id => _id;
-  String get year => _year;
-  String get month => _month;
-  String get day => _day;
+  String get date => _date;
   String get price => _price;
   String get category => _category;
   String get memo => _memo;

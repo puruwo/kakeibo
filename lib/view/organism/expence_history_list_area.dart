@@ -57,11 +57,11 @@ class ExpenceHistoryArea extends ConsumerWidget {
           if (snapshot.hasData) {
             //snapShotのリストを分割する
             final groupedMap =
-                snapshot.data!.groupListsBy<DateTime>((e) => e['dateTime']);
+                snapshot.data!.groupListsBy<String>((e) => e[TBL001RecordKey().date]);
             //Mapのキーで上から降順に並び替える
             //型指定してやらんとエラーになる、Object型で判定されるため
             final sortedGroupedMap = SplayTreeMap.from(groupedMap,
-                (DateTime key1, DateTime key2) => key2.compareTo(key1));
+                (String key1, String key2) => key2.compareTo(key1));
 
             //DateTimeで並べ替えたMapのKeyをリストとして取得
             final keys = List.from(sortedGroupedMap.keys);
@@ -72,13 +72,12 @@ class ExpenceHistoryArea extends ConsumerWidget {
                 controller: _scrollController,
                 itemCount: sortedGroupedMap.length,
                 itemBuilder: (BuildContext context, int index) {
-                  DateTime dateTime = sortedGroupedMap.keys.elementAt(index);
-                  List<Map> itemsInADay = sortedGroupedMap[dateTime]!;
+                  String date = sortedGroupedMap.keys.elementAt(index);
+                  List<Map> itemsInADay = sortedGroupedMap[date]!;
                   List<Map> descendingOrderItems =
                       descendingOrderSort(itemsInADay);
 
-                  final stringDate =
-                      '${dateTime.year}年${dateTime.month}月${dateTime.day}日';
+                  final stringDate = date;
                   return AutoScrollTag(
                     key: ValueKey(index),
                     index: index,
@@ -136,7 +135,7 @@ class ExpenceHistoryArea extends ConsumerWidget {
                                               TBL001RecordKey()
                                                   .paymentCategoryId]),
                                           Text(
-                                            item['_id'].toString(),
+                                            item[TBL001RecordKey().id].toString(),
                                             style: const TextStyle(
                                                 color: MyColors.white),
                                           ),
@@ -164,7 +163,7 @@ class ExpenceHistoryArea extends ConsumerWidget {
                                           SizedBox(
                                             width: 87,
                                             child: Text(
-                                              item['price'].toString(),
+                                              item[TBL001RecordKey().price].toString(),
                                               textAlign: TextAlign.end,
                                               style: const TextStyle(
                                                   color: MyColors.white),
@@ -185,13 +184,8 @@ class ExpenceHistoryArea extends ConsumerWidget {
                                           context: context,
                                           builder: (_) => Torok(
                                             torokRecord: TorokRecord(
-                                                year: item[
-                                                    SeparateLabelMapKey().year],
-                                                month: item[
-                                                    SeparateLabelMapKey()
-                                                        .month],
-                                                day: item[
-                                                    SeparateLabelMapKey().day],
+                                                date: item[
+                                                    SeparateLabelMapKey().date],
                                                 id: item[
                                                     SeparateLabelMapKey().id],
                                                 price: item[
@@ -252,18 +246,14 @@ class ExpenceHistoryArea extends ConsumerWidget {
                                       item[TBL001RecordKey().paymentCategoryId],
                                   price: item[TBL001RecordKey().price],
                                   memo: item[TBL001RecordKey().memo],
-                                  year: item[TBL001RecordKey().year],
-                                  month: item[TBL001RecordKey().month],
-                                  day: item[TBL001RecordKey().day],
+                                  date: item[TBL001RecordKey().date],
                                 );
                                 record.delete();
                                 print('削除されました id:${item[TBL001RecordKey().id]}'
                                     'category:${item[TBL001RecordKey().paymentCategoryId]}'
                                     'price:${item[TBL001RecordKey().price]}'
                                     'memo:${item[TBL001RecordKey().memo]}'
-                                    '${item[TBL001RecordKey().year]}年'
-                                    '${item[TBL001RecordKey().month]}月'
-                                    '${item[TBL001RecordKey().day]}日');
+                                    '${item[TBL001RecordKey().date]}年');
                               },
                             );
                           },
@@ -275,9 +265,9 @@ class ExpenceHistoryArea extends ConsumerWidget {
               ),
             );
           } else if (snapshot.hasError) {
-            children = Container();
+            children = Container(child:Text('データが見つかりません',style: TextStyle(color: MyColors.white),));
           } else {
-            children = Container();
+            children = Container(child:Text('データが見つかりません',style: TextStyle(color: MyColors.white),));
           }
 
           return children;

@@ -18,10 +18,10 @@ void main() {
     DatabaseHelper db = DatabaseHelper.instance;
 
     final a = Sqflite.firstIntValue(await db.query('''
-    SELECT ${TBL004RecordKey().resourcePath} FROM ${TBL003RecordKey().tableName} a
+    SELECT ${TBL004RecordKey().resourcePath} FROM ${TBL202RecordKey().tableName} a
     INNER JOIN ${TBL004RecordKey().tableName} b
-    ON a.${TBL003RecordKey().bigCategoryKey} = b.${TBL004RecordKey().id}
-    WHERE a.${TBL003RecordKey().id} = 6
+    ON a.${TBL202RecordKey().bigCategoryKey} = b.${TBL004RecordKey().id}
+    WHERE a.${TBL202RecordKey().id} = 6
     '''));
 
     print(a);

@@ -9,16 +9,16 @@ class CategoryHandler {
 
   Widget iconGetter(int categoryId, {double? height, double? width}) {
     final futureListMap = db.query('''
-    SELECT ${TBL004RecordKey().resourcePath} FROM ${TBL003RecordKey().tableName} a
-    INNER JOIN ${TBL004RecordKey().tableName} b
-    ON a.${TBL003RecordKey().bigCategoryKey} = b.${TBL004RecordKey().id}
-    WHERE a.${TBL003RecordKey().id} = $categoryId
+    SELECT ${TBL202RecordKey().resourcePath} FROM ${TBL201RecordKey().tableName} a
+    INNER JOIN ${TBL202RecordKey().tableName} b
+    ON a.${TBL201RecordKey().bigCategoryKey} = b.${TBL202RecordKey().id}
+    WHERE a.${TBL201RecordKey().id} = $categoryId
     ''');
     return FutureBuilder(
         future: futureListMap,
         builder: (context, snapshot) {
           if (snapshot.data != null) {
-            String url = snapshot.data![0][TBL004RecordKey().resourcePath];
+            String url = snapshot.data![0][TBL202RecordKey().resourcePath];
             Widget icon = FittedBox(
               fit: BoxFit.scaleDown,
               child: SvgPicture.asset(
@@ -51,19 +51,19 @@ class CategoryHandler {
 
   Future<String> bigCategoryNameGetter(int categoryId) async {
     final futureListMap = await db.query('''
-    SELECT ${TBL004RecordKey().bigCategoryName} FROM ${TBL004RecordKey().tableName} a
-    WHERE a.${TBL004RecordKey().id} = $categoryId
+    SELECT ${TBL202RecordKey().bigCategoryName} FROM ${TBL202RecordKey().tableName} a
+    WHERE a.${TBL202RecordKey().id} = $categoryId
     ''');
-    String categoryName = futureListMap[0][TBL004RecordKey().bigCategoryName];
+    String categoryName = futureListMap[0][TBL202RecordKey().bigCategoryName];
     return categoryName;
   }
 
   Future<String> categoryNameGetter(int categoryId) async {
     final futureListMap = await db.query('''
-    SELECT ${TBL003RecordKey().categoryName} FROM ${TBL003RecordKey().tableName} a
-    WHERE a.${TBL003RecordKey().id} = $categoryId
+    SELECT ${TBL201RecordKey().categoryName} FROM ${TBL201RecordKey().tableName} a
+    WHERE a.${TBL201RecordKey().id} = $categoryId
     ''');
-    String categoryName = futureListMap[0][TBL003RecordKey().categoryName];
+    String categoryName = futureListMap[0][TBL201RecordKey().categoryName];
     return categoryName;
   }
 }

@@ -15,9 +15,7 @@ class TorokRecord with _$TorokRecord {
 
   const factory TorokRecord({
     @Default(0) int id,
-    required int year,
-    required int month,
-    required int day,
+    required String date,
     @Default(0) int price,
     @Default(0) int category,
     @Default('') String memo,
@@ -28,13 +26,11 @@ class TorokRecord with _$TorokRecord {
       _$TorokRecordFromJson(json);
 
   update() {
-    print('$category,$year,$month,$day,$price,$memo,にこうしんしました');
+    print('$category,$date,$price,$memo,にこうしんしました');
     db.update(
         TBL001RecordKey().tableName,
         {
-          TBL001RecordKey().year: year,
-          TBL001RecordKey().month: month,
-          TBL001RecordKey().day: day,
+          TBL001RecordKey().date: date,
           TBL001RecordKey().price: price,
           TBL001RecordKey().paymentCategoryId: category,
           TBL001RecordKey().memo: memo

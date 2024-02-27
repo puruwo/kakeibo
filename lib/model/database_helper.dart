@@ -2,14 +2,13 @@ import 'dart:io';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:kakeibo/model/tableNameKey.dart';
 import 'package:kakeibo/model/sql_sentence.dart';
-import 'package:kakeibo/model/initial_data_create.dart';
+
+import 'package:kakeibo/model/tableNameKey.dart';
 
 class DatabaseHelper {
-  static final _databaseName = "kakeibo5.db"; // DB名
-  static final _databaseVersion = 15; // スキーマのバージョン指定
+  static final _databaseName = "kakeibo.db"; // DB名
+  static final _databaseVersion = 1; // スキーマのバージョン指定
 
   //読み出しデータ(Map)はImmutable!!!!!!!!!!
   //なので'Unsupported operation: read-only'が出た時はmakeMutable関数で返す必要がある
@@ -47,18 +46,61 @@ class DatabaseHelper {
     return await openDatabase(
       path, version: _databaseVersion,
 
-      // テーブル作成
+      // テーブル作成とレコード挿入
       onCreate: (Database db, int version) async {
-        for (var sentence in SQLSentence().initialCreateList) {
-          await db.execute(sentence);
-        }
+          await db.execute('''
+          CREATE TABLE ${TBL001RecordKey().tableName} (
+            ${TBL001RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL001RecordKey().date} TEXT NOT NULL,
+            ${TBL001RecordKey().price} INTEGER NOT NULL,
+            ${TBL001RecordKey().paymentCategoryId} INTEGER NOT NULL,
+            ${TBL001RecordKey().memo} TEXT)
+          ;
+          ''');
+          await db.execute('''
+          CREATE TABLE ${TBL002RecordKey().tableName} (
+            ${TBL002RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL002RecordKey().date} TEXT NOT NULL,
+            ${TBL002RecordKey().price} INTEGER NOT NULL,
+            ${TBL002RecordKey().incomeCategoryId} INTEGER NOT NULL,
+            ${TBL002RecordKey().memo} TEXT
+          )
+          ;
+          ''');
+          await db.execute('''
+          CREATE TABLE ${TBL003RecordKey().tableName} (
+            ${TBL003RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL003RecordKey().date} TEXT NOT NULL,
+            ${TBL003RecordKey().bigCategoryId} INTEGER NOT NULL,
+            ${TBL003RecordKey().price} INTEGER
+          )
+          ;
+    ''');
+          await db.execute('''
+          CREATE TABLE ${TBL201RecordKey().tableName} (
+            ${TBL201RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL201RecordKey().smallCategoryOrderKey} INTEGER NOT NULL,
+            ${TBL201RecordKey().bigCategoryKey} INTEGER NOT NULL,
+            ${TBL201RecordKey().displayedOrderInBig} INTEGER NOT NULL,
+            ${TBL201RecordKey().categoryName} TEXT NOT NULL,
+            ${TBL201RecordKey().defaultDisplayed} INTEGER NOT NULL
+          )
+          ;
+          ''');
+          await db.execute('''
+          CREATE TABLE ${TBL202RecordKey().tableName} (
+            ${TBL202RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL202RecordKey().colorCode} TEXT NOT NULL,
+            ${TBL202RecordKey().bigCategoryName} TEXT NOT NULL,
+            ${TBL202RecordKey().resourcePath} TEXT NOT NULL,
+            ${TBL202RecordKey().displayOrder} INTEGER NOT NULL,
+            ${TBL202RecordKey().isDisplayed} INTEGER NOT NULL
+          )
+          ;''');
 
-        //レコードを挿入
-        for(var record in InitialDataCreate().tBL003RecordsMap){
-          insert(TBL003RecordKey().tableName, record);
-        }
-        for(var record in InitialDataCreate().tBL004RecordsMap){
-          insert(TBL004RecordKey().tableName, record);
+
+        for (String sentence in SQLSentence().initialCreateList) {
+          await db.execute(sentence);
         }
       },
 

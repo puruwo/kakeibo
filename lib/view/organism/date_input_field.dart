@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import 'package:kakeibo/constant/colors.dart';
 import 'package:kakeibo/view_model/provider/torok_state/torok_state.dart';
@@ -20,7 +21,7 @@ class DateDisplay extends ConsumerWidget {
         //providerを取得
         final provider = ref.read(torokRecordNotifierProvider);
         //現在の選択日付を取得
-        final dt = DateTime(provider.year,provider.month,provider.day);
+        final dt = DateTime.parse(provider.date);
 
 
         //カレンダーピッカーで日付を選択し取得
@@ -36,7 +37,7 @@ class DateDisplay extends ConsumerWidget {
         final notifier = ref.read(torokRecordNotifierProvider.notifier);
         //nullチェックせなあかん
         if (picked != null) {
-          notifier.updateDateTime(picked);
+          notifier.updateDate(picked);
         } else {
           print(e);
         }
@@ -65,7 +66,7 @@ class DateDisplay extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.only(right: 11.5),
               child: Text(
-                '${provider.year}年${provider.month}月${provider.day}日',
+                '${provider.date.substring(0,4)}年${int.parse(provider.date.substring(4,6)).toString()}月${int.parse(provider.date.substring(6,8)).toString()}日',
                 textAlign: TextAlign.right,
                 style: const TextStyle(color: MyColors.white, fontSize: 17),
               ),

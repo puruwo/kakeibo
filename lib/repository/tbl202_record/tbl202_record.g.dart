@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'tbl004_record.dart';
+part of 'tbl202_record.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$TBL004RecordImpl _$$TBL004RecordImplFromJson(Map<String, dynamic> json) =>
-    _$TBL004RecordImpl(
+_$TBL202RecordImpl _$$TBL202RecordImplFromJson(Map<String, dynamic> json) =>
+    _$TBL202RecordImpl(
       id: json['id'] as int,
       colorCode: json['colorCode'] as String,
       bigCategoryName: json['bigCategoryName'] as String,
@@ -16,7 +16,7 @@ _$TBL004RecordImpl _$$TBL004RecordImplFromJson(Map<String, dynamic> json) =>
       isDisplayed: json['isDisplayed'] as int,
     );
 
-Map<String, dynamic> _$$TBL004RecordImplToJson(_$TBL004RecordImpl instance) =>
+Map<String, dynamic> _$$TBL202RecordImplToJson(_$TBL202RecordImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
       'colorCode': instance.colorCode,

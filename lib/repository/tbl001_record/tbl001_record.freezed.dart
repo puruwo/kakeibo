@@ -21,9 +21,7 @@ TBL001Record _$TBL001RecordFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$TBL001Record {
   int get id => throw _privateConstructorUsedError;
-  int get year => throw _privateConstructorUsedError;
-  int get month => throw _privateConstructorUsedError;
-  int get day => throw _privateConstructorUsedError;
+  String get date => throw _privateConstructorUsedError;
   int get price => throw _privateConstructorUsedError;
   int get category => throw _privateConstructorUsedError;
   String get memo => throw _privateConstructorUsedError;
@@ -40,14 +38,7 @@ abstract class $TBL001RecordCopyWith<$Res> {
           TBL001Record value, $Res Function(TBL001Record) then) =
       _$TBL001RecordCopyWithImpl<$Res, TBL001Record>;
   @useResult
-  $Res call(
-      {int id,
-      int year,
-      int month,
-      int day,
-      int price,
-      int category,
-      String memo});
+  $Res call({int id, String date, int price, int category, String memo});
 }
 
 /// @nodoc
@@ -64,9 +55,7 @@ class _$TBL001RecordCopyWithImpl<$Res, $Val extends TBL001Record>
   @override
   $Res call({
     Object? id = null,
-    Object? year = null,
-    Object? month = null,
-    Object? day = null,
+    Object? date = null,
     Object? price = null,
     Object? category = null,
     Object? memo = null,
@@ -76,18 +65,10 @@ class _$TBL001RecordCopyWithImpl<$Res, $Val extends TBL001Record>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      year: null == year
-          ? _value.year
-          : year // ignore: cast_nullable_to_non_nullable
-              as int,
-      month: null == month
-          ? _value.month
-          : month // ignore: cast_nullable_to_non_nullable
-              as int,
-      day: null == day
-          ? _value.day
-          : day // ignore: cast_nullable_to_non_nullable
-              as int,
+      date: null == date
+          ? _value.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as String,
       price: null == price
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
@@ -112,14 +93,7 @@ abstract class _$$TBL001RecordImplCopyWith<$Res>
       __$$TBL001RecordImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {int id,
-      int year,
-      int month,
-      int day,
-      int price,
-      int category,
-      String memo});
+  $Res call({int id, String date, int price, int category, String memo});
 }
 
 /// @nodoc
@@ -134,9 +108,7 @@ class __$$TBL001RecordImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? year = null,
-    Object? month = null,
-    Object? day = null,
+    Object? date = null,
     Object? price = null,
     Object? category = null,
     Object? memo = null,
@@ -146,18 +118,10 @@ class __$$TBL001RecordImplCopyWithImpl<$Res>
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      year: null == year
-          ? _value.year
-          : year // ignore: cast_nullable_to_non_nullable
-              as int,
-      month: null == month
-          ? _value.month
-          : month // ignore: cast_nullable_to_non_nullable
-              as int,
-      day: null == day
-          ? _value.day
-          : day // ignore: cast_nullable_to_non_nullable
-              as int,
+      date: null == date
+          ? _value.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as String,
       price: null == price
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
@@ -179,9 +143,7 @@ class __$$TBL001RecordImplCopyWithImpl<$Res>
 class _$TBL001RecordImpl extends _TBL001Record {
   const _$TBL001RecordImpl(
       {this.id = 0,
-      required this.year,
-      required this.month,
-      required this.day,
+      required this.date,
       this.price = 0,
       this.category = 0,
       this.memo = ''})
@@ -194,11 +156,7 @@ class _$TBL001RecordImpl extends _TBL001Record {
   @JsonKey()
   final int id;
   @override
-  final int year;
-  @override
-  final int month;
-  @override
-  final int day;
+  final String date;
   @override
   @JsonKey()
   final int price;
@@ -211,7 +169,7 @@ class _$TBL001RecordImpl extends _TBL001Record {
 
   @override
   String toString() {
-    return 'TBL001Record(id: $id, year: $year, month: $month, day: $day, price: $price, category: $category, memo: $memo)';
+    return 'TBL001Record(id: $id, date: $date, price: $price, category: $category, memo: $memo)';
   }
 
   @override
@@ -220,9 +178,7 @@ class _$TBL001RecordImpl extends _TBL001Record {
         (other.runtimeType == runtimeType &&
             other is _$TBL001RecordImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.year, year) || other.year == year) &&
-            (identical(other.month, month) || other.month == month) &&
-            (identical(other.day, day) || other.day == day) &&
+            (identical(other.date, date) || other.date == date) &&
             (identical(other.price, price) || other.price == price) &&
             (identical(other.category, category) ||
                 other.category == category) &&
@@ -231,8 +187,7 @@ class _$TBL001RecordImpl extends _TBL001Record {
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, year, month, day, price, category, memo);
+  int get hashCode => Object.hash(runtimeType, id, date, price, category, memo);
 
   @JsonKey(ignore: true)
   @override
@@ -251,9 +206,7 @@ class _$TBL001RecordImpl extends _TBL001Record {
 abstract class _TBL001Record extends TBL001Record {
   const factory _TBL001Record(
       {final int id,
-      required final int year,
-      required final int month,
-      required final int day,
+      required final String date,
       final int price,
       final int category,
       final String memo}) = _$TBL001RecordImpl;
@@ -265,11 +218,7 @@ abstract class _TBL001Record extends TBL001Record {
   @override
   int get id;
   @override
-  int get year;
-  @override
-  int get month;
-  @override
-  int get day;
+  String get date;
   @override
   int get price;
   @override

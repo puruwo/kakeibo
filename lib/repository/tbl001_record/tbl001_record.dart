@@ -15,9 +15,7 @@ class TBL001Record with _$TBL001Record {
 
   const factory TBL001Record({
     @Default(0) int id,
-    required int year,
-    required int month,
-    required int day,
+    required String date,
     @Default(0) int price,
     @Default(0) int category,
     @Default('') String memo,
@@ -29,12 +27,10 @@ class TBL001Record with _$TBL001Record {
 
   //登録ボタン押下関数
   insert() {
-    print('$category,$year,$month,$day,$price,$memo');
+    print('$category,$date,$price,$memo');
     // //データベースに格納の処理
     print(db.insert(TBL001RecordKey().tableName,{
-      TBL001RecordKey().year: year,
-      TBL001RecordKey().month: month,
-      TBL001RecordKey().day: day,
+      TBL001RecordKey().date: date,
       TBL001RecordKey().price: price,
       TBL001RecordKey().paymentCategoryId: category,
       TBL001RecordKey().memo: memo
@@ -42,11 +38,9 @@ class TBL001Record with _$TBL001Record {
   }
 
   update(){
-    print('id: $id,category:$category,$year年$month月$day日,$price円,$memo,にこうしんしました');
+    print('id: $id,category:$category,$date,$price円,$memo,にこうしんしました');
     db.update(TBL001RecordKey().tableName, {
-      TBL001RecordKey().year: year,
-      TBL001RecordKey().month: month,
-      TBL001RecordKey().day: day,
+      TBL001RecordKey().date: date,
       TBL001RecordKey().price: price,
       TBL001RecordKey().paymentCategoryId: category,
       TBL001RecordKey().memo: memo

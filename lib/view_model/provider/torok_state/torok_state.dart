@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:kakeibo/repository/tbl001_record/tbl001_record.dart';
 import 'package:kakeibo/repository/tbl002_record/tbl002_record.dart';
@@ -5,40 +6,24 @@ import 'package:kakeibo/repository/torok_record/torok_record.dart';
 
 part 'torok_state.g.dart';
 
-// class TorokRecord {
-//   const TorokRecord(
-//       {this.id = 0,
-//       this.price = 0,
-//       this.category = 1,
-//       this.memo = '',
-//       required this.year,
-//       required this.month,
-//       required this.day});
-//   final int id;
-//   final int year;
-//   final int month;
-//   final int day;
-//   final int price;
-//   final int category;
-//   final String memo;
-// }
-
 @riverpod
 class TorokRecordNotifier extends _$TorokRecordNotifier {
   @override
   TorokRecord build() {
     DateTime dt = DateTime.now();
-    return TorokRecord(year: dt.year, month: dt.month, day: dt.day);
+    String date = DateFormat('yyyyMMdd').format(dt);
+    return TorokRecord(date:date);
   }
 
   void setData(TorokRecord torokRecord) {
     state = torokRecord;
   }
 
-  void updateDateTime(DateTime dt) {
+  void updateDate(DateTime dt) {
+    String date = DateFormat('yyyyMMdd').format(dt);
     final oldState = state;
     final newState =
-        oldState.copyWith(year: dt.year, month: dt.month, day: dt.day);
+        oldState.copyWith(date:date);
     state = newState;
   }
 
@@ -66,9 +51,7 @@ class TorokRecordNotifier extends _$TorokRecordNotifier {
       category: state.category,
       price: state.price,
       memo: state.memo,
-      year: state.year,
-      month: state.month,
-      day: state.day,
+      date: state.date,
     );
   }
 
@@ -78,9 +61,7 @@ class TorokRecordNotifier extends _$TorokRecordNotifier {
       category: state.category,
       price: state.price,
       memo: state.memo,
-      year: state.year,
-      month: state.month,
-      day: state.day,
+      date: state.date,
     );
   }
 }

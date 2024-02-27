@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kakeibo/constant/colors.dart';
@@ -18,7 +16,6 @@ import 'package:kakeibo/view_model/provider/update_DB_count.dart';
 
 import 'package:kakeibo/view/organism/date_input_field.dart';
 import 'package:kakeibo/view_model/provider/torok_state/torok_state.dart';
-import 'package:kakeibo/view_model/provider/tbl002_state/tbl002_state.dart';
 
 class Torok extends ConsumerStatefulWidget {
   const Torok({this.screenMode = 0, this.torokRecord, super.key});
