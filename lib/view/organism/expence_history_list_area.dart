@@ -182,7 +182,7 @@ class ExpenceHistoryArea extends ConsumerWidget {
                                           //縁タップで閉じる
                                           isDismissible: true,
                                           context: context,
-                                          builder: (_) => Torok(
+                                          builder: (_) => Torok.origin(
                                             torokRecord: TorokRecord(
                                                 date: item[
                                                     SeparateLabelMapKey().date],

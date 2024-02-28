@@ -13,7 +13,7 @@ DatabaseHelper db = DatabaseHelper.instance;
 class TorokRecord with _$TorokRecord {
   const TorokRecord._();
 
-  const factory TorokRecord({
+  factory TorokRecord({
     @Default(0) int id,
     required String date,
     @Default(0) int price,

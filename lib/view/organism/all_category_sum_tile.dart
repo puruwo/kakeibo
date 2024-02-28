@@ -6,28 +6,27 @@ import 'package:kakeibo/model/assets_conecter/category_handler.dart';
 import 'package:kakeibo/model/tableNameKey.dart';
 import 'package:kakeibo/view_model/category_sum_getter.dart';
 
-class CategorySumTile extends StatefulWidget {
-  const CategorySumTile(
-      {required this.icon,
-      required this.categoryName,
-      required this.bigCategorySum,
-      required this.budget,
-      required this.smallCategorySumList,
+class AllCategorySumTile extends StatefulWidget {
+  const AllCategorySumTile(
+      {
+      required this.bigCategoryInformationMaps,
+      required this.allCategorySum,
+      required this.allCategoryBudgetSum,
       super.key});
 
-  final Widget icon;
-  final String categoryName;
-  final int bigCategorySum;
-  final int budget;
-  final List<Map<String, dynamic>> smallCategorySumList;
+  // ['big_category_name'] ['sum_price'] ['icon'] ['color']
+  final List<Map<String,dynamic>> bigCategoryInformationMaps;
+
+  final int allCategorySum;
+  final int allCategoryBudgetSum;
 
   final double barFrameWidth = 200.0;
 
   @override
-  State<CategorySumTile> createState() => _CategorySumTileState();
+  State<AllCategorySumTile> createState() => _CategorySumTileState();
 }
 
-class _CategorySumTileState extends State<CategorySumTile>
+class _CategorySumTileState extends State<AllCategorySumTile>
     with SingleTickerProviderStateMixin {
   //横棒グラフの初期値
   double barWidth = 0;
@@ -47,7 +46,7 @@ class _CategorySumTileState extends State<CategorySumTile>
     //ビルドが完了したら横棒グラフのサイズを変更しアニメーションが動く
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
-        double degrees = (widget.bigCategorySum / widget.budget);
+        double degrees = (widget.allCategorySum / widget.allCategoryBudgetSum);
         barWidth = degrees <= 1.0
             ? widget.barFrameWidth * degrees
             : widget.barFrameWidth;
@@ -94,13 +93,12 @@ class _CategorySumTileState extends State<CategorySumTile>
                   ),
                   Row(
                     children: [
-                      widget.icon,
-                      Text(
-                        widget.categoryName,
+                      const Text(
+                        '全体',
                         style: const TextStyle(color: MyColors.white),
                       ),
                       Text(
-                        widget.bigCategorySum.toString(),
+                        widget.allCategorySum.toString(),
                         style: const TextStyle(color: MyColors.white),
                       ),
                       const Text(
@@ -108,7 +106,7 @@ class _CategorySumTileState extends State<CategorySumTile>
                         style: TextStyle(color: MyColors.white),
                       ),
                       Text(
-                        widget.budget.toString(),
+                        widget.allCategoryBudgetSum.toString(),
                         style: const TextStyle(color: MyColors.white),
                       )
                     ],
@@ -116,16 +114,16 @@ class _CategorySumTileState extends State<CategorySumTile>
                 ],
               ),
               children: [
-                ...List.generate(widget.smallCategorySumList.length, (index) {
+                ...List.generate(widget.bigCategoryInformationMaps.length, (index) {
                   return Row(
                     children: [
                       Text(
-                        widget.smallCategorySumList[index]
-                            [TBL201RecordKey().categoryName],
+                        widget.bigCategoryInformationMaps[index]
+                            [TBL202RecordKey().bigCategoryName],
                         style: const TextStyle(color: MyColors.white),
                       ),
                       Text(
-                        widget.smallCategorySumList[index]['sum_by_category']
+                        widget.bigCategoryInformationMaps[index]['sum_by_big_category']
                             .toString(),
                         style: const TextStyle(color: MyColors.white),
                       ),

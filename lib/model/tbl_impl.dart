@@ -120,6 +120,61 @@ Future<List<Map<String, dynamic>>> queryCrossMonthMutableRowsByCategory(
   return mutable;
 }
 
+//Bigカテゴリーごとの一ヶ月合計支出、目標、アイコン、カラーの取得
+Future<List<Map<String, dynamic>>> queryBigCategoryMonthlyInformation(
+    DateTime fromDate, DateTime toDate) async {
+  final sql = 
+            '''
+            SELECT c.${TBL202RecordKey().bigCategoryName}, SUM(b.${TBL001RecordKey().price}) as sum_by_big_category, c.${TBL202RecordKey().resourcePath}, c.${TBL202RecordKey().colorCode}, d.${TBL003RecordKey().price} FROM ${TBL201RecordKey().tableName} a
+            INNER JOIN (SELECT ${TBL001RecordKey().price}, ${TBL001RecordKey().paymentCategoryId} FROM ${TBL001RecordKey().tableName}
+                        WHERE ${TBL001RecordKey().date} >= ${DateFormat('yyyyMMdd').format(fromDate)} AND ${TBL001RecordKey().date} <= ${DateFormat('yyyyMMdd').format(toDate)} ) b
+            INNER JOIN ${TBL202RecordKey().tableName} c
+            INNER JOIN (SELECT * FROM ${TBL003RecordKey().tableName} WHERE ${TBL003RecordKey().date} = 20240101) d
+            ON a.${TBL201RecordKey().id} = b.${TBL001RecordKey().paymentCategoryId}
+            AND a.${TBL201RecordKey().bigCategoryKey} = c.${TBL202RecordKey().id}
+            AND d.${TBL003RecordKey().bigCategoryId} = c.${TBL202RecordKey().id}
+            GROUP BY c.${TBL202RecordKey().id}
+            ORDER BY c.${TBL202RecordKey().displayOrder}
+            ;
+            ''';
+
+
+  final immutable = db.query(sql);
+  final mutable = makeMutable(immutable);
+
+  return mutable;
+}
+
+//一ヶ月合計支出の取得
+Future<List<Map<String, dynamic>>> queryMonthlyAllPriceSum(
+    DateTime fromDate, DateTime toDate) async {
+  final sql = 
+            '''
+            SELECT SUM(${TBL001RecordKey().price}) as all_price_sum FROM ${TBL001RecordKey().tableName}
+            WHERE ${TBL001RecordKey().date} >= ${DateFormat('yyyyMMdd').format(fromDate)} AND ${TBL001RecordKey().date} <= ${DateFormat('yyyyMMdd').format(toDate)} 
+            ;
+            ''';
+
+  final immutable = db.query(sql);
+  final mutable = makeMutable(immutable);
+
+  return mutable;
+}
+//一ヶ月合計目標の取得
+Future<List<Map<String, dynamic>>> queryMonthlyAllBudgetSum(
+    DateTime fromDate, DateTime toDate) async {
+  final sql = 
+            '''
+            SELECT SUM(${TBL003RecordKey().price}) as budget_sum FROM ${TBL003RecordKey().tableName} WHERE ${TBL003RecordKey().date} = 20240101
+            ;
+            ''';
+
+  final immutable = db.query(sql);
+  final mutable = makeMutable(immutable);
+
+  return mutable;
+}
+
 Future<List<Map<String, dynamic>>> makeMutable(
     Future<List<Map<String, dynamic>>> mapsList) async {
   List<Map<String, dynamic>> oldList = await mapsList;

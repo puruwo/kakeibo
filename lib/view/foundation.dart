@@ -38,7 +38,7 @@ class _FoundationState extends ConsumerState<Foundation> {
       if (isInitialOpen == true) {
         showCupertinoModalBottomSheet(
           context: context,
-          builder: (_) => const Torok(),
+          builder: (_) => Torok(),
           isDismissible: true,
         );
         final notifier = ref.read(initialOpenNotifierProvider.notifier);
@@ -71,7 +71,7 @@ class _FoundationState extends ConsumerState<Foundation> {
         onPressed: () {
           showCupertinoModalBottomSheet(
             context: context,
-            builder: (_) => const Torok(),
+            builder: (_) => Torok(),
             isDismissible: true,
           );
         },

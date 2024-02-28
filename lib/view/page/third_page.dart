@@ -7,6 +7,7 @@ import 'package:kakeibo/model/tableNameKey.dart';
 
 import 'package:kakeibo/view/organism/category_sum_tile.dart';
 import 'package:kakeibo/view/organism/balance_graph.dart';
+import 'package:kakeibo/view/organism/all_category_sum_tile.dart';
 
 import 'package:kakeibo/view_model/provider/active_datetime.dart';
 import 'package:kakeibo/view_model/category_sum_getter.dart';
@@ -32,6 +33,13 @@ class _ThirdState extends ConsumerState<Third> {
     Future<List<Map<String, dynamic>>> bigcategorySumMapList =
         BigCategorySumMapGetter().build(provider);
 
+    Future<List<Map<String, dynamic>>> allBigCategoryInformationMapList =
+        AllBigCategoryInformationMapListGetter().build(provider);
+    Future<List<Map<String, dynamic>>> priceSum =
+        AllPriceGetter().build(provider);
+    Future<List<Map<String, dynamic>>> budgetSum =
+        AllBudgetGetter().build(provider);
+
     //--------------------------------------------------------------------------------------------
     //レイアウト------------------------------------------------------------------------------------
 
@@ -48,11 +56,25 @@ class _ThirdState extends ConsumerState<Third> {
             children: [
               LineChartSample(),
               FutureBuilder(
+                  future: Future.wait(
+                      [allBigCategoryInformationMapList, priceSum, budgetSum]),
+                  builder: ((context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('エラーが発生しました');
+                    } else {
+                      return AllCategorySumTile(bigCategoryInformationMaps: snapshot.data![0], allCategorySum: snapshot.data![1][0]['all_price_sum'], allCategoryBudgetSum: snapshot.data![2][0]['budget_sum']);
+                      
+                    }
+                  })),
+              FutureBuilder(
                   future: bigcategorySumMapList,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return Column(
-                          children: List.generate(snapshot.data!.length, (index) {
+                          children:
+                              List.generate(snapshot.data!.length, (index) {
                         return CategorySumTile(
                             icon: CategoryHandler().iconGetterFromPath(snapshot
                                 .data![index][TBL202RecordKey().resourcePath]),
