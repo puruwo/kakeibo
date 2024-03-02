@@ -9,7 +9,11 @@ class PreviousArrowButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      onPressed: () => function.call(),
-      icon: const Icon(Icons.arrow_back_ios_rounded),color: MyColors.white,);
+      onPressed: () async {
+        await function.call();
+      },
+      icon: const Icon(Icons.arrow_back_ios_rounded),
+      color: MyColors.white,
+    );
   }
 }

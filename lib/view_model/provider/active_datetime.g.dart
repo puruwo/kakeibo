@@ -7,7 +7,7 @@ part of 'active_datetime.dart';
 // **************************************************************************
 
 String _$activeDatetimeNotifierHash() =>
-    r'5fd87256a67cccf69d168f2a6c497add2b11ede2';
+    r'0cbb05be16fc4deb83e8677942d4ea7e0b081a5d';
 
 /// See also [ActiveDatetimeNotifier].
 @ProviderFor(ActiveDatetimeNotifier)

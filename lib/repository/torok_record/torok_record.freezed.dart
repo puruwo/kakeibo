@@ -141,7 +141,7 @@ class __$$TorokRecordImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$TorokRecordImpl extends _TorokRecord {
-  const _$TorokRecordImpl(
+  _$TorokRecordImpl(
       {this.id = 0,
       required this.date,
       this.price = 0,
@@ -204,13 +204,13 @@ class _$TorokRecordImpl extends _TorokRecord {
 }
 
 abstract class _TorokRecord extends TorokRecord {
-  const factory _TorokRecord(
+  factory _TorokRecord(
       {final int id,
       required final String date,
       final int price,
       final int category,
       final String memo}) = _$TorokRecordImpl;
-  const _TorokRecord._() : super._();
+  _TorokRecord._() : super._();
 
   factory _TorokRecord.fromJson(Map<String, dynamic> json) =
       _$TorokRecordImpl.fromJson;

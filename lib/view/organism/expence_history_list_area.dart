@@ -25,12 +25,14 @@ class ExpenceHistoryArea extends ConsumerWidget {
   const ExpenceHistoryArea({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    print('expence_history_list_area is built');
 //状態管理---------------------------------------------------------------------------------------
 
     //databaseに操作がされた場合にカウントアップされるprovider
     ref.watch(updateDBCountNotifierProvider);
 
     final activeDateTime = ref.watch(activeDatetimeNotifierProvider);
+    print('activeDatetime is $activeDateTime in expence_history_list_area');
 
     AutoScrollController _scrollController = AutoScrollController();
 

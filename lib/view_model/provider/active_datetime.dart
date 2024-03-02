@@ -1,8 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:kakeibo/view_model/reference_day_impl.dart';
 
 part 'active_datetime.g.dart';
-
 
 @riverpod
 class ActiveDatetimeNotifier extends _$ActiveDatetimeNotifier {
@@ -10,21 +8,21 @@ class ActiveDatetimeNotifier extends _$ActiveDatetimeNotifier {
   DateTime build() {
     // 最初のデータ
     final now = DateTime.now();
-    return DateTime(now.year,now.month,now.day);
+    return DateTime(now.year, now.month, now.day);
   }
 
   void updateState(DateTime dateTime) {
     // データを上書き
     state = dateTime;
-  }  
+  }
 
-  void updateToNextReferenceDay() {
-    final newDt = getNextReferenceDay(state);
+  void updateToNextMonth() {
+    final newDt = DateTime(state.year, state.month + 1, state.day);
     state = newDt;
-  }  
+  }
 
-  void updateToPreviousReferenceDay() {
-    final newDt = getPreviousReferenceDay(state);
+  void updateToPreviousMonth() {
+    final newDt = DateTime(state.year, state.month - 1, state.day);
     state = newDt;
-  }  
+  }
 }
