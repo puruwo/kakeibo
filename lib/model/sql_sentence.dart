@@ -1,8 +1,61 @@
+import 'package:sqflite/sqflite.dart';
+
 import 'tableNameKey.dart';
 
-class SQLSentence {
-  final initialCreateList = [
-    '''
+class DataBaseHelperHandling {
+  funcOnCreate(Database db)async{
+    await db.execute('''
+          CREATE TABLE ${TBL001RecordKey().tableName} (
+            ${TBL001RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL001RecordKey().date} TEXT NOT NULL,
+            ${TBL001RecordKey().price} INTEGER NOT NULL,
+            ${TBL001RecordKey().paymentCategoryId} INTEGER NOT NULL,
+            ${TBL001RecordKey().memo} TEXT)
+          ;
+          ''');
+
+          await db.execute('''
+          CREATE TABLE ${TBL002RecordKey().tableName} (
+            ${TBL002RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL002RecordKey().date} TEXT NOT NULL,
+            ${TBL002RecordKey().price} INTEGER NOT NULL,
+            ${TBL002RecordKey().incomeCategoryId} INTEGER NOT NULL,
+            ${TBL002RecordKey().memo} TEXT
+          );
+          ''');
+
+          await db.execute('''
+          CREATE TABLE ${TBL003RecordKey().tableName} (
+            ${TBL003RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL003RecordKey().date} TEXT NOT NULL,
+            ${TBL003RecordKey().bigCategoryId} INTEGER NOT NULL,
+            ${TBL003RecordKey().price} INTEGER
+          );
+          ''');
+
+          await db.execute('''
+          CREATE TABLE ${TBL201RecordKey().tableName} (
+            ${TBL201RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL201RecordKey().smallCategoryOrderKey} INTEGER NOT NULL,
+            ${TBL201RecordKey().bigCategoryKey} INTEGER NOT NULL,
+            ${TBL201RecordKey().displayedOrderInBig} INTEGER NOT NULL,
+            ${TBL201RecordKey().categoryName} TEXT NOT NULL,
+            ${TBL201RecordKey().defaultDisplayed} INTEGER NOT NULL
+          );
+          ''');
+
+          await db.execute('''
+          CREATE TABLE ${TBL202RecordKey().tableName} (
+            ${TBL202RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL202RecordKey().colorCode} TEXT NOT NULL,
+            ${TBL202RecordKey().bigCategoryName} TEXT NOT NULL,
+            ${TBL202RecordKey().resourcePath} TEXT NOT NULL,
+            ${TBL202RecordKey().displayOrder} INTEGER NOT NULL,
+            ${TBL202RecordKey().isDisplayed} INTEGER NOT NULL
+          )
+          ;''');
+
+          await db.execute('''
           INSERT INTO TBL201 (
             ${TBL201RecordKey().id},
             ${TBL201RecordKey().smallCategoryOrderKey},
@@ -25,25 +78,26 @@ class SQLSentence {
                   (12, 12, 4, 0, 'カット', 1),
                   (13, 13, 5, 0, '医療費', 1),
                   (14, 14, 6, 0, 'その他', 1);
-            ''',
-    '''
-          INSERT INTO TBL202 (
-            ${TBL202RecordKey().id},
-            ${TBL202RecordKey().colorCode},
-            ${TBL202RecordKey().bigCategoryName},
-            ${TBL202RecordKey().resourcePath},
-            ${TBL202RecordKey().displayOrder},
-            ${TBL202RecordKey().isDisplayed}) 
-            VALUES(0, 'FF7070', '食費', 'assets/images/icon_meal.svg', 0, 1),
-                  (1, '21D19F', '日用品', 'assets/images/icon_commodity.svg', 1, 1),
-                  (2, 'ED112B', '遊び娯楽', 'assets/images/icon_favo.svg', 2, 1),
-                  (3, '2596FF', '交通費', 'assets/images/icon_transportation.svg', 3, 1),
-                  (4, 'FFC857', '衣服美容', 'assets/images/icon_clothes.svg', 4, 1),
-                  (5, 'B118C8', '医療費', 'assets/images/icon_medical.svg', 5, 1),
-                  (6, '3E2F5B', '雑費', 'assets/images/icon_others.svg', 6, 1);
-            ''',
-            
-  ];
+          ''');
 
-  final batchCreateList = [];
+          await db.execute('''
+          INSERT INTO TBL202 (
+          ${TBL202RecordKey().id},
+          ${TBL202RecordKey().colorCode},
+          ${TBL202RecordKey().bigCategoryName},
+          ${TBL202RecordKey().resourcePath},
+          ${TBL202RecordKey().displayOrder},
+          ${TBL202RecordKey().isDisplayed}) 
+          VALUES(0, 'FF7070', '食費', 'assets/images/icon_meal.svg', 0, 1),
+                (1, '21D19F', '日用品', 'assets/images/icon_commodity.svg', 1, 1),
+                (2, 'ED112B', '遊び娯楽', 'assets/images/icon_favo.svg', 2, 1),
+                (3, '2596FF', '交通費', 'assets/images/icon_transportation.svg', 3, 1),
+                (4, 'FFC857', '衣服美容', 'assets/images/icon_clothes.svg', 4, 1),
+                (5, 'B118C8', '医療費', 'assets/images/icon_medical.svg', 5, 1),
+                (6, '3E2F5B', '雑費', 'assets/images/icon_others.svg', 6, 1);
+          '''
+          );
+  }
+
+  funcOnUpdate(Database db)async{}
 }

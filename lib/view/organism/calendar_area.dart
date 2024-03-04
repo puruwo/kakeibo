@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:intl/intl.dart';
 
 import 'package:kakeibo/view_model/provider/active_datetime.dart';
 import 'package:kakeibo/view_model/provider/update_DB_count.dart';
@@ -7,11 +10,15 @@ import 'package:kakeibo/view_model/provider/update_DB_count.dart';
 import 'package:kakeibo/view_model/calendar_builder.dart';
 import 'package:kakeibo/view_model/reference_day_impl.dart';
 
+import 'package:kakeibo/repository/torok_record/torok_record.dart';
+
 import 'package:kakeibo/view/molecule/calendar_date_box.dart';
 import 'package:kakeibo/view/molecule/calendar_month_display.dart';
 import 'package:kakeibo/view/atom/calendar_header.dart';
 import 'package:kakeibo/view/atom/next_arrow_button.dart';
 import 'package:kakeibo/view/atom/previous_arrow_button.dart';
+
+import 'package:kakeibo/view/page/torok.dart';
 
 class CalendarArea extends ConsumerWidget {
   CalendarArea({super.key});
@@ -19,13 +26,10 @@ class CalendarArea extends ConsumerWidget {
   // pageViewのコントローラ
   // 閾値：[0,1000] 初期値：500
   final int initialCenter = 500;
-  final pageController = PageController(
-    initialPage: 500,
-  );
+  final PageController pageController = PageController(initialPage: 500);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     print('calendar_area is built');
 //状態管理---------------------------------------------------------------------------------------
 
@@ -36,6 +40,12 @@ class CalendarArea extends ConsumerWidget {
     final activeDay = ref.watch(
         activeDatetimeNotifierProvider.select((DateTime value) => value.day));
 
+    // ビルドが終わってからじゃないとコントローラが紐づいてないので怒られる
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      DateTime activedt = ref.read(activeDatetimeNotifierProvider);
+      setPageControllerIndexFromActiveDt(activedt);
+    });
+
 //----------------------------------------------------------------------------------------------
 
 //描写-------------------------------------------------------------------------------------------
@@ -45,21 +55,18 @@ class CalendarArea extends ConsumerWidget {
         controller: pageController,
         itemBuilder: (context, index) {
           // データ取得------------------------------------------------------
-          // index=500は常にその日の月で設定
-          final todayDateTime = DateTime.now();
 
-          // そのページが現在の月のページ(index = 500)からどれだけ離れているか
-          int dateDiff = index - initialCenter;
-
-          // index=500 からどれだけ離れているかのdatediffを月に足し、日にはactiveDateTimeのdayを代入
-          final thisIndexDisplayDate = DateTime(todayDateTime.year,
-              todayDateTime.month + dateDiff, activeDay);
+          // そのindexで表示する日付のゲッター
+          final thisIndexDisplayDateTime =
+              getThisIndexDisplayDt(index, activeDay);
 
           // 表示する年月のラベルを取得
-          final calendarMonthDisplayLabel = getYYDDLabel(thisIndexDisplayDate);
+          final calendarMonthDisplayLabel =
+              getYYDDLabel(thisIndexDisplayDateTime);
 
           // 表示月のデータを取得
-          final calendarData = CalendarBuilder().build(thisIndexDisplayDate);
+          final calendarData =
+              CalendarBuilder().build(thisIndexDisplayDateTime);
 
           // データ取得終わり------------------------------------------------------
 
@@ -68,50 +75,88 @@ class CalendarArea extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 //左矢印ボタン、押すと前の月に移動
-                PreviousArrowButton(function: () async{
+                PreviousArrowButton(function: () async {
                   await pageController.previousPage(
                       duration: const Duration(milliseconds: 200),
                       curve: Curves.easeOutCubic);
-                  print(pageController.page);
                 }),
                 CalendarMonthDisplay(label: calendarMonthDisplayLabel),
 
                 //右矢印ボタン、押すと次の月に移動
-                NextArrowButton(function: () async{
+                NextArrowButton(function: () async {
                   await pageController.nextPage(
                       duration: const Duration(milliseconds: 200),
                       curve: Curves.easeOutCubic);
-                  print(pageController.page);
                 }),
               ],
             ),
             const CalendarHeader(),
             ...List.generate(
                 calendarData.length,
-                (weekIndex) =>
-                    _weekRow(ref, weekIndex, calendarData, thisIndexDisplayDate)),
+                (weekIndex) => _weekRow(
+                    ref, weekIndex, calendarData, thisIndexDisplayDateTime)),
           ]);
         },
         onPageChanged: (page) {
           // pageは現在ページ
           // pageController.page!は次ページに向かっている時の値なので、double型
-          var isMovingToNext = page > pageController.page!;
+          int movingDirection;
+
+          if (page > pageController.page!) {
+            movingDirection = 1;
+          } else if (page < pageController.page!) {
+            movingDirection = -1;
+          } else {
+            movingDirection = 0;
+          }
 
           final notifier = ref.read(activeDatetimeNotifierProvider.notifier);
 
           print(page.toString());
           print(pageController.page!.toString());
-          
-          if (isMovingToNext == true) {
+
+          if (movingDirection == 1) {
             notifier.updateToNextMonth();
             print('called updateToNextMonth()');
-          } else if (isMovingToNext == false) {
+          } else if (movingDirection == -1) {
             notifier.updateToPreviousMonth();
             print('called updateToPreviousMonth()');
+          } else if (movingDirection == 0) {
+            print('page isn\'t moving');
           }
         },
       ),
     );
+  }
+
+  void setPageControllerIndexFromActiveDt(DateTime activedt) {
+    // activeDtから基準日を取得
+    final activeDtReferenceDt = getReferenceDay(activedt);
+
+    // 現在の日付の基準日を取得
+    DateTime nowDt = DateTime.now();
+    final nowDtReferenceDt = getReferenceDay(nowDt);
+
+    // pageViewはindex=500がDateTime.now()で設定されるので
+    // 月の差分をPageControllerに反映
+    final monthDiff =
+        (activeDtReferenceDt.year * 12 + activeDtReferenceDt.month) -
+            (nowDtReferenceDt.year * 12 + nowDtReferenceDt.month);
+
+    pageController.jumpToPage((initialCenter + monthDiff));
+  }
+
+  DateTime getThisIndexDisplayDt(int index, int activeDay) {
+    // そのページが現在の月のページ(index = 500)からどれだけ離れているか
+    int monthDiff = index - initialCenter;
+
+    DateTime nowDt = DateTime.now();
+    final nowDtReferenceDay = getReferenceDay(nowDt);
+
+    // activeDayが基準日と同じ月でなければ(次の月ならば)現在の月のページとずれが出るので1足す必要がある
+    final month =
+        activeDay >= 25 ? nowDtReferenceDay.month : nowDtReferenceDay.month + 1;
+    return DateTime(nowDtReferenceDay.year, month + monthDiff, activeDay);
   }
 }
 
@@ -158,13 +203,51 @@ Row _weekRow(
               return InkWell(
                   onTap: isTapable
                       ? () {
-                          final notifier =
-                              ref.read(activeDatetimeNotifierProvider.notifier);
-                          notifier.updateState(DateTime(year, month, day));
-                          print('date = $label がタップされました。');
-                          print(
-                              '現在のactiveDateTimeは${ref.read(activeDatetimeNotifierProvider)}');
+                          final provider =
+                              ref.read(activeDatetimeNotifierProvider);
+
+                          // タップした日付が状態と違っていたら状態を更新
+                          if (DateFormat('yyyyMMdd').format(provider) !=
+                              DateFormat('yyyyMMdd')
+                                  .format(DateTime(year, month, day))) {
+                            final notifier = ref
+                                .read(activeDatetimeNotifierProvider.notifier);
+                            notifier.updateState(DateTime(year, month, day));
+                          }
+                          // タップした日付が状態と同じならタップした日付を持ったTorok画面を出す
+                          else if (DateFormat('yyyyMMdd').format(provider) ==
+                              DateFormat('yyyyMMdd')
+                                  .format(DateTime(year, month, day))) {
+                            showCupertinoModalBottomSheet(
+                                //sccafoldの上に出すか
+                                useRootNavigator: true,
+                                //縁タップで閉じる
+                                isDismissible: true,
+                                context: context,
+                                builder: (_) => Torok.origin(
+                                      torokRecord: TorokRecord(
+                                          date: DateFormat('yyyyMMdd').format(
+                                              DateTime(year, month, day))),
+                                      screenMode: 0,
+                                    ));
+                          }
                         }
+                      : null,
+
+                  // ロングプレスでも選択日付を持った登録画面を出す
+                  onLongPress: () => isTapable
+                      ? showCupertinoModalBottomSheet(
+                          //sccafoldの上に出すか
+                          useRootNavigator: true,
+                          //縁タップで閉じる
+                          isDismissible: true,
+                          context: context,
+                          builder: (_) => Torok.origin(
+                                torokRecord: TorokRecord(
+                                    date: DateFormat('yyyyMMdd')
+                                        .format(DateTime(year, month, day))),
+                                screenMode: 0,
+                              ))
                       : null,
                   child: displayDate == DateTime(year, month, day)
                       ? activeDateBox(weekday, label, label2)

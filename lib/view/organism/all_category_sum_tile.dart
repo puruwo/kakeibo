@@ -123,7 +123,7 @@ class _CategorySumTileState extends State<AllCategorySumTile>
                         style: const TextStyle(color: MyColors.white),
                       ),
                       Text(
-                        widget.bigCategoryInformationMaps[index]['sum_by_big_category']
+                        widget.bigCategoryInformationMaps[index]['payment_price_sum']
                             .toString(),
                         style: const TextStyle(color: MyColors.white),
                       ),

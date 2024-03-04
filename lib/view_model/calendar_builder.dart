@@ -16,16 +16,18 @@ class CalendarBuilder {
 
     //基準日
     final referenceDay = getReferenceDay(dt);
-    //基準日の曜日
-    int referenceDayWeekday = referenceDay.weekday;
 
-    //次期間の基準日
+    // 基準日の曜日
+    // 日曜日が7で表されることもあるため
+    int referenceDayWeekday = referenceDay.weekday % 7;
+
+    // 次期間の基準日
     DateTime datetimeOfNextPeriod =
         getReferenceDayOfMonth(DateTime(referenceDay.year,referenceDay.month+1,referenceDay.day).year, DateTime(referenceDay.year,referenceDay.month+1,referenceDay.day).month);
 
-    int dayOfNextPeriod = datetimeOfNextPeriod.day;
+    int dayOfNextPeriodStart = datetimeOfNextPeriod.day;
 
-    //1週間目だけ作成
+    // 1週間目だけ作成
     final firstweek = List.generate(7, (index) {
       final i = index; //index==0から始まるので
       // 基準日の曜日からの差分
@@ -105,7 +107,7 @@ class CalendarBuilder {
       final lastDateOfWeek = calendar.last.last['day'];
 
       //nullチェックの記載
-      if (lastDateOfWeek >= (dayOfNextPeriod - 1)) {
+      if (lastDateOfWeek >= (dayOfNextPeriodStart - 1)) {
         break;
       }
     }

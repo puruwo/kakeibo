@@ -8,7 +8,7 @@ import 'package:kakeibo/model/tableNameKey.dart';
 
 class DatabaseHelper {
   static final _databaseName = "kakeibo.db"; // DB名
-  static final _databaseVersion = 1; // スキーマのバージョン指定
+  static final _databaseVersion = 3; // スキーマのバージョン指定
 
   //読み出しデータ(Map)はImmutable!!!!!!!!!!
   //なので'Unsupported operation: read-only'が出た時はmakeMutable関数で返す必要がある
@@ -48,71 +48,16 @@ class DatabaseHelper {
 
       // テーブル作成とレコード挿入
       onCreate: (Database db, int version) async {
-          await db.execute('''
-          CREATE TABLE ${TBL001RecordKey().tableName} (
-            ${TBL001RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
-            ${TBL001RecordKey().date} TEXT NOT NULL,
-            ${TBL001RecordKey().price} INTEGER NOT NULL,
-            ${TBL001RecordKey().paymentCategoryId} INTEGER NOT NULL,
-            ${TBL001RecordKey().memo} TEXT)
-          ;
-          ''');
-          await db.execute('''
-          CREATE TABLE ${TBL002RecordKey().tableName} (
-            ${TBL002RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
-            ${TBL002RecordKey().date} TEXT NOT NULL,
-            ${TBL002RecordKey().price} INTEGER NOT NULL,
-            ${TBL002RecordKey().incomeCategoryId} INTEGER NOT NULL,
-            ${TBL002RecordKey().memo} TEXT
-          )
-          ;
-          ''');
-          await db.execute('''
-          CREATE TABLE ${TBL003RecordKey().tableName} (
-            ${TBL003RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
-            ${TBL003RecordKey().date} TEXT NOT NULL,
-            ${TBL003RecordKey().bigCategoryId} INTEGER NOT NULL,
-            ${TBL003RecordKey().price} INTEGER
-          )
-          ;
-    ''');
-          await db.execute('''
-          CREATE TABLE ${TBL201RecordKey().tableName} (
-            ${TBL201RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
-            ${TBL201RecordKey().smallCategoryOrderKey} INTEGER NOT NULL,
-            ${TBL201RecordKey().bigCategoryKey} INTEGER NOT NULL,
-            ${TBL201RecordKey().displayedOrderInBig} INTEGER NOT NULL,
-            ${TBL201RecordKey().categoryName} TEXT NOT NULL,
-            ${TBL201RecordKey().defaultDisplayed} INTEGER NOT NULL
-          )
-          ;
-          ''');
-          await db.execute('''
-          CREATE TABLE ${TBL202RecordKey().tableName} (
-            ${TBL202RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
-            ${TBL202RecordKey().colorCode} TEXT NOT NULL,
-            ${TBL202RecordKey().bigCategoryName} TEXT NOT NULL,
-            ${TBL202RecordKey().resourcePath} TEXT NOT NULL,
-            ${TBL202RecordKey().displayOrder} INTEGER NOT NULL,
-            ${TBL202RecordKey().isDisplayed} INTEGER NOT NULL
-          )
-          ;''');
-
-
-        for (String sentence in SQLSentence().initialCreateList) {
-          await db.execute(sentence);
-        }
+        print('データベースの初期設定中');
+        await DataBaseHelperHandling().funcOnCreate(db);
+        print('データベースの初期設定が完了しました');
       },
 
       // DBアップグッレード時に一度だけ呼び出す
       onUpgrade: (db, oldVersion, newVersion) async {
-        //テーブルの作成
-        if (SQLSentence().batchCreateList.isNotEmpty) {
-          for (var sentence in SQLSentence().batchCreateList) {
-            await db.execute(sentence);
-          }
-          print('バッチ処理が終了しました。');
-        }        
+        print('データベースをアップデート中です');
+        await DataBaseHelperHandling().funcOnUpdate(db);
+        print('アップデートが完了しました');
       },
     );
   }

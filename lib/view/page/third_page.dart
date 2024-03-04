@@ -12,7 +12,6 @@ import 'package:kakeibo/view/organism/all_category_sum_tile.dart';
 import 'package:kakeibo/view_model/provider/active_datetime.dart';
 import 'package:kakeibo/view_model/category_sum_getter.dart';
 
-import 'package:kakeibo/model/tbl_impl.dart';
 
 class Third extends ConsumerStatefulWidget {
   const Third({super.key});
@@ -30,14 +29,29 @@ class _ThirdState extends ConsumerState<Third> {
 
     //----------------------------------------------------------------------------------------------
     //データ取得--------------------------------------------------------------------------------------
+
     Future<List<Map<String, dynamic>>> bigcategorySumMapList =
         BigCategorySumMapGetter().build(provider);
+    // {
+    // _id:
+    // color_code:
+    // big_category_name:
+    // resource_path:
+    // big_category_budget:
+    // payment_price_sum:
+    // smallCategorySumAndBudgetList:{_id
+    //                                small_category_payment_sum :
+    //                                big_category_key:
+    //                                tdisplayed_order_in_big:
+    //                                category_name:
+    //                                default_displayed}:
+    // }
 
-    Future<List<Map<String, dynamic>>> allBigCategoryInformationMapList =
-        AllBigCategoryInformationMapListGetter().build(provider);
-    Future<List<Map<String, dynamic>>> priceSum =
-        AllPriceGetter().build(provider);
-    Future<List<Map<String, dynamic>>> budgetSum =
+
+    Future<List<Map<String, dynamic>>> paymentSumByBig =
+        AllPaymentGetter().build(provider);
+
+    Future<List<Map<String, dynamic>>> allBudgetSum =
         AllBudgetGetter().build(provider);
 
     //--------------------------------------------------------------------------------------------
@@ -54,18 +68,27 @@ class _ThirdState extends ConsumerState<Third> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              LineChartSample(),
+              const LineChartSample(),
               FutureBuilder(
-                  future: Future.wait(
-                      [allBigCategoryInformationMapList, priceSum, budgetSum]),
+                  future: Future.wait([
+                    bigcategorySumMapList,
+                    paymentSumByBig,
+                    allBudgetSum
+                  ]),
                   builder: ((context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return const CircularProgressIndicator();
                     } else if (snapshot.hasError) {
-                      return Text('エラーが発生しました');
+                      return const Text('エラーが発生しました');
                     } else {
-                      return AllCategorySumTile(bigCategoryInformationMaps: snapshot.data![0], allCategorySum: snapshot.data![1][0]['all_price_sum'], allCategoryBudgetSum: snapshot.data![2][0]['budget_sum']);
-                      
+                      return AllCategorySumTile(
+                          // List<Map> ['big_category_name'] ['sum_price'] ['icon'] ['color']
+                          bigCategoryInformationMaps: snapshot.data![0],
+                          // int
+                          allCategorySum: snapshot.data![1][0]['all_price_sum'],
+                          // int
+                          allCategoryBudgetSum: snapshot.data![2][0]
+                              ['budget_sum']);
                     }
                   })),
               FutureBuilder(
@@ -80,13 +103,15 @@ class _ThirdState extends ConsumerState<Third> {
                                 .data![index][TBL202RecordKey().resourcePath]),
                             categoryName: snapshot.data![index]
                                 [TBL202RecordKey().bigCategoryName],
-                            bigCategorySum: snapshot.data![index]['sum_price'],
-                            budget: snapshot.data![index]['budget'],
+                            bigCategorySum: snapshot.data![index]
+                                ['payment_price_sum'],
+                            budget: snapshot.data![index]
+                                ['big_category_budget'],
                             smallCategorySumList: snapshot.data![index]
-                                ['smallCategoryMaps']);
+                                ['smallCategorySumAndBudgetList']);
                       }));
                     } else {
-                      return Text('loading now');
+                      return const CircularProgressIndicator();
                     }
                   }),
             ],

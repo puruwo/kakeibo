@@ -4,34 +4,34 @@ import 'package:kakeibo/model/assets_conecter/category_handler.dart';
 
 import 'package:kakeibo/constant/colors.dart';
 
-class AuntIconButton extends ConsumerWidget {
-  final Image img;
-  final Function onTap;
-  const AuntIconButton({
-    required this.img,
-    required this.onTap,
-    super.key,
-  });
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return ElevatedButton(
-      //アクティブか否かの実装
+// class AuntIconButton extends ConsumerWidget {
+//   final Image img;
+//   final Function onTap;
+//   const AuntIconButton({
+//     required this.img,
+//     required this.onTap,
+//     super.key,
+//   });
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     return ElevatedButton(
+//       //アクティブか否かの実装
 
-      onPressed: () => onTap,
-      child: SizedBox(
-        height: 30,
-        width: 30,
-        child: img,
-      ),
-    );
-  }
-}
+//       onPressed: () => onTap,
+//       child: SizedBox(
+//         height: 30,
+//         width: 30,
+//         child: img,
+//       ),
+//     );
+//   }
+// }
 
 class CategoryIconButton extends ConsumerWidget {
-  final int buttonNumber;
+  final int buttonInfo;
   final bool isSelected;
   const CategoryIconButton({
-    required this.buttonNumber,
+    this.buttonInfo = -1,
     this.isSelected = false,
     Key? key,
   }) : super(key: key);
@@ -40,47 +40,51 @@ class CategoryIconButton extends ConsumerWidget {
     return Column(
       children: [
         //アイコンボタン本体
-        isSelected == false
+        buttonInfo != -1
             //非選択状態
             ? SizedBox(
                 height: 44,
                 width: 64,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: MyColors.jet,
+                    color:
+                        //非選択状態 or 選択状態
+                        isSelected == false ? MyColors.jet : MyColors.dimGray,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: CategoryHandler()
-                      .iconGetter(buttonNumber, height: 25, width: 25),
+                      .iconGetter(buttonInfo, height: 25, width: 25),
                 ),
               )
-            //選択状態
             : SizedBox(
                 height: 44,
                 width: 64,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: MyColors.dimGray,
+                    color: MyColors.black,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: CategoryHandler()
-                      .iconGetter(buttonNumber, height: 25, width: 25),
                 ),
               ),
 
-        //テキストラベル
-        FutureBuilder(
-            future: CategoryHandler().categoryNameGetter(buttonNumber),
-            builder: (context, snapshot) {
-              if (snapshot.data != null) {
-                return Text(
-                  snapshot.data!,
-                  style: const TextStyle(color: MyColors.white),
-                );
-              } else {
-                return const Text('');
-              }
-            })
+        // ボタンが空じゃなければ
+        buttonInfo != -1
+            ?
+            //テキストラベル
+            FutureBuilder(
+                future: CategoryHandler().categoryNameGetter(buttonInfo),
+                builder: (context, snapshot) {
+                  if (snapshot.data != null) {
+                    return Text(
+                      snapshot.data!,
+                      style: const TextStyle(color: MyColors.white),
+                    );
+                  } else {
+                    return const Text('');
+                  }
+                })
+            // ボタンが空なら
+            : Container()
       ],
     );
   }

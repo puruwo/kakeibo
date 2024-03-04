@@ -12,6 +12,7 @@ import 'package:kakeibo/view/organism/torok_selected_segment.dart';
 import 'package:kakeibo/view_model/provider/torok_state/selected_segment_status.dart';
 import 'package:kakeibo/view_model/provider/torok_state/is_registerable.dart';
 import 'package:kakeibo/view_model/provider/update_DB_count.dart';
+import 'package:kakeibo/view_model/provider/torok_state/when_open.dart';
 
 import 'package:kakeibo/view/organism/date_input_field.dart';
 import 'package:kakeibo/view_model/provider/torok_state/torok_state.dart';
@@ -22,7 +23,7 @@ class Torok extends ConsumerStatefulWidget {
   final TorokRecord torokRecord;
 
   Torok({this.screenMode = 0, super.key})
-      : torokRecord = TorokRecord(date: DateTime.now().toString());
+      : torokRecord = TorokRecord(date: DateFormat('yyyyMMdd').format(DateTime.now()));
 
   const Torok.origin({this.screenMode = 0, required this.torokRecord, super.key});
 
@@ -33,7 +34,7 @@ class Torok extends ConsumerStatefulWidget {
 class _TorokState extends ConsumerState<Torok> {
   late TextEditingController _priceInputController;
   late TextEditingController _memoInputController;
-  late DateTime _dateController;
+  late String _dateController;
 
   @override
   void initState() {
@@ -44,7 +45,7 @@ class _TorokState extends ConsumerState<Torok> {
 
     _priceInputController = TextEditingController(text: initialPriceData);
     _memoInputController = TextEditingController(text: widget.torokRecord.memo);
-    _dateController = DateTime.parse(widget.torokRecord.date);
+    _dateController = widget.torokRecord.date;
     super.initState();
   }
 
@@ -57,6 +58,21 @@ class _TorokState extends ConsumerState<Torok> {
   @override
   Widget build(BuildContext context) {
     //状態管理---------------------------------------------------------------------------------------
+
+    final whenOpenprovider = ref.watch(whenOpenNotifierProvider);
+
+    //ビルド完了時の操作
+    //前画面からレコードを受け取っていればそれを設定する
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      //Torokを受け取ってる時 && リビルドじゃない時
+      //データをセットしてwhenOpenフラグをfalseに設定する
+      if (widget.torokRecord != null && whenOpenprovider == true) {
+        final notifier = ref.read(torokRecordNotifierProvider.notifier);
+        notifier.setData(widget.torokRecord!);
+      }
+      final whenOpenNotifier = ref.read(whenOpenNotifierProvider.notifier);
+        whenOpenNotifier.updateToOpenedState();
+    });
 
     //支出か収入かの切り替えは登録時のみ可能
     //編集モードでは他のレコードに影響を与える可能性があるため実装しない
@@ -138,7 +154,7 @@ class _TorokState extends ConsumerState<Torok> {
                 notifier.setData(TorokRecord(
                     id: widget.torokRecord.id,
                     price: int.parse(_priceInputController.text),
-                    date: DateFormat('yyyyMMdd').format(_dateController),
+                    date: _dateController,
                     memo: _memoInputController.text,
                     category: selectedCategory));
 
@@ -233,7 +249,7 @@ class _TorokState extends ConsumerState<Torok> {
 
               const SizedBox(height: 5),
 
-              PriceInputField(
+              InputFieldBack(
                 label: label,
                 textfield: TextField(
                     controller: _priceInputController,
@@ -272,9 +288,6 @@ class _TorokState extends ConsumerState<Torok> {
                     ),
                     // //領域外をタップでproviderを更新する
                     onTapOutside: (event) {
-                      final price = _priceInputController.text != ''
-                          ? int.parse(_priceInputController.text)
-                          : 0;
                       //キーボードを閉じる
                       FocusScope.of(context).unfocus();
                     },
@@ -293,7 +306,7 @@ class _TorokState extends ConsumerState<Torok> {
 
               const SizedBox(height: 4.5),
 
-              PriceInputField(
+              InputFieldBack(
                 label: label,
                 textfield: TextField(
                   controller: _memoInputController,

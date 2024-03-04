@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:kakeibo/constant/colors.dart';
 
 
-class PriceInputField extends StatelessWidget {
-  const PriceInputField({required this.label, required this.textfield, super.key});
+class InputFieldBack extends StatelessWidget {
+  const InputFieldBack({required this.label, required this.textfield, super.key});
   final String label;
   final TextField textfield;
 

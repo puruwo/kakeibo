@@ -22,30 +22,7 @@ class BigCategorySumMapGetter{
   }
 }
 
-class AllBigCategoryInformationMapListGetter{
-  Future<List<Map<String,dynamic>>>build(DateTime dt) async{
-    //集計スタートの日
-    final fromDate = getReferenceDay(dt);
-
-    //集計終了の日
-    //次の基準日を取得しているので、そこから1引いて集計終了日を算出
-    final dtBuff = getNextReferenceDay(dt);
-    final toDate = dtBuff.add(const Duration(days: -1));
-
-    final mapList = await queryBigCategoryMonthlyInformation(fromDate, toDate);
-
-    int i = 0;
-    for(Map value in mapList){
-      final iconWidget = CategoryHandler().iconGetterFromPath(value[TBL202RecordKey().resourcePath]);
-      mapList[i].addAll({'icon':iconWidget});
-      i++;
-    }
-
-    return mapList;
-  }
-}
-
-class AllPriceGetter{
+class AllPaymentGetter{
   Future<List<Map<String,dynamic>>>build(DateTime dt) async{
 
     //集計スタートの日
@@ -60,6 +37,7 @@ class AllPriceGetter{
 
     return AllPrice;
 }}
+
 class AllBudgetGetter{
   Future<List<Map<String,dynamic>>>build(DateTime dt) async{
 
@@ -75,3 +53,5 @@ class AllBudgetGetter{
 
     return AllBudget;
 }}
+
+

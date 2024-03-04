@@ -34,7 +34,7 @@ class ExpenceHistoryArea extends ConsumerWidget {
     final activeDateTime = ref.watch(activeDatetimeNotifierProvider);
     print('activeDatetime is $activeDateTime in expence_history_list_area');
 
-    AutoScrollController _scrollController = AutoScrollController();
+    AutoScrollController _ScrollController = AutoScrollController();
 
 //----------------------------------------------------------------------------------------------
 //データ取得--------------------------------------------------------------------------------------
@@ -67,11 +67,11 @@ class ExpenceHistoryArea extends ConsumerWidget {
 
             //DateTimeで並べ替えたMapのKeyをリストとして取得
             final keys = List.from(sortedGroupedMap.keys);
-            _scrollToItem(activeDateTime, keys, _scrollController);
+            _scrollToItem(activeDateTime, keys, _ScrollController);
 
             return Expanded(
               child: ListView.builder(
-                controller: _scrollController,
+                controller: _ScrollController,
                 itemCount: sortedGroupedMap.length,
                 itemBuilder: (BuildContext context, int index) {
                   String date = sortedGroupedMap.keys.elementAt(index);
@@ -83,7 +83,7 @@ class ExpenceHistoryArea extends ConsumerWidget {
                   return AutoScrollTag(
                     key: ValueKey(index),
                     index: index,
-                    controller: _scrollController,
+                    controller: _ScrollController,
                     child: Column(
                       children: [
                         //日付ラベル
