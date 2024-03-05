@@ -8,6 +8,7 @@ import 'dart:collection';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:collection/collection.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
+import 'package:intl/intl.dart';
 
 import 'package:kakeibo/model/assets_conecter/category_handler.dart';
 
@@ -21,20 +22,46 @@ import 'package:kakeibo/model/database_helper.dart';
 import 'package:kakeibo/model/tbl_impl.dart';
 import 'package:kakeibo/model/tableNameKey.dart';
 
-class ExpenceHistoryArea extends ConsumerWidget {
-  const ExpenceHistoryArea({super.key});
+class ExpenceHistoryArea extends ConsumerStatefulWidget {
+  ExpenceHistoryArea({super.key});
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _ExpenceHistoryAreaState();
+  
+  final AutoScrollController _scrollController = AutoScrollController();
+}
+
+class _ExpenceHistoryAreaState extends ConsumerState<ExpenceHistoryArea> {
+  late SplayTreeMap<String, dynamic> sortedGroupedMap;
+
+  @override
+  Widget build(BuildContext context) {
+    // 消す
     print('expence_history_list_area is built');
+
 //状態管理---------------------------------------------------------------------------------------
 
     //databaseに操作がされた場合にカウントアップされるprovider
     ref.watch(updateDBCountNotifierProvider);
 
     final activeDateTime = ref.watch(activeDatetimeNotifierProvider);
-    print('activeDatetime is $activeDateTime in expence_history_list_area');
 
-    AutoScrollController _ScrollController = AutoScrollController();
+    // 消す
+    print(
+        'activeDatetime is $activeDateTime in expence_history_list_area');
+
+    // activeDatetimeが更新されたら動く
+    ref.listen(activeDatetimeNotifierProvider, (previous, next) {
+        // ビルドが終わったら動く
+        WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+          final updatedActiveDateTime =
+              ref.read(activeDatetimeNotifierProvider);
+          // DateTimeで並べ替えたMapのKeyをリストとして取得
+          final itemKeys = List.from(sortedGroupedMap.keys);
+          _scrollToItem(updatedActiveDateTime, itemKeys, widget._scrollController);
+        });
+    });
 
 //----------------------------------------------------------------------------------------------
 //データ取得--------------------------------------------------------------------------------------
@@ -50,6 +77,8 @@ class ExpenceHistoryArea extends ConsumerWidget {
     final Future<List<Map<String, dynamic>>> dayMaps =
         TBL001Impl().queryCrossMonthMutableRows(fromDate, toDate);
 
+//----------------------------------------------------------------------------------------------
+
     return FutureBuilder(
         future: dayMaps,
         builder: (BuildContext context,
@@ -58,20 +87,16 @@ class ExpenceHistoryArea extends ConsumerWidget {
 
           if (snapshot.hasData) {
             //snapShotのリストを分割する
-            final groupedMap =
-                snapshot.data!.groupListsBy<String>((e) => e[TBL001RecordKey().date]);
+            final groupedMap = snapshot.data!
+                .groupListsBy<String>((e) => e[TBL001RecordKey().date]);
             //Mapのキーで上から降順に並び替える
             //型指定してやらんとエラーになる、Object型で判定されるため
-            final sortedGroupedMap = SplayTreeMap.from(groupedMap,
-                (String key1, String key2) => key2.compareTo(key1));
-
-            //DateTimeで並べ替えたMapのKeyをリストとして取得
-            final keys = List.from(sortedGroupedMap.keys);
-            _scrollToItem(activeDateTime, keys, _ScrollController);
+            sortedGroupedMap = SplayTreeMap.from(
+                groupedMap, (String key1, String key2) => key2.compareTo(key1));
 
             return Expanded(
               child: ListView.builder(
-                controller: _ScrollController,
+                controller: widget._scrollController,
                 itemCount: sortedGroupedMap.length,
                 itemBuilder: (BuildContext context, int index) {
                   String date = sortedGroupedMap.keys.elementAt(index);
@@ -83,7 +108,8 @@ class ExpenceHistoryArea extends ConsumerWidget {
                   return AutoScrollTag(
                     key: ValueKey(index),
                     index: index,
-                    controller: _ScrollController,
+                    controller: widget._scrollController,
+
                     child: Column(
                       children: [
                         //日付ラベル
@@ -137,7 +163,8 @@ class ExpenceHistoryArea extends ConsumerWidget {
                                               TBL001RecordKey()
                                                   .paymentCategoryId]),
                                           Text(
-                                            item[TBL001RecordKey().id].toString(),
+                                            item[TBL001RecordKey().id]
+                                                .toString(),
                                             style: const TextStyle(
                                                 color: MyColors.white),
                                           ),
@@ -165,7 +192,8 @@ class ExpenceHistoryArea extends ConsumerWidget {
                                           SizedBox(
                                             width: 87,
                                             child: Text(
-                                              item[TBL001RecordKey().price].toString(),
+                                              item[TBL001RecordKey().price]
+                                                  .toString(),
                                               textAlign: TextAlign.end,
                                               style: const TextStyle(
                                                   color: MyColors.white),
@@ -251,6 +279,7 @@ class ExpenceHistoryArea extends ConsumerWidget {
                                   date: item[TBL001RecordKey().date],
                                 );
                                 record.delete();
+                                // 消す
                                 print('削除されました id:${item[TBL001RecordKey().id]}'
                                     'category:${item[TBL001RecordKey().paymentCategoryId]}'
                                     'price:${item[TBL001RecordKey().price]}'
@@ -267,9 +296,13 @@ class ExpenceHistoryArea extends ConsumerWidget {
               ),
             );
           } else if (snapshot.hasError) {
-            children = Container(child:Text('データが見つかりません',style: TextStyle(color: MyColors.white),));
+            children = Container(
+                child: const Text(
+              'データが見つかりません',
+              style: TextStyle(color: MyColors.white),
+            ));
           } else {
-            children = Container(child:Text('データが見つかりません',style: TextStyle(color: MyColors.white),));
+            children = const CircularProgressIndicator();
           }
 
           return children;
@@ -278,11 +311,12 @@ class ExpenceHistoryArea extends ConsumerWidget {
 
   void _scrollToItem(
       DateTime dt, List keysList, AutoScrollController controller) async {
-    final specificItem = dt;
+    final specificItem = DateFormat('yyyyMMdd').format(dt);
     final index = keysList.indexOf(specificItem);
     await controller.scrollToIndex(
       index,
-      // preferPosition: AutoScrollPosition.begin,
+      duration: const Duration(milliseconds: 500),
+      preferPosition: AutoScrollPosition.begin,
     );
     await controller.highlight(index);
   }

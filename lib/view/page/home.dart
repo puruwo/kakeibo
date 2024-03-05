@@ -27,7 +27,7 @@ class _HomeState extends ConsumerState<Home> {
       body: Center(
         child: Column(children: [
           CalendarArea(),
-          const ExpenceHistoryArea(),
+          ExpenceHistoryArea(),
         ]),
       ),
     );
