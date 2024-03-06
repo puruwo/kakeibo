@@ -85,6 +85,44 @@ class TBL202RecordKey {
   String get isDisplayed => _isDisplayed;
 }
 
+class TBL211RecordKey {
+  final String _tableName = 'TBL211';
+
+  final String _id = '_id';
+  final String _smallCategoryOrderKey = 'small_category_order_key';
+  final String _bigCategoryKey = 'big_category_key';
+  final String _displayedOrderInBig = 'displayed_order_in_big';
+  final String _categoryName = 'category_name';
+  final String _defaultDisplayed = 'default_displayed';
+
+  String get tableName => _tableName;
+  String get id => _id;
+  String get smallCategoryOrderKey => _smallCategoryOrderKey;
+  String get bigCategoryKey => _bigCategoryKey;
+  String get displayedOrderInBig => _displayedOrderInBig;
+  String get categoryName => _categoryName;
+  String get defaultDisplayed => _defaultDisplayed;
+}
+
+class TBL212RecordKey {
+  final String _tableName = 'TBL212';
+
+  final String _id = '_id';
+  final String _colorCode = 'color_code';
+  final String _bigCategoryName = 'big_category_name';
+  final String _resourcePath = 'resource_path';
+  final String _displayOrder = 'display_order';
+  final String _isDisplayed = 'is_displayed';
+
+  String get tableName => _tableName;
+  String get id => _id;
+  String get colorCode => _colorCode;
+  String get bigCategoryName => _bigCategoryName;
+  String get resourcePath => _resourcePath;
+  String get displayOrder => _displayOrder;
+  String get isDisplayed => _isDisplayed;
+}
+
 class SeparateLabelMapKey {
   final String _id = '_id';
   final String _date = 'date';

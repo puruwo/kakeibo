@@ -159,7 +159,7 @@ class _ExpenceHistoryAreaState extends ConsumerState<ExpenceHistoryArea> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.center,
                                         children: [
-                                          CategoryHandler().iconGetter(item[
+                                          CategoryHandler().sisytIconGetter(item[
                                               TBL001RecordKey()
                                                   .paymentCategoryId]),
                                           Text(
@@ -172,7 +172,7 @@ class _ExpenceHistoryAreaState extends ConsumerState<ExpenceHistoryArea> {
                                               width: 192,
                                               child: FutureBuilder(
                                                   future: CategoryHandler()
-                                                      .categoryNameGetter(item[
+                                                      .sisytCategoryNameGetter(item[
                                                           TBL001RecordKey()
                                                               .paymentCategoryId]),
                                                   builder: (context, snapshot) {

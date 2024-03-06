@@ -64,9 +64,9 @@ class _TorokState extends ConsumerState<Torok> {
     //ビルド完了時の操作
     //前画面からレコードを受け取っていればそれを設定する
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      //Torokを受け取ってる時 && リビルドじゃない時
+      //リビルドじゃない時
       //データをセットしてwhenOpenフラグをfalseに設定する
-      if (widget.torokRecord != null && whenOpenprovider == true) {
+      if (whenOpenprovider == true) {
         final notifier = ref.read(torokRecordNotifierProvider.notifier);
         notifier.setData(widget.torokRecord!);
       }

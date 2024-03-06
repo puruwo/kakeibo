@@ -7,7 +7,7 @@ DatabaseHelper db = DatabaseHelper.instance;
 
 class CategoryHandler {
 
-  Widget iconGetter(int categoryId, {double? height, double? width}) {
+  Widget sisytIconGetter(int categoryId, {double? height, double? width}) {
     final futureListMap = db.query('''
     SELECT ${TBL202RecordKey().resourcePath} FROM ${TBL201RecordKey().tableName} a
     INNER JOIN ${TBL202RecordKey().tableName} b
@@ -19,6 +19,34 @@ class CategoryHandler {
         builder: (context, snapshot) {
           if (snapshot.data != null) {
             String url = snapshot.data![0][TBL202RecordKey().resourcePath];
+            Widget icon = FittedBox(
+              fit: BoxFit.scaleDown,
+              child: SvgPicture.asset(
+                url,
+                semanticsLabel: 'categoryIcon',
+                width: width,
+                height: height,
+              ),
+            );
+            return icon;
+          } else {
+            return SizedBox(width: width, height: height);
+          }
+        });
+  }
+
+  Widget syunyuIconGetter(int categoryId, {double? height, double? width}) {
+    final futureListMap = db.query('''
+    SELECT ${TBL212RecordKey().resourcePath} FROM ${TBL211RecordKey().tableName} a
+    INNER JOIN ${TBL212RecordKey().tableName} b
+    ON a.${TBL211RecordKey().bigCategoryKey} = b.${TBL212RecordKey().id}
+    WHERE a.${TBL211RecordKey().id} = $categoryId
+    ''');
+    return FutureBuilder(
+        future: futureListMap,
+        builder: (context, snapshot) {
+          if (snapshot.data != null ) {
+            String url = snapshot.data![0][TBL212RecordKey().resourcePath];
             Widget icon = FittedBox(
               fit: BoxFit.scaleDown,
               child: SvgPicture.asset(
@@ -49,7 +77,7 @@ class CategoryHandler {
             return icon;
         }
 
-  Future<String> bigCategoryNameGetter(int categoryId) async {
+  Future<String> sisytBigCategoryNameGetter(int categoryId) async {
     final futureListMap = await db.query('''
     SELECT ${TBL202RecordKey().bigCategoryName} FROM ${TBL202RecordKey().tableName} a
     WHERE a.${TBL202RecordKey().id} = $categoryId
@@ -58,12 +86,30 @@ class CategoryHandler {
     return categoryName;
   }
 
-  Future<String> categoryNameGetter(int categoryId) async {
+  Future<String> sisytCategoryNameGetter(int categoryId) async {
     final futureListMap = await db.query('''
     SELECT ${TBL201RecordKey().categoryName} FROM ${TBL201RecordKey().tableName} a
     WHERE a.${TBL201RecordKey().id} = $categoryId
     ''');
     String categoryName = futureListMap[0][TBL201RecordKey().categoryName];
+    return categoryName;
+  }
+
+  Future<String> syunyuBigCategoryNameGetter(int categoryId) async {
+    final futureListMap = await db.query('''
+    SELECT ${TBL212RecordKey().bigCategoryName} FROM ${TBL212RecordKey().tableName} a
+    WHERE a.${TBL212RecordKey().id} = $categoryId
+    ''');
+    String categoryName = futureListMap[0][TBL212RecordKey().bigCategoryName];
+    return categoryName;
+  }
+
+  Future<String> syunyuCategoryNameGetter(int categoryId) async {
+    final futureListMap = await db.query('''
+    SELECT ${TBL211RecordKey().categoryName} FROM ${TBL211RecordKey().tableName} a
+    WHERE a.${TBL211RecordKey().id} = $categoryId
+    ''');
+    String categoryName = futureListMap[0][TBL211RecordKey().categoryName];
     return categoryName;
   }
 }

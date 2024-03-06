@@ -11,6 +11,11 @@ class MyColors {
   static const richBlack = Color(0xFF051014);
   static const red = Color(0xFFED112B);
   static const blue = Color(0xFF2596FF);
+
+  getColorFromHex(String colorCode){
+    int intValue = int.parse('FF$colorCode', radix: 16);
+    return Color(intValue);
+  }
 }
 
 class ColorName{

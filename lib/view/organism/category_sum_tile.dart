@@ -10,6 +10,7 @@ class CategorySumTile extends StatefulWidget {
   const CategorySumTile(
       {required this.icon,
       required this.categoryName,
+      required this.colorCode,
       required this.bigCategorySum,
       required this.budget,
       required this.smallCategorySumList,
@@ -17,6 +18,7 @@ class CategorySumTile extends StatefulWidget {
 
   final Widget icon;
   final String categoryName;
+  final String colorCode;
   final int bigCategorySum;
   final int budget;
   final List<Map<String, dynamic>> smallCategorySumList;
@@ -31,16 +33,6 @@ class _CategorySumTileState extends State<CategorySumTile>
     with SingleTickerProviderStateMixin {
   //横棒グラフの初期値
   double barWidth = 0;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +79,7 @@ class _CategorySumTileState extends State<CategorySumTile>
                       AnimatedContainer(
                         height: 15,
                         width: barWidth,
-                        color: MyColors.red,
+                        color: MyColors().getColorFromHex(widget.colorCode),
                         duration: const Duration(milliseconds: 500),
                       ),
                     ],

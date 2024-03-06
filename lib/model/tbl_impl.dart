@@ -194,10 +194,21 @@ Future<List<Map<String, dynamic>>> queryMonthlyAllBudgetSum(
   return mutable;
 }
 
-Future<int> getDisplayCategoryNumber() async {
+Future<int> getDisplaySisytCategoryNumber() async {
   final sql = '''
               SELECT count(*) as count FROM ${TBL201RecordKey().tableName} a
               WHERE a.${TBL201RecordKey().defaultDisplayed} = 1
+              ;
+              ''';
+  List<Map<String, dynamic>> listMap = await db.query(sql);
+  final count = listMap[0]['count'];
+  return count;
+}
+
+Future<int> getDisplaySyunyuCategoryNumber() async {
+  final sql = '''
+              SELECT count(*) as count FROM ${TBL211RecordKey().tableName} a
+              WHERE a.${TBL211RecordKey().defaultDisplayed} = 1
               ;
               ''';
   List<Map<String, dynamic>> listMap = await db.query(sql);

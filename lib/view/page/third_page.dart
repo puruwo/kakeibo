@@ -103,6 +103,7 @@ class _ThirdState extends ConsumerState<Third> {
                                 .data![index][TBL202RecordKey().resourcePath]),
                             categoryName: snapshot.data![index]
                                 [TBL202RecordKey().bigCategoryName],
+                            colorCode: snapshot.data![index][TBL202RecordKey().colorCode],
                             bigCategorySum: snapshot.data![index]
                                 ['payment_price_sum'],
                             budget: snapshot.data![index]

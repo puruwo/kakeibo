@@ -45,17 +45,6 @@ class DataBaseHelperHandling {
           ''');
 
           await db.execute('''
-          CREATE TABLE ${TBL202RecordKey().tableName} (
-            ${TBL202RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
-            ${TBL202RecordKey().colorCode} TEXT NOT NULL,
-            ${TBL202RecordKey().bigCategoryName} TEXT NOT NULL,
-            ${TBL202RecordKey().resourcePath} TEXT NOT NULL,
-            ${TBL202RecordKey().displayOrder} INTEGER NOT NULL,
-            ${TBL202RecordKey().isDisplayed} INTEGER NOT NULL
-          )
-          ;''');
-
-          await db.execute('''
           INSERT INTO TBL201 (
             ${TBL201RecordKey().id},
             ${TBL201RecordKey().smallCategoryOrderKey},
@@ -81,6 +70,17 @@ class DataBaseHelperHandling {
           ''');
 
           await db.execute('''
+          CREATE TABLE ${TBL202RecordKey().tableName} (
+            ${TBL202RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL202RecordKey().colorCode} TEXT NOT NULL,
+            ${TBL202RecordKey().bigCategoryName} TEXT NOT NULL,
+            ${TBL202RecordKey().resourcePath} TEXT NOT NULL,
+            ${TBL202RecordKey().displayOrder} INTEGER NOT NULL,
+            ${TBL202RecordKey().isDisplayed} INTEGER NOT NULL
+          )
+          ;''');
+
+          await db.execute('''
           INSERT INTO TBL202 (
           ${TBL202RecordKey().id},
           ${TBL202RecordKey().colorCode},
@@ -97,7 +97,113 @@ class DataBaseHelperHandling {
                 (6, '3E2F5B', '雑費', 'assets/images/icon_others.svg', 6, 1);
           '''
           );
+
+          await db.execute('''
+          CREATE TABLE ${TBL211RecordKey().tableName} (
+            ${TBL211RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL211RecordKey().smallCategoryOrderKey} INTEGER NOT NULL,
+            ${TBL211RecordKey().bigCategoryKey} INTEGER NOT NULL,
+            ${TBL211RecordKey().displayedOrderInBig} INTEGER NOT NULL,
+            ${TBL211RecordKey().categoryName} TEXT NOT NULL,
+            ${TBL211RecordKey().defaultDisplayed} INTEGER NOT NULL
+          );
+          ''');
+
+          await db.execute('''
+          INSERT INTO ${TBL211RecordKey().tableName} (
+            ${TBL211RecordKey().id},
+            ${TBL211RecordKey().smallCategoryOrderKey},
+            ${TBL211RecordKey().bigCategoryKey},
+            ${TBL211RecordKey().displayedOrderInBig},
+            ${TBL211RecordKey().categoryName},
+            ${TBL211RecordKey().defaultDisplayed}) 
+            VALUES(0, 0, 0, 0, '給与', 1),
+                  (1, 1, 1, 1, 'ボーナス', 1),
+                  (2, 2, 1, 2, '小遣い', 1),
+                  (3, 3, 1, 3, '臨時収入', 1);
+          ''');
+
+          await db.execute('''
+          CREATE TABLE ${TBL212RecordKey().tableName} (
+            ${TBL212RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL212RecordKey().colorCode} TEXT NOT NULL,
+            ${TBL212RecordKey().bigCategoryName} TEXT NOT NULL,
+            ${TBL212RecordKey().resourcePath} TEXT NOT NULL,
+            ${TBL212RecordKey().displayOrder} INTEGER NOT NULL,
+            ${TBL212RecordKey().isDisplayed} INTEGER NOT NULL
+          )
+          ;''');
+
+          await db.execute('''
+          INSERT INTO ${TBL212RecordKey().tableName} (
+          ${TBL212RecordKey().id},
+          ${TBL212RecordKey().colorCode},
+          ${TBL212RecordKey().bigCategoryName},
+          ${TBL212RecordKey().resourcePath},
+          ${TBL212RecordKey().displayOrder},
+          ${TBL212RecordKey().isDisplayed}) 
+          VALUES
+          (0, 'FFC857', '定期収入', 'assets/images/icon_regular_income.svg', 0, 1),
+          (1, 'ECB22D', '臨時収入', 'assets/images/icon_extra_income.svg', 1, 1);
+          '''
+          );
   }
 
-  funcOnUpdate(Database db)async{}
+  funcOnUpdate(Database db)async{
+
+    // version: from 1.0.13 to 1.0.14
+    // 20240206
+
+    print('データベースの更新処理が呼び出されました');
+
+    await db.execute('''
+          CREATE TABLE ${TBL211RecordKey().tableName} (
+            ${TBL211RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL211RecordKey().smallCategoryOrderKey} INTEGER NOT NULL,
+            ${TBL211RecordKey().bigCategoryKey} INTEGER NOT NULL,
+            ${TBL211RecordKey().displayedOrderInBig} INTEGER NOT NULL,
+            ${TBL211RecordKey().categoryName} TEXT NOT NULL,
+            ${TBL211RecordKey().defaultDisplayed} INTEGER NOT NULL
+          );
+          ''');
+
+          await db.execute('''
+          INSERT INTO ${TBL211RecordKey().tableName} (
+            ${TBL211RecordKey().id},
+            ${TBL211RecordKey().smallCategoryOrderKey},
+            ${TBL211RecordKey().bigCategoryKey},
+            ${TBL211RecordKey().displayedOrderInBig},
+            ${TBL211RecordKey().categoryName},
+            ${TBL211RecordKey().defaultDisplayed}) 
+            VALUES(0, 0, 0, 0, '給与', 1),
+                  (1, 1, 1, 1, 'ボーナス', 1),
+                  (2, 2, 1, 2, '小遣い', 1),
+                  (3, 3, 1, 3, '臨時収入', 1);
+          ''');
+
+          await db.execute('''
+          CREATE TABLE ${TBL212RecordKey().tableName} (
+            ${TBL212RecordKey().id} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${TBL212RecordKey().colorCode} TEXT NOT NULL,
+            ${TBL212RecordKey().bigCategoryName} TEXT NOT NULL,
+            ${TBL212RecordKey().resourcePath} TEXT NOT NULL,
+            ${TBL212RecordKey().displayOrder} INTEGER NOT NULL,
+            ${TBL212RecordKey().isDisplayed} INTEGER NOT NULL
+          )
+          ;''');
+
+          await db.execute('''
+          INSERT INTO ${TBL212RecordKey().tableName} (
+          ${TBL212RecordKey().id},
+          ${TBL212RecordKey().colorCode},
+          ${TBL212RecordKey().bigCategoryName},
+          ${TBL212RecordKey().resourcePath},
+          ${TBL212RecordKey().displayOrder},
+          ${TBL212RecordKey().isDisplayed}) 
+          VALUES
+          (0, 'FFC857', '定期収入', 'assets/images/icon_regular_income.svg', 0, 1),
+          (1, 'ECB22D', '臨時収入', 'assets/images/icon_extra_income.svg', 1, 1);
+          '''
+          );
+  }
 }
