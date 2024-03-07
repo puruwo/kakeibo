@@ -33,16 +33,20 @@ class _CategorySumTileState extends State<CategorySumTile>
     with SingleTickerProviderStateMixin {
   //横棒グラフの初期値
   double barWidth = 0;
+  bool _isBuilt = false;
 
   @override
   Widget build(BuildContext context) {
-    //ビルドが完了したら横棒グラフのサイズを変更しアニメーションが動く
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        double degrees = (widget.bigCategorySum / widget.budget);
+
+    double degrees = (widget.bigCategorySum / widget.budget);
         barWidth = degrees <= 1.0
             ? widget.barFrameWidth * degrees
             : widget.barFrameWidth;
+
+    //ビルドが完了したら横棒グラフのサイズを変更しアニメーションが動く
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _isBuilt = true;
       });
     });
 
@@ -78,7 +82,7 @@ class _CategorySumTileState extends State<CategorySumTile>
                       ),
                       AnimatedContainer(
                         height: 15,
-                        width: barWidth,
+                        width: _isBuilt ? barWidth : 0,
                         color: MyColors().getColorFromHex(widget.colorCode),
                         duration: const Duration(milliseconds: 500),
                       ),

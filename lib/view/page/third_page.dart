@@ -82,7 +82,7 @@ class _ThirdState extends ConsumerState<Third> {
                       return const Text('エラーが発生しました');
                     } else {
                       return AllCategorySumTile(
-                          // List<Map> ['big_category_name'] ['sum_price'] ['icon'] ['color']
+                          // ['big_category_name'] ['payment_price_sum'] ['icon'] ['color']
                           bigCategoryInformationMaps: snapshot.data![0],
                           // int
                           allCategorySum: snapshot.data![1][0]['all_price_sum'],
