@@ -12,6 +12,7 @@ class PreviousArrowButton extends StatelessWidget {
       onPressed: () async {
         await function.call();
       },
+      iconSize: 18,
       icon: const Icon(Icons.arrow_back_ios_rounded),
       color: MyColors.white,
     );

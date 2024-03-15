@@ -47,8 +47,8 @@ class TBL001Record with _$TBL001Record {
     }, id);
   }
 
-  delete(){
-    db.delete(TBL001RecordKey().tableName, id);
+  delete()async{
+    await db.delete(TBL001RecordKey().tableName, id);
     print('${TBL001RecordKey().tableName}で${id}のレコードを削除しました');
   }
 }

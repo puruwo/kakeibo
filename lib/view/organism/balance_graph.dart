@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kakeibo/constant/colors.dart';
 
-class LineChartSample extends StatefulWidget {
-  const LineChartSample({super.key});
+import 'package:kakeibo/view_model/provider/active_datetime.dart';
+import 'package:kakeibo/model/tbl_impl.dart';
+
+class BalanceGraph extends ConsumerStatefulWidget {
+  const BalanceGraph({super.key});
 
   @override
-  State<LineChartSample> createState() => _LineChartSampleState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _BalanceGraphState();
 }
 
-class _LineChartSampleState extends State<LineChartSample> {
+class _BalanceGraphState extends ConsumerState<BalanceGraph> {
   List<Color> gradientColors = [
     MyColors.red,
     MyColors.blue,
@@ -17,37 +21,81 @@ class _LineChartSampleState extends State<LineChartSample> {
 
   ScrollController? _scrollController;
 
+  // 最大の月毎の収入 or 支出
+  late int maxPrice;
+
+  // 上1から本目のメモリ
+  late int topLinePrice;
+
+  // 2本目のメモリ
+  late int halfLinePrice;
+
+  // メモリの感覚
+  late int lineInterval;
+
+  // グラフの背の高さ
+  late double maxHeight;
+
+  late DateTime activeDt;
+
   @override
   void initState() {
-    // スクロール位置の初期設定
-    _scrollController = ScrollController(initialScrollOffset: 600);
+    activeDt = DateTime.now();
+    // スクロール位置の初期設定357
+    // 現在の月でスクロール位置を変える
+    _scrollController = ScrollController(initialScrollOffset: (activeDt.month-6) * 60);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(
-            right: 16,
-            left: 16,
-            top: 16,
-            bottom: 16,
-          ),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            controller: _scrollController,
-            child: Container(
-              height: 213,
-              width: 714,
-              child: LineChart(
-                mainData(),
+    
+
+    Future<List<Map<String, dynamic>>> sumPaymentByMonthFutureMapList =
+        sumPaymentByMonthMapListGetter(activeDt.year);
+
+    Future<List<Map<String, dynamic>>> sumIncomeByMonthFutureMapList =
+        sumIncomeByMonthMapListGetter(activeDt.year);
+
+    return FutureBuilder(
+      future: Future.wait(
+          [sumPaymentByMonthFutureMapList, sumIncomeByMonthFutureMapList]),
+      builder: (context, snapshot) {
+        final sumPaymentByMonthMapList = snapshot.data![0];
+        final sumIncomeByMonthMapList = snapshot.data![1];
+
+        maxPrice =
+            maxPriceGetter(sumPaymentByMonthMapList, sumIncomeByMonthMapList);
+
+        topLinePrice = topLinePriceGetter(maxPrice);
+        halfLinePrice = halfLinePriceGetter(topLinePrice);
+        lineInterval = lineIntervalGetter();
+        maxHeight = maxHeightGetter();
+
+        return Stack(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(
+                right: 16,
+                left: 16,
+                top: 16,
+                bottom: 16,
+              ),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                controller: _scrollController,
+                child: Container(
+                  height: 213,
+                  width: 714,
+                  child: LineChart(
+                    mainData(sumPaymentByMonthMapList, sumIncomeByMonthMapList),
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 
@@ -57,41 +105,41 @@ class _LineChartSampleState extends State<LineChartSample> {
       fontSize: 16,
     );
     Widget text;
-    switch (value.toInt()) {
-      case 1:
+    switch (value) {
+      case 0:
         text = const Text('1月', style: style);
         break;
-      case 2:
+      case 1:
         text = const Text('2月', style: style);
         break;
-      case 3:
+      case 2:
         text = const Text('3月', style: style);
         break;
-      case 4:
+      case 3:
         text = const Text('4月', style: style);
         break;
-      case 5:
+      case 4:
         text = const Text('5月', style: style);
         break;
-      case 6:
+      case 5:
         text = const Text('6月', style: style);
         break;
-      case 7:
+      case 6:
         text = const Text('7月', style: style);
         break;
-      case 8:
+      case 7:
         text = const Text('8月', style: style);
         break;
-      case 9:
+      case 8:
         text = const Text('9月', style: style);
         break;
-      case 10:
+      case 9:
         text = const Text('10月', style: style);
         break;
-      case 11:
+      case 10:
         text = const Text('11月', style: style);
         break;
-      case 12:
+      case 11:
         text = const Text('12月', style: style);
         break;
       default:
@@ -105,56 +153,64 @@ class _LineChartSampleState extends State<LineChartSample> {
     );
   }
 
+// 左軸ラベル
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
       fontSize: 12,
     );
     String text;
-    switch (value.toInt()) {
-      case 10:
-        text = '10万';
-        break;
-      case 20:
-        text = '20万';
-        break;
-      case 30:
-        text = '30万';
-        break;
-      default:
-        return Container();
-    }
 
-    return Text(text, style: style, textAlign: TextAlign.left);
+    if (value.toInt() == topLinePrice) {
+      text = labelGetter(topLinePrice);
+      return Text(text, style: style, textAlign: TextAlign.right);
+    } else if (value.toInt() == halfLinePrice) {
+      text = labelGetter(halfLinePrice);
+      return Text(text, style: style, textAlign: TextAlign.right);
+    } else {
+      return Container();
+    }
   }
 
-  LineChartData mainData() {
+// 右軸ラベル
+  Widget rightTitleWidgets(double value, TitleMeta meta) {
+    const style = TextStyle(
+      fontSize: 12,
+    );
+    String text;
+
+    if (value.toInt() == topLinePrice) {
+      text = labelGetter(topLinePrice);
+      return Text(text, style: style, textAlign: TextAlign.left);
+    } else if (value.toInt() == halfLinePrice) {
+      text = labelGetter(halfLinePrice);
+      return Text(text, style: style, textAlign: TextAlign.left);
+    } else {
+      return Container();
+    }
+  }
+
+  LineChartData mainData(List<Map<String, dynamic>> paymentListMap,
+      List<Map<String, dynamic>> incomeListMap) {
     return LineChartData(
       gridData: FlGridData(
         show: true,
-        drawVerticalLine: true,
-        horizontalInterval: 10,
-        verticalInterval: 1,
+        drawVerticalLine: false,
+        // メモリの間隔
+        horizontalInterval: lineInterval.toDouble(),
         getDrawingHorizontalLine: (value) {
           return const FlLine(
             color: MyColors.dimGray,
             strokeWidth: 0.01,
           );
         },
-        getDrawingVerticalLine: (value) {
-          return const FlLine(
-            color: MyColors.dimGray,
-            strokeWidth: 0.5,
-          );
-        },
       ),
       titlesData: FlTitlesData(
         show: true,
-        leftTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
+        // 上の軸表示 false
         topTitles: const AxisTitles(
           sideTitles: SideTitles(showTitles: false),
         ),
+        // 横軸
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
@@ -163,51 +219,59 @@ class _LineChartSampleState extends State<LineChartSample> {
             getTitlesWidget: bottomTitleWidgets,
           ),
         ),
+        // 左軸
+        leftTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            interval: lineInterval.toDouble(),
+            getTitlesWidget: leftTitleWidgets,
+            reservedSize: 30,
+          ),
+        ),
+        // 右軸
         rightTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            interval: 1,
-            getTitlesWidget: leftTitleWidgets,
+            interval: lineInterval.toDouble(),
+            getTitlesWidget: rightTitleWidgets,
             reservedSize: 42,
           ),
         ),
       ),
+
+      // 外の枠線
       borderData: FlBorderData(
-        show: true,
+        show: false,
         border: Border.all(color: MyColors.black),
       ),
-      minX: 0,
-      maxX: 12,
+
+      // グラフの最大値最小値
+      minX: -0.2,
+      maxX: 11.2,
       minY: 0,
-      maxY: 30,
+      maxY: maxHeight,
+
+      // 描画データの配置
       lineBarsData: [
+
+
         LineChartBarData(
-          spots: const [
-            FlSpot(0, 19.5),
-            FlSpot(1, 20.2),
-            FlSpot(2, 17.0),
-            FlSpot(3, 21.3),
-            FlSpot(4, 23.8),
-            FlSpot(5, 30.6),
-            FlSpot(6, 21.0),
-            FlSpot(7, 19.5),
-            FlSpot(8, 20.2),
-            FlSpot(9, 17.0),
-            FlSpot(10, 21.3),
-            FlSpot(11, 23.8),
-            FlSpot(12, 30.6),
-          ],
+          // 支出グラフデータの作成
+          spots: List.generate(paymentListMap.length, (index) {
+            int sumPrice = paymentListMap[index]['sum_price'];
+            return FlSpot(index.toDouble(), sumPrice.toDouble());
+          }),
+
           isCurved: false,
-          preventCurveOverShooting: true,
-          preventCurveOvershootingThreshold: 1,
           gradient: LinearGradient(
             colors: gradientColors,
           ),
-          barWidth: 3,
+          barWidth: 2,
           isStrokeCapRound: true,
           dotData: const FlDotData(
-            show: false,
+            show: true,
           ),
+          // 下の影
           belowBarData: BarAreaData(
             show: false,
             gradient: LinearGradient(
@@ -217,25 +281,14 @@ class _LineChartSampleState extends State<LineChartSample> {
             ),
           ),
         ),
+
         LineChartBarData(
-          spots: const [
-            FlSpot(0, 20.2),
-            FlSpot(1, 17.0),
-            FlSpot(2, 21.3),
-            FlSpot(3, 23.8),
-            FlSpot(4, 30.6),
-            FlSpot(5, 21.0),
-            FlSpot(6, 19.5),
-            FlSpot(7, 20.2),
-            FlSpot(8, 17.0),
-            FlSpot(9, 21.3),
-            FlSpot(10, 23.8),
-            FlSpot(11, 30.6),
-            FlSpot(12, 19.5),
-          ],
+          // 収入グラフデータの作成
+          spots: List.generate(incomeListMap.length, (index) {
+            int sumPrice = incomeListMap[index]['sum_price'];
+            return FlSpot(index.toDouble(), sumPrice.toDouble());
+          }),
           isCurved: false,
-          preventCurveOverShooting: true,
-          preventCurveOvershootingThreshold: 1,
           gradient: LinearGradient(
             colors: gradientColors,
           ),
@@ -244,6 +297,7 @@ class _LineChartSampleState extends State<LineChartSample> {
           dotData: const FlDotData(
             show: false,
           ),
+          // 下の影
           belowBarData: BarAreaData(
             show: false,
             gradient: LinearGradient(
@@ -255,5 +309,125 @@ class _LineChartSampleState extends State<LineChartSample> {
         ),
       ],
     );
+  }
+
+  int topLinePriceGetter(int maxPrice) {
+    if (maxPrice < 1000) {
+      return 1000;
+    } else if (1000 <= maxPrice && maxPrice < 5000) {
+      return 5000;
+    } else if (5000 <= maxPrice && maxPrice < 10000) {
+      return 10000;
+    } else if (10000 <= maxPrice && maxPrice < 100000) {
+      double convertedMaxPrice = maxPrice / 1000;
+      return convertedMaxPrice.round().toInt() * 1000;
+    } else if (100000 <= maxPrice && maxPrice < 200000) {
+      double convertedMaxPrice = maxPrice / 5000;
+      return convertedMaxPrice.round().toInt() * 5000;
+    } else if (200000 <= maxPrice && maxPrice < 600000) {
+      double convertedMaxPrice = maxPrice / 10000;
+      return convertedMaxPrice.round().toInt() * 10000;
+    } else if (600000 <= maxPrice && maxPrice < 2000000) {
+      double convertedMaxPrice = maxPrice / 50000;
+      return convertedMaxPrice.round().toInt() * 50000;
+    } else {
+      double convertedMaxPrice = maxPrice / 100000;
+      return convertedMaxPrice.round().toInt() * 100000;
+    }
+  }
+
+  int halfLinePriceGetter(int topLinePrice) {
+    return (topLinePrice / 2).ceil();
+  }
+
+  int lineIntervalGetter() {
+    return topLinePrice - halfLinePrice;
+  }
+
+  String labelGetter(int linePrice) {
+    if (linePrice < 1000) {
+      return '$linePrice円';
+    } else if (1000 <= linePrice && linePrice < 10000) {
+      double convertedLinePrice = linePrice / 10000;
+      return '${convertedLinePrice.toStringAsFixed(1)}万';
+    } else if (10000 <= linePrice && linePrice < 10000000) {
+      double convertedLinePrice = linePrice / 10000;
+      return '${convertedLinePrice.floor().toInt()}万';
+    } else if (10000000 <= linePrice && linePrice < 100000000) {
+      double convertedLinePrice = linePrice / 100000000;
+      return '${convertedLinePrice.floor()}億';
+    } else if (100000000 <= linePrice && linePrice < 100000000000) {
+      double convertedLinePrice = linePrice / 100000000;
+      return '${convertedLinePrice.floor().toInt()}億';
+    } else {
+      return '';
+    }
+  }
+
+  double maxHeightGetter() {
+    double maxHeight = maxPrice > topLinePrice
+        ? maxPrice + lineInterval * 0.25
+        : topLinePrice + lineInterval * 0.25;
+    return maxHeight;
+  }
+
+  // {
+  // year_month:
+  // sum_price:
+  // }
+  Future<List<Map<String, dynamic>>> sumPaymentByMonthMapListGetter(
+      int year) async {
+    List<Map<String, dynamic>> list = [];
+    for (int i = 0; i < 12; i++) {
+      DateTime fromDate = DateTime(year, i + 1, 25);
+      DateTime toDate = DateTime(year, i + 2, 25);
+      final buff = await getMonthPaymentSum(fromDate, toDate);
+      // 一ヶ月分しか返ってこないが、リスト形式で返ってくるためindex=0を指定
+      list.add(buff[0]);
+    }
+    return list;
+  }
+
+  // {
+  // year_month:
+  // sum_price:
+  // }
+  Future<List<Map<String, dynamic>>> sumIncomeByMonthMapListGetter(
+      int year) async {
+    List<Map<String, dynamic>> list = [];
+    for (int i = 0; i < 12; i++) {
+      DateTime fromDate = DateTime(year, i + 1, 25);
+      DateTime toDate = DateTime(year, i + 2, 25);
+      final buff = await getMonthIncomeSum(fromDate, toDate);
+      // 一ヶ月分しか返ってこないが、リスト形式で返ってくるためindex=0を指定
+      list.add(buff[0]);
+
+      buff[0]['sum_price'];
+    }
+    return list;
+  }
+
+  int maxPriceGetter(List<Map<String, dynamic>> sumPaymentByMonthMapList,
+      List<Map<String, dynamic>> sumIncomeByMonthMapList) {
+    int maxPrice = 0;
+    int sumPaymentPrice = 0;
+    int sumIncomePrice = 0;
+    for (int i = 0; i < 12; i++) {
+      sumPaymentPrice = sumPaymentByMonthMapList[i]['sum_price'];
+      sumIncomePrice = sumIncomeByMonthMapList[i]['sum_price'];
+
+      int largerPrice = 0;
+      if (sumIncomePrice > sumPaymentPrice) {
+        largerPrice = sumIncomePrice;
+      } else {
+        largerPrice = sumPaymentPrice;
+      }
+
+      if (maxPrice < largerPrice) {
+        maxPrice = largerPrice;
+      }
+    }
+
+    return maxPrice;
   }
 }

@@ -106,6 +106,6 @@ class DatabaseHelper {
   //　削除処理
   Future<int> delete(String table, int id) async {
     Database? db = await instance.database;
-    return await db!.delete(table, where: '_Id = ?', whereArgs: [id]);
+    return await db!.delete(table, where: '_id = ?', whereArgs: [id]);
   }
 }

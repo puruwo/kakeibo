@@ -68,7 +68,11 @@ class _ThirdState extends ConsumerState<Third> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const LineChartSample(),
+
+              // グラフ部分
+              const BalanceGraph(),
+
+              // カテゴリータイル
               FutureBuilder(
                   future: Future.wait([
                     bigcategorySumMapList,

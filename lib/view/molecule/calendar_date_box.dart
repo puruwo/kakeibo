@@ -2,27 +2,30 @@ import 'package:flutter/material.dart';
 
 import 'package:kakeibo/constant/colors.dart';
 
-Container vacantDateBox(int weekday, String dateLabel, String? expenceLabel) {
+double width = 46.0;
+
+Container vacantDateBox(int weekday, String dateLabel, String? expenceLabel,double boxHeight) {
   return Container(
-    width: 50,
-    height: 46,
+    width: width,
+    height: boxHeight,
+    decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(6)),),
     child: Center(
       child: Column(
         children: [
-          Text(dateLabel,style: const TextStyle(color: MyColors.dimGray)),
+          Text(dateLabel,style: const TextStyle(color: MyColors.tirtiaryLabel)),
         ],
       ),
     ),
   );
 }
 
-Container normalDateBox(int weekday, String dateLabel, String? expenceLabel) {
+Container normalDateBox(int weekday, String dateLabel, String? expenceLabel,double boxHeight) {
   return Container(
-    width: 50,
-    height: 46,
-    decoration: BoxDecoration(
-        border: Border.all(color: MyColors.eerieBlack, width: 1),
-        color: MyColors.eerieBlack),
+    width: width,
+    height: boxHeight,
+    decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(6)),),
     child: Center(
       child: Column(
         children: [
@@ -33,12 +36,12 @@ Container normalDateBox(int weekday, String dateLabel, String? expenceLabel) {
                   ? MyColors.blue
                   : weekday == 1
                       ? MyColors.red
-                      : MyColors.white,
+                      : MyColors.secondaryLabel,
             ),
           ),
           Text(
             expenceLabel ??= '',
-            style: const TextStyle(color: MyColors.white,fontSize: 10),
+            style: const TextStyle(color: MyColors.white,fontSize: 11),
           )
         ],
       ),
@@ -46,14 +49,13 @@ Container normalDateBox(int weekday, String dateLabel, String? expenceLabel) {
   );
 }
 
-Container activeDateBox(int weekday, String dateLabel, String? expenceLabel) {
+Container activeDateBox(int weekday, String dateLabel, String? expenceLabel,double boxHeight) {
   return Container(
-    width: 50,
-    height: 46,
-    decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(Radius.circular(6)),
-        border: Border.all(color: MyColors.richBlack, width: 1),
-        color: MyColors.jet),
+    width: width,
+    height: boxHeight,
+    decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(6)),
+        color: MyColors.tirtiarySystemfill),
     child: Center(
       child: Column(
         children: [
@@ -64,12 +66,12 @@ Container activeDateBox(int weekday, String dateLabel, String? expenceLabel) {
                   ? MyColors.blue
                   : weekday == 1
                       ? MyColors.red
-                      : MyColors.white,
+                      : MyColors.secondaryLabel,
             ),
           ),
           Text(
             expenceLabel ??= '',
-            style: const TextStyle(color: MyColors.white,fontSize: 10),
+            style: const TextStyle(color: MyColors.white,fontSize: 11),
           )
         ],
       ),

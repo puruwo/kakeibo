@@ -8,13 +8,31 @@ DatabaseHelper db = DatabaseHelper.instance;
 //Paymentの操作
 class TBL001Impl {
   //月またぎ、1月分取得(Mutable)
+  // {
+  //    '_id': 
+  //    'date': 
+  //    'price': 
+  //    'payment_category_id': 
+  //    'memo': 
+  //    'category_name': 
+  //    'big_category_name': 
+  //    'resource_path': 
+  // }
   Future<List<Map<String, dynamic>>> queryCrossMonthMutableRows(
       DateTime fromDate, DateTime toDate) async {
-    final immutable = db.query('''
-      SELECT * FROM ${TBL001RecordKey().tableName}
-      WHERE ${TBL001RecordKey().date} >= ${DateFormat('yyyyMMdd').format(fromDate)} 
-      AND ${TBL001RecordKey().date} <= ${DateFormat('yyyyMMdd').format(toDate)}
-      ''');
+    final sql = '''
+      SELECT a.${TBL001RecordKey().id},a.${TBL001RecordKey().date},a.${TBL001RecordKey().price},a.${TBL001RecordKey().paymentCategoryId},a.${TBL001RecordKey().memo},b.${TBL201RecordKey().categoryName},b.${TBL202RecordKey().bigCategoryName},b.${TBL202RecordKey().resourcePath} 
+      FROM ${TBL001RecordKey().tableName} a
+      INNER JOIN (SELECT x.${TBL201RecordKey().id},x.${TBL201RecordKey().categoryName},y.${TBL202RecordKey().bigCategoryName},y.${TBL202RecordKey().resourcePath}  
+                  FROM ${TBL201RecordKey().tableName} x
+                  INNER JOIN ${TBL202RecordKey().tableName} y
+                  ON x.${TBL201RecordKey().bigCategoryKey} = y.${TBL202RecordKey().id}) b
+      ON a.${TBL001RecordKey().paymentCategoryId} = b.${TBL201RecordKey().id}
+      WHERE a.${TBL001RecordKey().date} >= ${DateFormat('yyyyMMdd').format(fromDate)} 
+      AND a.${TBL001RecordKey().date} <= ${DateFormat('yyyyMMdd').format(toDate)};
+      ''';
+      print(sql);
+    final immutable = db.query(sql);
     final mutable = makeMutable(immutable);
     return mutable;
   }
@@ -216,6 +234,36 @@ Future<int> getDisplaySyunyuCategoryNumber() async {
   return count;
 }
 
+// {
+// year_month:
+// sum_price:
+// }
+Future<List<Map<String,dynamic>>> getMonthPaymentSum(DateTime fromDate, DateTime toDate){
+  final sql = '''
+              SELECT SUBSTR(CAST(a.date AS STRING), 1, 6) AS year_month, COALESCE(SUM(price), 0) as sum_price FROM TBL001 a
+              WHERE ${TBL001RecordKey().date} >= ${DateFormat('yyyyMMdd').format(fromDate)} AND ${TBL001RecordKey().date} <= ${DateFormat('yyyyMMdd').format(toDate)};
+              ''';
+  final immutable = db.query(sql);
+  final mutable = makeMutable(immutable);
+
+  return mutable; 
+}
+
+// {
+// year_month:
+// sum_price:
+// }
+Future<List<Map<String,dynamic>>> getMonthIncomeSum(DateTime fromDate, DateTime toDate){
+  final sql = '''
+              SELECT SUBSTR(CAST(a.date AS STRING), 1, 6) AS year_month, COALESCE(SUM(price), 0) as sum_price FROM TBL002 a
+              WHERE ${TBL002RecordKey().date} >= ${DateFormat('yyyyMMdd').format(fromDate)} AND ${TBL002RecordKey().date} <= ${DateFormat('yyyyMMdd').format(toDate)};
+              ''';
+  final immutable = db.query(sql);
+  final mutable = makeMutable(immutable);
+
+  return mutable; 
+}
+
 Future<List<Map<String, dynamic>>> makeMutable(
     Future<List<Map<String, dynamic>>> mapsList) async {
   List<Map<String, dynamic>> oldList = await mapsList;
@@ -226,3 +274,5 @@ Future<List<Map<String, dynamic>>> makeMutable(
   }
   return newList;
 }
+
+

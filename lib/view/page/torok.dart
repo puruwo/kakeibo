@@ -23,9 +23,11 @@ class Torok extends ConsumerStatefulWidget {
   final TorokRecord torokRecord;
 
   Torok({this.screenMode = 0, super.key})
-      : torokRecord = TorokRecord(date: DateFormat('yyyyMMdd').format(DateTime.now()));
+      : torokRecord =
+            TorokRecord(date: DateFormat('yyyyMMdd').format(DateTime.now()));
 
-  const Torok.origin({this.screenMode = 0, required this.torokRecord, super.key});
+  const Torok.origin(
+      {this.screenMode = 0, required this.torokRecord, super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _TorokState();
@@ -34,18 +36,17 @@ class Torok extends ConsumerStatefulWidget {
 class _TorokState extends ConsumerState<Torok> {
   late TextEditingController _priceInputController;
   late TextEditingController _memoInputController;
-  late String _dateController;
 
   @override
   void initState() {
-    // 初期値が0なら空文字を入れる
+    // 初期値が0ならpriceInputFieldに空文字を入れる
     final initialPriceData = widget.torokRecord.price == 0
         ? ''
         : widget.torokRecord.price.toString();
 
     _priceInputController = TextEditingController(text: initialPriceData);
     _memoInputController = TextEditingController(text: widget.torokRecord.memo);
-    _dateController = widget.torokRecord.date;
+
     super.initState();
   }
 
@@ -69,9 +70,10 @@ class _TorokState extends ConsumerState<Torok> {
       if (whenOpenprovider == true) {
         final notifier = ref.read(torokRecordNotifierProvider.notifier);
         notifier.setData(widget.torokRecord!);
-      }
-      final whenOpenNotifier = ref.read(whenOpenNotifierProvider.notifier);
+        // 一度openしたというflagを立てる
+        final whenOpenNotifier = ref.read(whenOpenNotifierProvider.notifier);
         whenOpenNotifier.updateToOpenedState();
+      }
     });
 
     //支出か収入かの切り替えは登録時のみ可能
@@ -109,9 +111,23 @@ class _TorokState extends ConsumerState<Torok> {
     //レイアウト------------------------------------------------------------------------------------
 
     return Scaffold(
-      backgroundColor: MyColors.eerieBlack,
+      backgroundColor: MyColors.secondarySystemBackground,
 
       appBar: AppBar(
+        // ヘッダーの色
+        backgroundColor: MyColors.jet,
+
+        // ヘッダーの形
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(10),
+          ),
+        ),
+        title: const SizedBox(
+          child: Text('登録画面'),
+        ),
+
         //ヘッダー右のアイコンボタン
         actions: [
           IconButton(
@@ -121,41 +137,27 @@ class _TorokState extends ConsumerState<Torok> {
               color: MyColors.white,
             ),
             onPressed: () {
-              //登録可非の状態管理
-              final isRegisterableNotifier =
-                  ref.read(isRegisterableNotifierProvider.notifier);
+              //登録可非のチェック
+              final isRegisterable = checkPriceFunc(
+                  _priceInputController.text, selectedSegmentedStatus);
 
-              //torokrecordの金額を取得
-              if (selectedSegmentedStatus == SelectedEnum.sisyt) {
-                final price = int.parse(_priceInputController.text);
-
-                //エラーチェック
-                //金額分岐でisRegisterableの更新とメッセージ定義
-                if (price <= 0) {
-                  isRegisterableNotifier.updateState(false);
-                } else if (price >= 1888888) {
-                  isRegisterableNotifier.updateState(false);
-                } else {
-                  isRegisterableNotifier.updateState(true);
-                }
-              } else if (selectedSegmentedStatus == SelectedEnum.syunyu) {
-                isRegisterableNotifier.updateState(true);
-              }
-
-              final isRegisterableProvider =
-                  ref.read(isRegisterableNotifierProvider);
               //登録できるなら
-              if (isRegisterableProvider == true) {
-                //挿入
-                final notifier = ref.read(torokRecordNotifierProvider.notifier);
+              if (isRegisterable == true) {
+                //挿入するためにproviderから値をfetch
                 final provider = ref.read(torokRecordNotifierProvider);
+                final id = widget.torokRecord.id;
+                final price = int.parse(_priceInputController.text);
+                final selectedDt = provider.date;
                 final selectedCategory = provider.category;
+                final memo = _memoInputController.text;
 
+                // TorokRecordにセット
+                final notifier = ref.read(torokRecordNotifierProvider.notifier);
                 notifier.setData(TorokRecord(
-                    id: widget.torokRecord.id,
-                    price: int.parse(_priceInputController.text),
-                    date: _dateController,
-                    memo: _memoInputController.text,
+                    id: id,
+                    price: price,
+                    date: selectedDt,
+                    memo: memo,
                     category: selectedCategory));
 
                 //登録モード
@@ -165,14 +167,8 @@ class _TorokState extends ConsumerState<Torok> {
                   } else if (selectedSegmentedStatus == SelectedEnum.syunyu) {
                     notifier.setToTBL002().insert();
                   }
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(const SnackBar(
-                      content: Text('登録が完了しました'),
-                      behavior: SnackBarBehavior.floating,
-                      duration: Duration(seconds: 2),
-                    ));
+                  // スナックバーの表示
+                  doneSnackBarFunc();
                 }
                 //編集モード
                 else if (widget.screenMode == 1) {
@@ -181,30 +177,17 @@ class _TorokState extends ConsumerState<Torok> {
                   } else if (selectedSegmentedStatus == SelectedEnum.syunyu) {
                     notifier.setToTBL002().update();
                   }
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(const SnackBar(
-                      content: Text('変更が完了しました'),
-                      behavior: SnackBarBehavior.floating,
-                      duration: Duration(seconds: 2),
-                    ));
+                  // スナックバーの表示
+                  changeSnackBarFunc();
                 }
                 //DB更新のnotifier
                 //DBが更新されたことをグローバルなproviderに反映
-                final notifier2 =
-                    ref.read(updateDBCountNotifierProvider.notifier);
-                notifier2.incrementState();
+                dbUpdateNotify();
               }
               //登録できないなら
-              else if (isRegisterableProvider == false) {
+              else if (isRegisterable == false) {
                 //エラーハンドル
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(const SnackBar(
-                      content: Text('正しく入力してください'),
-                      behavior: SnackBarBehavior.floating,
-                      duration: Duration(seconds: 2)));
+                errorSnackBarFunc();
               }
             },
           ),
@@ -218,18 +201,6 @@ class _TorokState extends ConsumerState<Torok> {
             Icons.close_rounded,
             color: MyColors.white,
           ),
-        ),
-
-        backgroundColor: MyColors.jet,
-
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(10),
-            topRight: Radius.circular(10),
-          ),
-        ),
-        title: const SizedBox(
-          child: Text('登録画面'),
         ),
       ),
 
@@ -249,6 +220,7 @@ class _TorokState extends ConsumerState<Torok> {
 
               const SizedBox(height: 5),
 
+              // 値段inputField
               InputFieldBack(
                 label: label,
                 textfield: TextField(
@@ -306,6 +278,7 @@ class _TorokState extends ConsumerState<Torok> {
 
               const SizedBox(height: 4.5),
 
+              // メモinputField
               InputFieldBack(
                 label: label,
                 textfield: TextField(
@@ -353,6 +326,7 @@ class _TorokState extends ConsumerState<Torok> {
                 ),
               ),
               const SizedBox(height: 4.5),
+
               const DateDisplay(),
               const SizedBox(height: 4.5),
               const CategoryArea(),
@@ -361,5 +335,70 @@ class _TorokState extends ConsumerState<Torok> {
         ),
       ),
     );
+  }
+
+  bool checkPriceFunc(
+      String stringPrice, SelectedEnum selectedSegmentedStatus) {
+    //torokrecordの金額を取得
+    late bool isRegisterable;
+    if (selectedSegmentedStatus == SelectedEnum.sisyt) {
+      // 文字列の金額をint型に変換
+      late int intPrice;
+      if (stringPrice == '') {
+        intPrice = 0;
+      } else {
+        intPrice = int.parse(stringPrice);
+      }
+
+      //エラーチェック
+      //金額分岐でisRegisterableの更新とメッセージ定義
+      if (intPrice <= 0) {
+        isRegisterable = false;
+      } else if (intPrice >= 1888888) {
+        isRegisterable = false;
+      } else {
+        isRegisterable = true;
+      }
+    } else if (selectedSegmentedStatus == SelectedEnum.syunyu) {
+      isRegisterable = true;
+    }
+
+    return isRegisterable;
+  }
+
+  void changeSnackBarFunc() {
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(const SnackBar(
+        content: Text('変更が完了しました'),
+        behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 2),
+      ));
+  }
+
+  void doneSnackBarFunc() {
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(const SnackBar(
+        content: Text('登録が完了しました'),
+        behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 2),
+      ));
+  }
+
+  void errorSnackBarFunc() {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(const SnackBar(
+          content: Text('正しく入力してください'),
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 2)));
+  }
+
+  void dbUpdateNotify() {
+    final notifier2 = ref.read(updateDBCountNotifierProvider.notifier);
+    notifier2.incrementState();
   }
 }

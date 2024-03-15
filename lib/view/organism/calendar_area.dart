@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:kakeibo/constant/colors.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:intl/intl.dart';
 
@@ -21,12 +23,12 @@ import 'package:kakeibo/view/atom/previous_arrow_button.dart';
 import 'package:kakeibo/view/page/torok.dart';
 
 class CalendarArea extends ConsumerWidget {
-  CalendarArea({super.key});
+  CalendarArea({super.key, required this.pageController});
 
   // pageViewのコントローラ
   // 閾値：[0,1000] 初期値：500
   final int initialCenter = 500;
-  final PageController pageController = PageController(initialPage: 500);
+  final PageController pageController;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -50,6 +52,10 @@ class CalendarArea extends ConsumerWidget {
 
 //描写-------------------------------------------------------------------------------------------
     return Container(
+      decoration: BoxDecoration(
+          color: MyColors.quarternarySystemfill,
+          borderRadius: BorderRadius.circular(18)),
+      width: 346,
       height: 302,
       child: PageView.builder(
         controller: pageController,
@@ -60,42 +66,58 @@ class CalendarArea extends ConsumerWidget {
           final thisIndexDisplayDateTime =
               getThisIndexDisplayDt(index, activeDay);
 
-          // 表示する年月のラベルを取得
-          final calendarMonthDisplayLabel =
-              getYYDDLabel(thisIndexDisplayDateTime);
-
           // 表示月のデータを取得
           final calendarData =
               CalendarBuilder().build(thisIndexDisplayDateTime);
 
+          // その月が何週間表示されるか
+          final weekNumber = calendarData.length;
+
+          final boxHeight = (weekNumber == 5)
+              ?
+              // 5週間表示なら高さは60
+              54.0
+              // 6週間表示なら高さは50
+              : 45.0;
+
           // データ取得終わり------------------------------------------------------
 
-          return Column(children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                //左矢印ボタン、押すと前の月に移動
-                PreviousArrowButton(function: () async {
-                  await pageController.previousPage(
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeOutCubic);
-                }),
-                CalendarMonthDisplay(label: calendarMonthDisplayLabel),
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              // カレンダーヘッダー
+              const CalendarHeader(),
 
-                //右矢印ボタン、押すと次の月に移動
-                NextArrowButton(function: () async {
-                  await pageController.nextPage(
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeOutCubic);
-                }),
-              ],
-            ),
-            const CalendarHeader(),
-            ...List.generate(
-                calendarData.length,
-                (weekIndex) => _weekRow(
-                    ref, weekIndex, calendarData, thisIndexDisplayDateTime)),
-          ]);
+              // 区切り線
+              const Divider(
+                // ウィジェット自体の高さ
+                height: 0,
+                // 線の太さ
+                thickness: 0.25,
+                indent: 0,
+                endIndent: 0,
+                color: MyColors.separater,
+              ),
+
+              // カレンダー中身
+              ...List.generate(calendarData.length, (weekIndex) {
+                return Column(
+                  children: [
+                    _weekRow(ref, weekIndex, calendarData,
+                        thisIndexDisplayDateTime, boxHeight),
+                    // 区切り線
+                    const Divider(
+                      height: 0,
+                      thickness: 0.25,
+                      indent: 0,
+                      endIndent: 0,
+                      color: MyColors.separater,
+                    ),
+                  ],
+                );
+              }),
+            ],
+          );
         },
         onPageChanged: (page) {
           // pageは現在ページ
@@ -164,7 +186,8 @@ Row _weekRow(
     WidgetRef ref,
     int weekIndex,
     List<List<Map<String, dynamic>>> dateInformationList,
-    DateTime displayDate) {
+    DateTime displayDate,
+    double boxHeight) {
   return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(7, (dayIndex) {
@@ -178,7 +201,7 @@ Row _weekRow(
         String label;
         String label2;
 
-        if (day == 1) {
+        if (day == 1 || day == 25) {
           label = '$month/$day';
         } else {
           label = '$day';
@@ -201,6 +224,7 @@ Row _weekRow(
                 }
               }
               return InkWell(
+                  borderRadius: BorderRadius.circular(6),
                   onTap: isTapable
                       ? () {
                           final provider =
@@ -250,10 +274,10 @@ Row _weekRow(
                               ))
                       : null,
                   child: displayDate == DateTime(year, month, day)
-                      ? activeDateBox(weekday, label, label2)
+                      ? activeDateBox(weekday, label, label2, boxHeight)
                       : isTapable
-                          ? normalDateBox(weekday, label, label2)
-                          : vacantDateBox(weekday, label, label2));
+                          ? normalDateBox(weekday, label, label2, boxHeight)
+                          : vacantDateBox(weekday, label, label2, boxHeight));
             }));
       }));
 }

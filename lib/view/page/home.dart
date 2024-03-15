@@ -1,35 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:kakeibo/constant/colors.dart';
+
+import 'package:kakeibo/view/atom/next_arrow_button.dart';
+import 'package:kakeibo/view/atom/previous_arrow_button.dart';
+import 'package:kakeibo/view/molecule/calendar_month_display.dart';
 import 'package:kakeibo/view/organism/calendar_area.dart';
 import 'package:kakeibo/view/organism/expence_history_list_area.dart';
 
-class Home extends ConsumerStatefulWidget {
+import 'package:kakeibo/view_model/provider/active_datetime.dart';
+import 'package:kakeibo/view_model/reference_day_impl.dart';
+
+class Home extends StatelessWidget {
   const Home({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _HomeState();
-}
-
-class _HomeState extends ConsumerState<Home> {
-  @override
   Widget build(BuildContext context) {
+    // pageViewのコントローラ
+    // 閾値：[0,1000] 初期値：500
+    const initialCenter = 500;
+    final pageController = PageController(initialPage: initialCenter);
 
-    return  Scaffold(
+    return Scaffold(
+      // ヘッダー
       appBar: AppBar(
-        backgroundColor: MyColors.jet,
-        title: const SizedBox(
-          child: Text('Home'),
-        ),
+        backgroundColor: Colors.transparent,
+        title: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          //左矢印ボタン、押すと前の月に移動
+          PreviousArrowButton(function: () async {
+            await pageController.previousPage(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOutCubic);
+          }),
+          Consumer(builder: (context, ref, _) {
+            final activeDt = ref.watch(activeDatetimeNotifierProvider);
+            final label = labelGetter(activeDt);
+            return CalendarMonthDisplay(label: label);
+          }),
+          NextArrowButton(function: () async {
+            await pageController.nextPage(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOutCubic);
+          }),
+        ]),
       ),
-      backgroundColor: MyColors.eerieBlack,
+
+      // 本文
+      backgroundColor: MyColors.secondarySystemBackground,
       body: Center(
         child: Column(children: [
-          CalendarArea(),
+          Padding(
+            padding:  const EdgeInsets.only(left:14.5,right:14.5,top:0,bottom:0),
+            child: CalendarArea(
+              pageController: pageController,
+            ),
+          ),
           ExpenceHistoryArea(),
         ]),
       ),
     );
+  }
+
+  labelGetter(DateTime activeDt) {
+    final referenceDay = getReferenceDay(activeDt);
+    // 基準日が月初日設定なら表示月はその月のみ
+    if (referenceDay.day == 1) {
+      final label = '${referenceDay.year}年 ${referenceDay.month}月';
+      return label;
+    }
+    // 基準日が月初日以外設定なら表示月はその月とその次の月
+    else {
+      // 12月の次の月は1月なので分岐して処理
+      if (referenceDay.month == 12) {
+        final label = '${referenceDay.year}年 ${referenceDay.month} - ${1}月';
+        return label;
+      } else {
+        final label =
+            '${referenceDay.year}年 ${referenceDay.month} - ${referenceDay.month + 1}月';
+        return label;
+      }
+    }
   }
 }

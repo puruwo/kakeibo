@@ -11,6 +11,28 @@ class MyColors {
   static const richBlack = Color(0xFF051014);
   static const red = Color(0xFFED112B);
   static const blue = Color(0xFF2596FF);
+  
+  static const label = Color(0xffffffff);
+  static const secondaryLabel = Color(0x99ebebf5);
+  static const tirtiaryLabel = Color(0x4cebebf5);
+  static const quarternaryLabel = Color(0x2debebf5);
+
+  static const systemfill = Color(0x5b787880);
+  static const secondarySystemfill = Color(0x51787880);
+  static const tirtiarySystemfill = Color(0x3d767680);
+  static const quarternarySystemfill = Color(0x2d767680);
+
+  static const systemGray = Color(0x5b787880);
+  static const systemGray2 = Color(0xff636366);
+  static const systemGray3 = Color(0xff48484a);
+  static const systemGray4 = Color(0xff3a3a3c);
+  static const systemGray5 = Color(0xff2c2c2c);
+  static const systemGray6 = Color(0xff1c1c1e);
+
+  
+
+  static const secondarySystemBackground = Color(0xff1c1c1e);
+  static const separater = Color(0x99545458);
 
   getColorFromHex(String colorCode){
     int intValue = int.parse('FF$colorCode', radix: 16);
