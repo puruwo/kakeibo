@@ -9,6 +9,8 @@ void main() {
         home: const Foundation(),
         debugShowCheckedModeBanner: false,
         darkTheme: ThemeData.dark(),
+        // アプリ全体にテキストサイズの制御を適用
+        // builder: (context, child) => TextScaleFactor(child: child!),
       ),
     ),
   );

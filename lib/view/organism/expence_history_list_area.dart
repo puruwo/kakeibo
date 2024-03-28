@@ -1,9 +1,11 @@
+import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:kakeibo/constant/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:kakeibo/constant/properties.dart';
 import 'package:kakeibo/repository/tbl001_record/tbl001_record.dart';
 import 'package:kakeibo/repository/torok_record/torok_record.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -13,7 +15,10 @@ import 'package:intl/intl.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:collection/collection.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
+
+/// Local imports
 import 'package:kakeibo/util/util.dart';
+import 'package:kakeibo/util/screen_size_func.dart';
 
 import 'package:kakeibo/view/page/torok.dart';
 
@@ -38,10 +43,26 @@ class ExpenceHistoryArea extends ConsumerStatefulWidget {
 class _ExpenceHistoryAreaState extends ConsumerState<ExpenceHistoryArea> {
   late SplayTreeMap<String, dynamic> sortedGroupedMap;
 
+  // リストビューの左の空白
+  late double leftsidePadding;
+
   @override
   Widget build(BuildContext context) {
-    // 消す
-    print('expence_history_list_area is built');
+    // 画面の横幅を取得
+    final screenWidthSize = MediaQuery.of(context).size.width;
+
+    // 画面の倍率を計算
+    // iphoneProMaxの横幅が430で、それより大きい端末では拡大しない
+    final screenHorizontalMagnification =
+        screenHorizontalMagnificationGetter(screenWidthSize);
+
+    // リスト内テキストボックスの倍率を計算
+    // iphoneProMaxの横幅が430で、それより大きい端末では拡大しない
+    final listSmallcategoryMemoOffset =
+        listSmallcategoryMemoOffsetGetter(screenWidthSize);
+
+    // カレンダーサイズから左の空白の大きさを計算
+    leftsidePadding = 14.5 * screenHorizontalMagnification;
 
     // DateTimeの日本語対応
     initializeDateFormatting();
@@ -52,9 +73,6 @@ class _ExpenceHistoryAreaState extends ConsumerState<ExpenceHistoryArea> {
     ref.watch(updateDBCountNotifierProvider);
 
     final activeDateTime = ref.watch(activeDatetimeNotifierProvider);
-
-    // 消す
-    print('activeDatetime is $activeDateTime in expence_history_list_area');
 
     // activeDatetimeが更新されたら動く
     ref.listen(activeDatetimeNotifierProvider, (previous, next) {
@@ -126,7 +144,7 @@ class _ExpenceHistoryAreaState extends ConsumerState<ExpenceHistoryArea> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(left: 14.5),
+                              padding: EdgeInsets.only(left: leftsidePadding),
                               child: Text(stringDate,
                                   style: const TextStyle(
                                     fontSize: 14,
@@ -138,10 +156,11 @@ class _ExpenceHistoryAreaState extends ConsumerState<ExpenceHistoryArea> {
                         ),
 
                         //区切り線
-                        const Divider(
+                        Divider(
                           thickness: 0.25,
                           height: 0.25,
-                          indent: 14.5,
+                          indent: leftsidePadding,
+                          endIndent: leftsidePadding,
                           color: MyColors.separater,
                         ),
 
@@ -165,7 +184,7 @@ class _ExpenceHistoryAreaState extends ConsumerState<ExpenceHistoryArea> {
                             // メモ
                             final memo = item[TBL001RecordKey().memo];
                             // 値段ラベル
-                            final priceLabel = formattedPriceGetter(
+                            final priceLabel = yenmarkFormattedPriceGetter(
                                 item[TBL001RecordKey().price]);
 
                             return Column(
@@ -194,130 +213,148 @@ class _ExpenceHistoryAreaState extends ConsumerState<ExpenceHistoryArea> {
                                           ),
                                         )),
                                   ),
-                                  child: GestureDetector(
-                                    child: SizedBox(
-                                      height: 49,
-                                      width: double.infinity,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          // アイコン
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 20, right: 18),
-                                            child: icon,
-                                          ),
+                                  child: Padding(
+                                    padding: EdgeInsets.only(
+                                        left: leftsidePadding,
+                                        right: leftsidePadding),
+                                    child: GestureDetector(
+                                      child: SizedBox(
+                                        height: 49,
+                                        width: double.infinity,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            // アイコン
+                                            SizedBox(
+                                                height: 49,
+                                                width: 49,
+                                                child: icon),
 
-                                          // 大カテゴリー、小カテゴリーのColumn
-                                          Expanded(
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                // 大カテゴリー
-                                                Text(
-                                                  bigCategoryName,
-                                                  textAlign: TextAlign.end,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                    fontSize: 15,
-                                                    color:
-                                                        MyColors.secondaryLabel,
+                                            // 大カテゴリー、小カテゴリーのColumn
+                                            Expanded(
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  // 大カテゴリー
+                                                  SizedBox(
+                                                    width: 153 *screenHorizontalMagnification,
+                                                    child: Text(
+                                                      bigCategoryName,
+                                                      textAlign:
+                                                          TextAlign.start,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: const TextStyle(
+                                                        fontSize: 15,
+                                                        color: MyColors
+                                                            .secondaryLabel,
+                                                      ),
+                                                    ),
                                                   ),
+
+                                                  // 小カテゴリーとメモ
+                                                  Row(
+                                                    children: [
+                                                      // 小カテゴリー
+                                                      SizedBox(
+                                                        width: 56 ,
+                                                        child: Text(
+                                                          ' $categoryName',
+                                                          textAlign:
+                                                              TextAlign.start,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: const TextStyle(
+                                                              fontSize: 12,
+                                                              color: MyColors
+                                                                  .tirtiaryLabel),
+                                                        ),
+                                                      ),
+                                                      // メモ
+                                                      SizedBox(
+                                                        width: 90 +
+                                                            listSmallcategoryMemoOffset,
+                                                        child: Text(
+                                                          ' $memo',
+                                                          textAlign:
+                                                              TextAlign.start,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: const TextStyle(
+                                                              fontSize: 12,
+                                                              color: MyColors
+                                                                  .tirtiaryLabel),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+
+                                            // 値段
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 22.0),
+                                              child: SizedBox(
+                                                width: 100,
+                                                child: Text(
+                                                  priceLabel,
+                                                  textAlign: TextAlign.end,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                      fontSize: 19,
+                                                      color: MyColors.label),
                                                 ),
-
-                                                // 小カテゴリーとメモ
-                                                Row(
-                                                  children: [
-                                                    // 小カテゴリー
-                                                    SizedBox(
-                                                      width: 60,
-                                                      child: Text(
-                                                        ' $categoryName',
-                                                        textAlign:
-                                                            TextAlign.start,
-                                                        overflow: TextOverflow.ellipsis,
-                                                        style: const TextStyle(
-                                                            fontSize: 12,
-                                                            color: MyColors
-                                                                .tirtiaryLabel),
-                                                      ),
-                                                    ),
-                                                    // メモ
-                                                    SizedBox(
-                                                      width: 100,
-                                                      child: Text(
-                                                        ' $memo',
-                                                        textAlign:
-                                                            TextAlign.start,
-                                                        overflow: TextOverflow.ellipsis,
-                                                        style: const TextStyle(
-                                                            fontSize: 12,
-                                                            color: MyColors
-                                                                .tirtiaryLabel),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                )
-                                              ],
+                                              ),
                                             ),
-                                          ),
 
-                                          // 値段
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 22.0),
-                                            child: Text(
-                                              priceLabel,
-                                              textAlign: TextAlign.end,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                  fontSize: 19,
-                                                  color: MyColors.label),
-                                            ),
-                                          ),
-
-                                          // nextArrowアイコン
-                                          const Padding(
-                                            padding: EdgeInsets.only(right: 20),
-                                            child: Icon(
-                                              size: 18,
-                                              Icons.arrow_forward_ios_rounded,
-                                              color: MyColors.white,
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                    onTap: () {
-                                      showCupertinoModalBottomSheet(
-                                        //sccafoldの上に出すか
-                                        useRootNavigator: true,
-                                        //縁タップで閉じる
-                                        isDismissible: true,
-                                        context: context,
-                                        builder: (_) => Torok.origin(
-                                          torokRecord: TorokRecord(
-                                              date: item[
-                                                  SeparateLabelMapKey().date],
-                                              id: item[
-                                                  SeparateLabelMapKey().id],
-                                              price: item[
-                                                  SeparateLabelMapKey().price],
-                                              memo: item[
-                                                  SeparateLabelMapKey().memo],
-                                              category: item[
-                                                  SeparateLabelMapKey()
-                                                      .category]),
-                                          screenMode: 1,
+                                            // nextArrowアイコン
+                                            const Padding(
+                                              padding:
+                                                  EdgeInsets.only(right: 4),
+                                              child: Icon(
+                                                size: 18,
+                                                Icons.arrow_forward_ios_rounded,
+                                                color: MyColors.white,
+                                              ),
+                                            )
+                                          ],
                                         ),
-                                      );
-                                    },
+                                      ),
+                                      onTap: () {
+                                        showCupertinoModalBottomSheet(
+                                          //sccafoldの上に出すか
+                                          useRootNavigator: true,
+                                          //縁タップで閉じる
+                                          isDismissible: true,
+                                          context: context,
+                                          builder: (_) => Torok.origin(
+                                            torokRecord: TorokRecord(
+                                                date: item[
+                                                    SeparateLabelMapKey().date],
+                                                id: item[
+                                                    SeparateLabelMapKey().id],
+                                                price: item[
+                                                    SeparateLabelMapKey()
+                                                        .price],
+                                                memo: item[
+                                                    SeparateLabelMapKey().memo],
+                                                category: item[
+                                                    SeparateLabelMapKey()
+                                                        .category]),
+                                            screenMode: 1,
+                                          ),
+                                        );
+                                      },
+                                    ),
                                   ),
 
                                   //タイルを横にスライドした時の処理
@@ -364,17 +401,19 @@ class _ExpenceHistoryAreaState extends ConsumerState<ExpenceHistoryArea> {
                                     );
                                     record.delete();
                                     // 消す
-                                    print('削除されました id:${item[TBL001RecordKey().id]}'
+                                    print(
+                                        '削除されました id:${item[TBL001RecordKey().id]}'
                                         'category:${item[TBL001RecordKey().paymentCategoryId]}'
                                         'price:${item[TBL001RecordKey().price]}'
                                         'memo:${item[TBL001RecordKey().memo]}'
                                         '${item[TBL001RecordKey().date]}年');
                                   },
                                 ), //区切り線
-                                const Divider(
+                                Divider(
                                   thickness: 0.25,
                                   height: 0.25,
-                                  indent: 50,
+                                  indent: 50 + leftsidePadding,
+                                  endIndent: leftsidePadding,
                                   color: MyColors.separater,
                                 )
                               ],
@@ -430,5 +469,10 @@ class _ExpenceHistoryAreaState extends ConsumerState<ExpenceHistoryArea> {
     String formattedDate = DateFormat('yyyy年M月d日(E)', 'ja_JP').format(dateTime);
 
     return formattedDate;
+  }
+  
+  double listSmallcategoryMemoOffsetGetter(double screenWidthSize) {
+    final defaultWidth = ScreenLayoutProperties().defaultWidth;
+    return screenWidthSize - defaultWidth;
   }
 }

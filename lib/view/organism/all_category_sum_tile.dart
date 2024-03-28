@@ -1,12 +1,13 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:kakeibo/constant/colors.dart';
 
+import 'package:kakeibo/util/util.dart';
+import 'package:kakeibo/util/screen_size_func.dart';
+
 import 'package:kakeibo/model/assets_conecter/category_handler.dart';
 import 'package:kakeibo/model/tableNameKey.dart';
-import 'package:kakeibo/view_model/category_sum_getter.dart';
 
 class AllCategorySumTile extends StatefulWidget {
   const AllCategorySumTile(
@@ -28,18 +29,17 @@ class AllCategorySumTile extends StatefulWidget {
 
 class _CategorySumTileState extends State<AllCategorySumTile>
     with SingleTickerProviderStateMixin {
-
   // ビルドが完了したかどうか
   bool _isBuilt = false;
 
   // 横棒グラフのフレームサイズ
-  final double barFrameWidth = 200.0;
+  final double barFrameWidth = 280.0;
 
   late List<double> barWidthList;
 
   @override
   void initState() {
-    // 各カテゴリーの棒グラフの幅リストを初期化
+    // アニメーションのため各カテゴリーの棒グラフの幅リストを初期化
     barWidthList =
         List.generate(widget.bigCategoryInformationMaps.length, (index) => 0);
     // TODO: implement initState
@@ -48,6 +48,13 @@ class _CategorySumTileState extends State<AllCategorySumTile>
 
   @override
   Widget build(BuildContext context) {
+    // 画面の横幅を取得
+    final screenWidthSize = MediaQuery.of(context).size.width;
+
+    // 画面の倍率を計算
+    // iphoneProMaxの横幅が430で、それより大きい端末では拡大しない
+    final screenHorizontalMagnification =
+        screenHorizontalMagnificationGetter(screenWidthSize);
 
     // 各大カテゴリーの名前
     List<String> bigCategoryNameList = [];
@@ -61,7 +68,8 @@ class _CategorySumTileState extends State<AllCategorySumTile>
     for (var value in widget.bigCategoryInformationMaps) {
       bigCategoryNameList.add(value[TBL202RecordKey().bigCategoryName]);
       paymentPriceSumList.add(value['payment_price_sum']);
-      // iconList.add(value['icon']);
+      iconList.add(CategoryHandler()
+          .iconGetterFromPath(value[TBL202RecordKey().resourcePath]));
       colorList
           .add(MyColors().getColorFromHex(value[TBL202RecordKey().colorCode]));
     }
@@ -69,9 +77,8 @@ class _CategorySumTileState extends State<AllCategorySumTile>
     // 角カテゴリーのグラフ幅を計算
     for (int i = 0; i < barWidthList.length; i++) {
       double degrees = (paymentPriceSumList[i] / widget.allCategoryBudgetSum);
-      barWidthList[i] = degrees <= 1.0
-          ? barFrameWidth * degrees
-          : barFrameWidth;
+      barWidthList[i] =
+          degrees <= 1.0 ? barFrameWidth * degrees : barFrameWidth;
     }
 
     //ビルドが完了したら横棒グラフのサイズを変更しアニメーションが動く
@@ -81,94 +88,234 @@ class _CategorySumTileState extends State<AllCategorySumTile>
       });
     });
 
-    return Container(
-      decoration: BoxDecoration(
-        color: MyColors.jet,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        children: [
-          //themeでwrapするExpansionTileの線が消える
-          Theme(
-            data: Theme.of(context).copyWith(
-              dividerColor: Colors.transparent,
-              listTileTheme: ListTileTheme.of(context).copyWith(
-                titleAlignment: ListTileTitleAlignment.center,
-                horizontalTitleGap: 0,
-                minVerticalPadding: 0,
-                dense: true,
+    // 支出合計のLabel
+    final String paymentSumLabel = formattedPriceGetter(widget.allCategorySum);
+
+    // 予算のLabel
+    final String budgetLabel =
+        formattedPriceGetter(widget.allCategoryBudgetSum);
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 16, left: 16, bottom: 8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: MyColors.quarternarySystemfill,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          children: [
+            //themeでwrapするExpansionTileの線が消える
+            Theme(
+              data: Theme.of(context).copyWith(
+                dividerColor: Colors.transparent,
+                splashColor: Colors.transparent,
+                listTileTheme: ListTileTheme.of(context).copyWith(
+                  titleAlignment: ListTileTitleAlignment.center,
+                  horizontalTitleGap: 0,
+                  minVerticalPadding: 0,
+                  dense: true,
+                ),
               ),
-            ),
-            child: ExpansionTile(
-              iconColor: MyColors.mint,
-              collapsedIconColor: MyColors.mint,
-              title: Column(
+              child: ExpansionTile(
+                // アイコンのカラー
+                iconColor: MyColors.white,
+                collapsedIconColor: MyColors.white,
+                // 右のアイコンのpaddingの設定はここ
+                tilePadding:
+                    const EdgeInsets.symmetric(vertical: 5, horizontal: 12),
+                // 開いた後の要素のpadding
+                childrenPadding: const EdgeInsets.only(bottom: 10.0),
+                title: Column(
+                  children: [
+                    // バーグラフ
+                    Padding(
+                      // バーの上下の余白を調整
+                      padding: const EdgeInsets.only(top: 8, bottom: 3),
+                      child: Stack(
+                        children: [
+                          // バーの背景枠
+                          Container(
+                            height: 10,
+                            width: barFrameWidth,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: MyColors.secondarySystemfill,
+                            ),
+                          ),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Container(
+                              constraints: const BoxConstraints(
+                                minWidth: 0,
+                              ),
+                              child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ...List.generate(
+                                        widget.bigCategoryInformationMaps
+                                            .length, (index) {
+                                      return AnimatedContainer(
+                                        height: 10,
+                                        width:
+                                            _isBuilt ? barWidthList[index] : 0,
+                                        color: colorList[index],
+                                        duration:
+                                            const Duration(milliseconds: 500),
+                                      );
+                                    }),
+                                  ]),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+
+                    // バー下ラベル
+                    Container(
+                      constraints: BoxConstraints(
+                          minWidth: barFrameWidth, minHeight: 30),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(left: 2),
+                            child: Text(
+                              '全体支出',
+                              style: GoogleFonts.notoSans(
+                                  fontSize: 16,
+                                  color: MyColors.white,
+                                  fontWeight: FontWeight.w300),
+                            ),
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              // カテゴリー総支出
+                              Text(
+                                paymentSumLabel,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.notoSans(
+                                    fontSize: 18,
+                                    color: MyColors.white,
+                                    fontWeight: FontWeight.w400),
+                                textAlign: TextAlign.end,
+                              ),
+                              Text(
+                                ' 円',
+                                style: GoogleFonts.notoSans(
+                                    fontSize: 14,
+                                    color: MyColors.white,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                              Text(
+                                ' /',
+                                style: GoogleFonts.notoSans(
+                                    fontSize: 14,
+                                    color: MyColors.secondaryLabel,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                              Text(
+                                '予算 ',
+                                style: GoogleFonts.notoSans(
+                                    fontSize: 13,
+                                    color: MyColors.secondaryLabel,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                              // カテゴリー予算
+                              Text(
+                                budgetLabel,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.notoSans(
+                                    fontSize: 14,
+                                    color: MyColors.secondaryLabel,
+                                    fontWeight: FontWeight.w400),
+                                textAlign: TextAlign.end,
+                              ),
+                              Padding(
+                                // 円の右のスペース
+                                padding: const EdgeInsets.only(right: 2.0),
+                                child: Text(
+                                  ' 円',
+                                  style: GoogleFonts.notoSans(
+                                    fontSize: 11,
+                                    color: MyColors.secondaryLabel,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                  textAlign: TextAlign.end,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                // expansionArea
                 children: [
-                  Stack(
-                    children: [
-                      Container(
-                        height: 15,
-                        width: barFrameWidth,
-                        color: MyColors.white,
+                  ...List.generate(widget.bigCategoryInformationMaps.length,
+                      (index) {
+                    // 支出合計のLabel
+                    final String categoryPaymentSumLabel =
+                        formattedPriceGetter(paymentPriceSumList[index]);
+                    return Padding(
+                      // 子一列の両サイドのパディング
+                      padding: const EdgeInsets.only(
+                        left: 24,
+                        right: 52.0,
                       ),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            ...List.generate(
-                                widget.bigCategoryInformationMaps.length,
-                                (index) {
-                              return AnimatedContainer(
-                                height: 15,
-                                width: _isBuilt ? barWidthList[index] : 0,
-                                color: colorList[index],
-                                duration: const Duration(milliseconds: 500),
-                              );
-                            }),
-                          ])
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Text(
-                        '全体',
-                        style: const TextStyle(color: MyColors.white),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              // アイコン
+                              iconList[index],
+                              // カテゴリー名
+                              Text(
+                                ' ${bigCategoryNameList[index]}',
+                                style: GoogleFonts.notoSans(
+                                    fontSize: 16,
+                                    color: MyColors.label,
+                                    fontWeight: FontWeight.w400),
+                                textAlign: TextAlign.start,
+                              ),
+                            ],
+                          ),
+                          // 小カテゴリーの支払い合計
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                categoryPaymentSumLabel,
+                                style: GoogleFonts.notoSans(
+                                    fontSize: 18,
+                                    color: MyColors.label,
+                                    fontWeight: FontWeight.w400),
+                                textAlign: TextAlign.end,
+                              ),
+                              Text(
+                                ' 円',
+                                style: GoogleFonts.notoSans(
+                                  fontSize: 11,
+                                  color: MyColors.secondaryLabel,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                textAlign: TextAlign.end,
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                      Text(
-                        widget.allCategorySum.toString(),
-                        style: const TextStyle(color: MyColors.white),
-                      ),
-                      const Text(
-                        '/',
-                        style: TextStyle(color: MyColors.white),
-                      ),
-                      Text(
-                        widget.allCategoryBudgetSum.toString(),
-                        style: const TextStyle(color: MyColors.white),
-                      )
-                    ],
-                  ),
+                    );
+                  }),
                 ],
               ),
-              children: [
-                ...List.generate(widget.bigCategoryInformationMaps.length,
-                    (index) {
-                  return Row(
-                    children: [
-                      Text(
-                        bigCategoryNameList[index],
-                        style: const TextStyle(color: MyColors.white),
-                      ),
-                      Text(
-                        paymentPriceSumList[index].toString(),
-                        style: const TextStyle(color: MyColors.white),
-                      ),
-                    ],
-                  );
-                }),
-              ],
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

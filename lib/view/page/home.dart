@@ -51,11 +51,8 @@ class Home extends StatelessWidget {
       backgroundColor: MyColors.secondarySystemBackground,
       body: Center(
         child: Column(children: [
-          Padding(
-            padding:  const EdgeInsets.only(left:14.5,right:14.5,top:0,bottom:0),
-            child: CalendarArea(
-              pageController: pageController,
-            ),
+          CalendarArea(
+            pageController: pageController,
           ),
           ExpenceHistoryArea(),
         ]),

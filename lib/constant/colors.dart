@@ -10,7 +10,8 @@ class MyColors {
   static const eerieBlack = Color(0xFF1E1E1E);
   static const richBlack = Color(0xFF051014);
   static const red = Color(0xFFED112B);
-  static const blue = Color(0xFF2596FF);
+  static const blue = Color(0xFF2596FF); 
+  static const pink = Color(0xFFFF7070); 
   
   static const label = Color(0xffffffff);
   static const secondaryLabel = Color(0x99ebebf5);
@@ -22,16 +23,18 @@ class MyColors {
   static const tirtiarySystemfill = Color(0x3d767680);
   static const quarternarySystemfill = Color(0x2d767680);
 
-  static const systemGray = Color(0x5b787880);
+  static const systemGray = Color(0xff8E8E93);
   static const systemGray2 = Color(0xff636366);
   static const systemGray3 = Color(0xff48484a);
   static const systemGray4 = Color(0xff3a3a3c);
   static const systemGray5 = Color(0xff2c2c2c);
   static const systemGray6 = Color(0xff1c1c1e);
 
-  
-
+  static const systemBackground = Color(0xff000000);
   static const secondarySystemBackground = Color(0xff1c1c1e);
+  static const tirtiarySystemBackground = Color(0xff2c2c2e);
+
+
   static const separater = Color(0x99545458);
 
   getColorFromHex(String colorCode){

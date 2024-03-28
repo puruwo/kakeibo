@@ -192,7 +192,19 @@ class _BalanceGraphState extends ConsumerState<BalanceGraph> {
   LineChartData mainData(List<Map<String, dynamic>> paymentListMap,
       List<Map<String, dynamic>> incomeListMap) {
     return LineChartData(
+      // タッチ操作時の設定
+      lineTouchData: LineTouchData(
+        handleBuiltInTouches: true,                        // タッチ時のアクションの有無
+        getTouchedSpotIndicator: defaultTouchedIndicators, // インジケーターの設定
+        touchTooltipData: LineTouchTooltipData(            // ツールチップの設定
+          getTooltipItems: defaultLineTooltipItem,         // 表示文字設定
+          tooltipBgColor: MyColors.dimGray,                    // 背景の色
+          tooltipRoundedRadius: 10.0,                       // 角丸
+        ),
+      ),
+      
       gridData: FlGridData(
+        
         show: true,
         drawVerticalLine: false,
         // メモリの間隔
@@ -204,6 +216,7 @@ class _BalanceGraphState extends ConsumerState<BalanceGraph> {
           );
         },
       ),
+      
       titlesData: FlTitlesData(
         show: true,
         // 上の軸表示 false
@@ -253,7 +266,6 @@ class _BalanceGraphState extends ConsumerState<BalanceGraph> {
 
       // 描画データの配置
       lineBarsData: [
-
 
         LineChartBarData(
           // 支出グラフデータの作成

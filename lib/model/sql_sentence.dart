@@ -145,6 +145,22 @@ class DataBaseHelperHandling {
           (0, 'FFC857', '定期収入', 'assets/images/icon_regular_income.svg', 0, 1),
           (1, 'ECB22D', '臨時収入', 'assets/images/icon_extra_income.svg', 1, 1);
           ''');
+
+    await db.execute('''
+          INSERT INTO ${TBL003RecordKey().tableName}
+          (_id, date, big_category_id, price)
+          VALUES
+          (0, '20240101', 0, 35000),
+          (1, '20240101', 1, 5000),
+          (2, '20240101', 2, 32000),
+          (3, '20240101', 3, 9000),
+          (4, '20240101', 4, 15000),
+          (5, '20240101', 5, 0),
+          (6, '20240101', 6, 5000),
+          (7, '20240225', 0, 32000);
+          ''');
+
+    
   }
 
   funcOnUpdate(Database db) async {

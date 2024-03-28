@@ -40,18 +40,8 @@ class AllPaymentGetter{
 
 class AllBudgetGetter{
   Future<List<Map<String,dynamic>>>build(DateTime dt) async{
-
-    //集計スタートの日
-    final fromDate = getReferenceDay(dt);
-
-    //集計終了の日
-    //次の基準日を取得しているので、そこから1引いて集計終了日を算出
-    final dtBuff = getNextReferenceDay(dt);
-    final toDate = dtBuff.add(const Duration(days: -1));
-
-    final AllBudget = queryMonthlyAllBudgetSum(fromDate, toDate);
-
-    return AllBudget;
+    final allBudget = queryMonthlyAllBudgetSum(dt);
+    return allBudget;
 }}
 
 
