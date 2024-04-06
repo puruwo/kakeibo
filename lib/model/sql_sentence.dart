@@ -164,8 +164,19 @@ class DataBaseHelperHandling {
   }
 
   funcOnUpdate(Database db) async {
-    // version: from 1.0.13 to 1.0.14
-    // 20240206
+    // version: from 1.0.17 to 1.0.18
+    // 20240406
+    await db.delete(TBL201RecordKey().tableName,where:'${TBL201RecordKey().id} = ?',whereArgs: [15]);
+    await db.delete(TBL201RecordKey().tableName,where:'${TBL201RecordKey().id} = ?',whereArgs: [16]);
+    await db.delete(TBL201RecordKey().tableName,where:'${TBL201RecordKey().id} = ?',whereArgs: [17]);
+
+    await db.execute('''
+          INSERT INTO ${TBL201RecordKey().tableName}
+          (${TBL201RecordKey().id}, ${TBL201RecordKey().smallCategoryOrderKey}, ${TBL201RecordKey().bigCategoryKey}, ${TBL201RecordKey().displayedOrderInBig},${TBL201RecordKey().categoryName},${TBL201RecordKey().defaultDisplayed})
+          VALUES
+          (15, 15, 2, 4,'旅行', 1),
+          (16, 16, 4, 1,'衣服', 1);
+          ''');
 
     // print('データベースの更新処理が呼び出されました');
   }

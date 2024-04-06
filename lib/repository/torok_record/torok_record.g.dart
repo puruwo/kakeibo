@@ -11,7 +11,7 @@ _$TorokRecordImpl _$$TorokRecordImplFromJson(Map<String, dynamic> json) =>
       id: json['id'] as int? ?? 0,
       date: json['date'] as String,
       price: json['price'] as int? ?? 0,
-      category: json['category'] as int? ?? 0,
+      categoryOrderKey: json['categoryOrderKey'] as int? ?? 0,
       memo: json['memo'] as String? ?? '',
     );
 
@@ -20,6 +20,6 @@ Map<String, dynamic> _$$TorokRecordImplToJson(_$TorokRecordImpl instance) =>
       'id': instance.id,
       'date': instance.date,
       'price': instance.price,
-      'category': instance.category,
+      'categoryOrderKey': instance.categoryOrderKey,
       'memo': instance.memo,
     };

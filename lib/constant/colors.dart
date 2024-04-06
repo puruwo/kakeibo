@@ -4,6 +4,7 @@ class MyColors {
   static const white = Colors.white;
   static const black = Colors.black;
   static const mint = Color(0xFF21D19F);
+  static const blackmint = Color.fromARGB(255, 11, 178, 131);
   static const lightGray = Color(0xFFF6F6F6);
   static const dimGray = Color(0xFF6A706E);
   static const jet = Color(0xFF3F3D3D);
@@ -33,6 +34,10 @@ class MyColors {
   static const systemBackground = Color(0xff000000);
   static const secondarySystemBackground = Color(0xff1c1c1e);
   static const tirtiarySystemBackground = Color(0xff2c2c2e);
+
+  static const linkColor = Color(0xff0a84ff);
+
+  
 
 
   static const separater = Color(0x99545458);

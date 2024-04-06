@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:kakeibo/model/database_helper.dart';
 import 'package:kakeibo/model/tableNameKey.dart';
+import 'package:kakeibo/model/db_read_impl.dart';
 
 //Freezedで生成されるデータクラス
 part 'torok_record.freezed.dart';
@@ -17,24 +18,11 @@ class TorokRecord with _$TorokRecord {
     @Default(0) int id,
     required String date,
     @Default(0) int price,
-    @Default(0) int category,
+    @Default(0) int categoryOrderKey,
     @Default('') String memo,
   }) = _TorokRecord;
 
   @override
   factory TorokRecord.fromJson(Map<String, dynamic> json) =>
       _$TorokRecordFromJson(json);
-
-  update() {
-    print('$category,$date,$price,$memo,にこうしんしました');
-    db.update(
-        TBL001RecordKey().tableName,
-        {
-          TBL001RecordKey().date: date,
-          TBL001RecordKey().price: price,
-          TBL001RecordKey().paymentCategoryId: category,
-          TBL001RecordKey().memo: memo
-        },
-        id);
-  }
 }

@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:kakeibo/model/db_read_impl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:kakeibo/repository/tbl001_record/tbl001_record.dart';
 import 'package:kakeibo/repository/tbl002_record/tbl002_record.dart';
@@ -35,7 +36,7 @@ class TorokRecordNotifier extends _$TorokRecordNotifier {
 
   void updateCategory(int category) {
     final oldState = state;
-    final newState = oldState.copyWith(category: category);
+    final newState = oldState.copyWith(categoryOrderKey: category);
     state = newState;
   }
 
@@ -45,20 +46,22 @@ class TorokRecordNotifier extends _$TorokRecordNotifier {
     state = newState;
   }
   
-  TBL001Record setToTBL001() {
+  Future<TBL001Record> setToTBL001() async{
+    final int categoryId = await getPaymentCategoryIdFromCategoryOrder(state.categoryOrderKey);
     return TBL001Record(
       id: state.id,
-      category: state.category,
+      category: categoryId,
       price: state.price,
       memo: state.memo,
       date: state.date,
     );
   }
 
-  TBL002Record setToTBL002() {
+  Future<TBL002Record> setToTBL002() async{
+    final int categoryId = await getIncomeCategoryIdFromCategoryOrder(state.categoryOrderKey);
     return TBL002Record(
       id: state.id,
-      category: state.category,
+      category: categoryId,
       price: state.price,
       memo: state.memo,
       date: state.date,

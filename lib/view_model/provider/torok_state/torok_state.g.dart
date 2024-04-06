@@ -7,7 +7,7 @@ part of 'torok_state.dart';
 // **************************************************************************
 
 String _$torokRecordNotifierHash() =>
-    r'04d0e786b05fc1cb5de0780738aa806440917637';
+    r'129cf8fa7ec0bace319854e021d63bf8f7918b4d';
 
 /// See also [TorokRecordNotifier].
 @ProviderFor(TorokRecordNotifier)

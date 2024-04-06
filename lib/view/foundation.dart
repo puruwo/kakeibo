@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import 'package:kakeibo/constant/colors.dart';
 import 'package:kakeibo/view/page/third_page.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -68,6 +69,7 @@ class _FoundationState extends ConsumerState<Foundation> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
+        backgroundColor: MyColors.blackmint,
         onPressed: () {
           showCupertinoModalBottomSheet(
             context: context,
@@ -78,7 +80,7 @@ class _FoundationState extends ConsumerState<Foundation> {
         child: const Icon(Icons.add),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: MyColors.jet,
+        backgroundColor: MyColors.quarternarySystemfill,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.plus_one), label: 'Torok')

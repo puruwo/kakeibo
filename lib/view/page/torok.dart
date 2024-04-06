@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:kakeibo/constant/colors.dart';
+import 'package:kakeibo/repository/tbl001_record/tbl001_record.dart';
 import 'package:kakeibo/repository/torok_record/torok_record.dart';
 import 'package:flutter/services.dart';
 
@@ -136,7 +137,7 @@ class _TorokState extends ConsumerState<Torok> {
               Icons.done_rounded,
               color: MyColors.white,
             ),
-            onPressed: () {
+            onPressed: () async {
               //登録可非のチェック
               final isRegisterable = checkPriceFunc(
                   _priceInputController.text, selectedSegmentedStatus);
@@ -148,7 +149,7 @@ class _TorokState extends ConsumerState<Torok> {
                 final id = widget.torokRecord.id;
                 final price = int.parse(_priceInputController.text);
                 final selectedDt = provider.date;
-                final selectedCategory = provider.category;
+                final selectedCategoryOrderKey = provider.categoryOrderKey;
                 final memo = _memoInputController.text;
 
                 // TorokRecordにセット
@@ -158,14 +159,16 @@ class _TorokState extends ConsumerState<Torok> {
                     price: price,
                     date: selectedDt,
                     memo: memo,
-                    category: selectedCategory));
+                    categoryOrderKey: selectedCategoryOrderKey));
 
                 //登録モード
                 if (widget.screenMode == 0) {
                   if (selectedSegmentedStatus == SelectedEnum.sisyt) {
-                    notifier.setToTBL001().insert();
+                    final tBL001Record = await notifier.setToTBL001();
+                    tBL001Record.insert();
                   } else if (selectedSegmentedStatus == SelectedEnum.syunyu) {
-                    notifier.setToTBL002().insert();
+                    final tBL002Record = await notifier.setToTBL002();
+                    tBL002Record.insert();
                   }
                   // スナックバーの表示
                   doneSnackBarFunc();
@@ -173,9 +176,11 @@ class _TorokState extends ConsumerState<Torok> {
                 //編集モード
                 else if (widget.screenMode == 1) {
                   if (selectedSegmentedStatus == SelectedEnum.sisyt) {
-                    notifier.setToTBL001().update();
+                    final tBL001Record = await notifier.setToTBL001();
+                    tBL001Record.update();
                   } else if (selectedSegmentedStatus == SelectedEnum.syunyu) {
-                    notifier.setToTBL002().update();
+                    final tBL002Record = await notifier.setToTBL002();
+                    tBL002Record.update();
                   }
                   // スナックバーの表示
                   changeSnackBarFunc();
@@ -327,8 +332,12 @@ class _TorokState extends ConsumerState<Torok> {
               ),
               const SizedBox(height: 4.5),
 
+              // 日付選択エリア
               const DateDisplay(),
+
               const SizedBox(height: 4.5),
+
+              // カテゴリー選択エリア
               const CategoryArea(),
             ],
           ),

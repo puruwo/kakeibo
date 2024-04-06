@@ -20,7 +20,7 @@ class AllCategorySumTile extends StatefulWidget {
   final List<Map<String, dynamic>> bigCategoryInformationMaps;
   // 全カテゴリーの合計支出
   final int allCategorySum;
-  // 前カテゴリーの合計予算
+  // 全カテゴリーの合計予算
   final int allCategoryBudgetSum;
 
   @override
@@ -74,11 +74,17 @@ class _CategorySumTileState extends State<AllCategorySumTile>
           .add(MyColors().getColorFromHex(value[TBL202RecordKey().colorCode]));
     }
 
-    // 角カテゴリーのグラフ幅を計算
+    // 各カテゴリーのグラフ幅を計算
     for (int i = 0; i < barWidthList.length; i++) {
-      double degrees = (paymentPriceSumList[i] / widget.allCategoryBudgetSum);
-      barWidthList[i] =
-          degrees <= 1.0 ? barFrameWidth * degrees : barFrameWidth;
+      if (widget.allCategorySum < widget.allCategoryBudgetSum) {
+        double degrees = (paymentPriceSumList[i] / widget.allCategoryBudgetSum);
+        barWidthList[i] =
+            degrees = barFrameWidth * degrees;
+      }else{
+        double degrees = (paymentPriceSumList[i] / widget.allCategorySum);
+        barWidthList[i] =
+            degrees = barFrameWidth * degrees;
+      }
     }
 
     //ビルドが完了したら横棒グラフのサイズを変更しアニメーションが動く

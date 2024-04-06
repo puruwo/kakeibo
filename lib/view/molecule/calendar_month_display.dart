@@ -8,6 +8,6 @@ class CalendarMonthDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(child: Text(label,style: TextStyle(color: MyColors.white,fontSize: 16),),);
+    return Container(child: Text(label,style: TextStyle(color: MyColors.white,fontSize: 20),),);
   }
 }

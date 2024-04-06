@@ -5,7 +5,10 @@ import 'dart:ui' as ui;
 /// Package imports
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart' show DateFormat;
+import 'package:kakeibo/view_model/category_sum_getter.dart';
+import 'package:kakeibo/view_model/provider/active_datetime.dart';
 import 'package:kakeibo/view_model/reference_day_impl.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -14,23 +17,22 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 
 /// Local imports
 import 'package:kakeibo/constant/colors.dart';
+
 import 'package:kakeibo/util/util.dart';
 
-import 'package:kakeibo/model/tbl_impl.dart';
+import 'package:kakeibo/view_model/provider/update_DB_count.dart';
 
-class PredictionGraph extends StatefulWidget {
-  const PredictionGraph({super.key, required this.allBudgetSum});
+import 'package:kakeibo/model/db_read_impl.dart';
 
-  // 目標設定額
-  final int allBudgetSum;
+class PredictionGraph extends ConsumerStatefulWidget {
+  const PredictionGraph({super.key});
 
   @override
-  State<PredictionGraph> createState() => _PredictionGraphState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _PredictionGraphState();
 }
 
-class _PredictionGraphState extends State<PredictionGraph> {
-  _PredictionGraphState();
-
+class _PredictionGraphState extends ConsumerState<PredictionGraph> {
   // チャートデータ
   List<ChartData> chartDataList = <ChartData>[];
 
@@ -61,8 +63,13 @@ class _PredictionGraphState extends State<PredictionGraph> {
   // グラフ内の最高額
   late double graphHeight;
 
+  // 目標設定額
+  late Future<List<Map<String, dynamic>>> allBudgetSum;
+
   @override
   Widget build(BuildContext context) {
+    final provider = ref.watch(activeDatetimeNotifierProvider);
+
     final activeDt = DateTime.now();
 
     final Future<List<Map<String, dynamic>>> cumulativePriceByDateFuture =
@@ -71,10 +78,17 @@ class _PredictionGraphState extends State<PredictionGraph> {
     final Future<List<Map<String, dynamic>>> incomeFuture =
         incomeGetter(activeDt);
 
+    // 目標設定額
+    final Future<List<Map<String, dynamic>>> allBudgetSum =
+        AllBudgetGetter().build(provider);
+
     return FutureBuilder(
-        future: Future.wait([cumulativePriceByDateFuture, incomeFuture]),
+        future: Future.wait(
+            [cumulativePriceByDateFuture, incomeFuture, allBudgetSum]),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            final int allBudgetSum = snapshot.data![2][0]['budget_sum'] as int;
+
             // チャートデータの作成
             final cumulativePriceDataList = snapshot.data![0];
             for (int i = 0; i < cumulativePriceDataList.length; i++) {
@@ -103,9 +117,9 @@ class _PredictionGraphState extends State<PredictionGraph> {
             }
 
             // 説明ラベルとラインデータの作成
-            setTargetData();
+            setTargetData(allBudgetSum);
 
-            setGraphHeight();
+            setGraphHeight(allBudgetSum);
 
             return Padding(
                 padding: const EdgeInsets.only(
@@ -115,12 +129,13 @@ class _PredictionGraphState extends State<PredictionGraph> {
                   bottom: 8,
                 ),
                 child: Container(
-                    height: 213,
-                    width: 714,
-                    decoration: BoxDecoration(
-                        color: MyColors.quarternarySystemfill,
-                        borderRadius: BorderRadius.circular(8)),
-                    child: _buildCustomizedLineChart()));
+                  height: 213,
+                  width: 714,
+                  decoration: BoxDecoration(
+                      color: MyColors.quarternarySystemfill,
+                      borderRadius: BorderRadius.circular(8)),
+                  child: _buildCustomizedLineChart(allBudgetSum),
+                ));
           } else {
             return Container();
           }
@@ -128,7 +143,7 @@ class _PredictionGraphState extends State<PredictionGraph> {
   }
 
   /// Returns the customized Line chart.
-  SfCartesianChart _buildCustomizedLineChart() {
+  SfCartesianChart _buildCustomizedLineChart(int allBudgetSum) {
     return SfCartesianChart(
       plotAreaBorderWidth: 0,
       borderWidth: 10,
@@ -212,7 +227,7 @@ class _PredictionGraphState extends State<PredictionGraph> {
           color: MyColors.separater,
           width: 1,
           onCreateRenderer: (ChartSeries<dynamic, dynamic> series) {
-            return _CustomIncomeLineSeriesRenderer(income, widget.allBudgetSum,
+            return _CustomIncomeLineSeriesRenderer(income, allBudgetSum,
                 series as LineSeries<ChartData, DateTime>);
           },
           // アニメーションの設定
@@ -227,7 +242,7 @@ class _PredictionGraphState extends State<PredictionGraph> {
           color: MyColors.separater,
           width: 1,
           onCreateRenderer: (ChartSeries<dynamic, dynamic> series) {
-            return _CustomBudgetLineSeriesRenderer(income, widget.allBudgetSum,
+            return _CustomBudgetLineSeriesRenderer(income, allBudgetSum,
                 series as LineSeries<ChartData, DateTime>);
           },
           // アニメーションの設定
@@ -291,13 +306,13 @@ class _PredictionGraphState extends State<PredictionGraph> {
   }
 
   // グラフ内で最高の値段がどの値か決める処理
-  void setGraphHeight() {
+  void setGraphHeight(int allBudgetSum) {
     graphHeight = latestCumulativePrice.toDouble();
     if (graphHeight < finalPredictionPrice) {
       graphHeight = finalPredictionPrice.toDouble();
     }
-    if (graphHeight < widget.allBudgetSum) {
-      graphHeight = widget.allBudgetSum.toDouble();
+    if (graphHeight < allBudgetSum) {
+      graphHeight = allBudgetSum.toDouble();
     }
     if (graphHeight < income) {
       graphHeight = income.toDouble();
@@ -305,13 +320,13 @@ class _PredictionGraphState extends State<PredictionGraph> {
   }
 
   // 目標データの設定
-  void setTargetData() {
+  void setTargetData(int allBudgetSum) {
     incomeData.add(ChartData(x: fromDate, y: income));
     incomeData
         .add(ChartData(x: toDate.add(const Duration(days: 1) * -1), y: income));
-    budgetData.add(ChartData(x: fromDate, y: widget.allBudgetSum));
+    budgetData.add(ChartData(x: fromDate, y: allBudgetSum));
     budgetData.add(ChartData(
-        x: toDate.add(const Duration(days: 1) * -1), y: widget.allBudgetSum));
+        x: toDate.add(const Duration(days: 1) * -1), y: allBudgetSum));
   }
 
   Future<List<Map<String, dynamic>>> incomeGetter(DateTime activeDt) {
@@ -523,8 +538,11 @@ class _TrendLineCustomPainter<T, D> extends LineSegment<T, D> {
           color: MyColors.secondaryLabel,
           fontFamily: 'sf_ui',
         ));
-    final TextPainter tp =
-        TextPainter(text: span,textAlign: TextAlign.left, textDirection: TextDirection.ltr,);
+    final TextPainter tp = TextPainter(
+      text: span,
+      textAlign: TextAlign.left,
+      textDirection: TextDirection.ltr,
+    );
     tp.layout();
     tp.paint(canvas, Offset(_textBudgetXOffset!, _textBudgetYOffset!));
   }

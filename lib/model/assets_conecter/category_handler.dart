@@ -7,12 +7,12 @@ DatabaseHelper db = DatabaseHelper.instance;
 
 class CategoryHandler {
 
-  Widget sisytIconGetter(int categoryId, {double? height, double? width}) {
+  Widget sisytIconGetter(int categoryOrderKey, {double? height, double? width}) {
     final futureListMap = db.query('''
     SELECT ${TBL202RecordKey().resourcePath} FROM ${TBL201RecordKey().tableName} a
     INNER JOIN ${TBL202RecordKey().tableName} b
     ON a.${TBL201RecordKey().bigCategoryKey} = b.${TBL202RecordKey().id}
-    WHERE a.${TBL201RecordKey().id} = $categoryId
+    WHERE a.${TBL201RecordKey().smallCategoryOrderKey} = $categoryOrderKey
     ''');
     return FutureBuilder(
         future: futureListMap,
@@ -35,12 +35,12 @@ class CategoryHandler {
         });
   }
 
-  Widget syunyuIconGetter(int categoryId, {double? height, double? width}) {
+  Widget syunyuIconGetter(int categoryOrederKey, {double? height, double? width}) {
     final futureListMap = db.query('''
     SELECT ${TBL212RecordKey().resourcePath} FROM ${TBL211RecordKey().tableName} a
     INNER JOIN ${TBL212RecordKey().tableName} b
     ON a.${TBL211RecordKey().bigCategoryKey} = b.${TBL212RecordKey().id}
-    WHERE a.${TBL211RecordKey().id} = $categoryId
+    WHERE a.${TBL211RecordKey().smallCategoryOrderKey} = $categoryOrederKey
     ''');
     return FutureBuilder(
         future: futureListMap,

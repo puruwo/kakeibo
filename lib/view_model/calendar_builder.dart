@@ -1,4 +1,4 @@
-import 'package:kakeibo/model/tbl_impl.dart';
+import 'package:kakeibo/model/db_read_impl.dart';
 import 'package:kakeibo/model/tableNameKey.dart';
 import 'package:kakeibo/view_model/reference_day_impl.dart';
 

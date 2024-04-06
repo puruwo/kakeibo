@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:kakeibo/constant/colors.dart';
+import 'package:kakeibo/util/util.dart';
 
 import 'package:kakeibo/view/atom/next_arrow_button.dart';
 import 'package:kakeibo/view/atom/previous_arrow_button.dart';
@@ -27,7 +28,7 @@ class Home extends StatelessWidget {
       // ヘッダー
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        title: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [
           //左矢印ボタン、押すと前の月に移動
           PreviousArrowButton(function: () async {
             await pageController.previousPage(
@@ -58,26 +59,5 @@ class Home extends StatelessWidget {
         ]),
       ),
     );
-  }
-
-  labelGetter(DateTime activeDt) {
-    final referenceDay = getReferenceDay(activeDt);
-    // 基準日が月初日設定なら表示月はその月のみ
-    if (referenceDay.day == 1) {
-      final label = '${referenceDay.year}年 ${referenceDay.month}月';
-      return label;
-    }
-    // 基準日が月初日以外設定なら表示月はその月とその次の月
-    else {
-      // 12月の次の月は1月なので分岐して処理
-      if (referenceDay.month == 12) {
-        final label = '${referenceDay.year}年 ${referenceDay.month} - ${1}月';
-        return label;
-      } else {
-        final label =
-            '${referenceDay.year}年 ${referenceDay.month} - ${referenceDay.month + 1}月';
-        return label;
-      }
-    }
   }
 }

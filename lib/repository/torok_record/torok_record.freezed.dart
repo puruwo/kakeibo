@@ -23,7 +23,7 @@ mixin _$TorokRecord {
   int get id => throw _privateConstructorUsedError;
   String get date => throw _privateConstructorUsedError;
   int get price => throw _privateConstructorUsedError;
-  int get category => throw _privateConstructorUsedError;
+  int get categoryOrderKey => throw _privateConstructorUsedError;
   String get memo => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -38,7 +38,8 @@ abstract class $TorokRecordCopyWith<$Res> {
           TorokRecord value, $Res Function(TorokRecord) then) =
       _$TorokRecordCopyWithImpl<$Res, TorokRecord>;
   @useResult
-  $Res call({int id, String date, int price, int category, String memo});
+  $Res call(
+      {int id, String date, int price, int categoryOrderKey, String memo});
 }
 
 /// @nodoc
@@ -57,7 +58,7 @@ class _$TorokRecordCopyWithImpl<$Res, $Val extends TorokRecord>
     Object? id = null,
     Object? date = null,
     Object? price = null,
-    Object? category = null,
+    Object? categoryOrderKey = null,
     Object? memo = null,
   }) {
     return _then(_value.copyWith(
@@ -73,9 +74,9 @@ class _$TorokRecordCopyWithImpl<$Res, $Val extends TorokRecord>
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
               as int,
-      category: null == category
-          ? _value.category
-          : category // ignore: cast_nullable_to_non_nullable
+      categoryOrderKey: null == categoryOrderKey
+          ? _value.categoryOrderKey
+          : categoryOrderKey // ignore: cast_nullable_to_non_nullable
               as int,
       memo: null == memo
           ? _value.memo
@@ -93,7 +94,8 @@ abstract class _$$TorokRecordImplCopyWith<$Res>
       __$$TorokRecordImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int id, String date, int price, int category, String memo});
+  $Res call(
+      {int id, String date, int price, int categoryOrderKey, String memo});
 }
 
 /// @nodoc
@@ -110,7 +112,7 @@ class __$$TorokRecordImplCopyWithImpl<$Res>
     Object? id = null,
     Object? date = null,
     Object? price = null,
-    Object? category = null,
+    Object? categoryOrderKey = null,
     Object? memo = null,
   }) {
     return _then(_$TorokRecordImpl(
@@ -126,9 +128,9 @@ class __$$TorokRecordImplCopyWithImpl<$Res>
           ? _value.price
           : price // ignore: cast_nullable_to_non_nullable
               as int,
-      category: null == category
-          ? _value.category
-          : category // ignore: cast_nullable_to_non_nullable
+      categoryOrderKey: null == categoryOrderKey
+          ? _value.categoryOrderKey
+          : categoryOrderKey // ignore: cast_nullable_to_non_nullable
               as int,
       memo: null == memo
           ? _value.memo
@@ -145,7 +147,7 @@ class _$TorokRecordImpl extends _TorokRecord {
       {this.id = 0,
       required this.date,
       this.price = 0,
-      this.category = 0,
+      this.categoryOrderKey = 0,
       this.memo = ''})
       : super._();
 
@@ -162,14 +164,14 @@ class _$TorokRecordImpl extends _TorokRecord {
   final int price;
   @override
   @JsonKey()
-  final int category;
+  final int categoryOrderKey;
   @override
   @JsonKey()
   final String memo;
 
   @override
   String toString() {
-    return 'TorokRecord(id: $id, date: $date, price: $price, category: $category, memo: $memo)';
+    return 'TorokRecord(id: $id, date: $date, price: $price, categoryOrderKey: $categoryOrderKey, memo: $memo)';
   }
 
   @override
@@ -180,14 +182,15 @@ class _$TorokRecordImpl extends _TorokRecord {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.date, date) || other.date == date) &&
             (identical(other.price, price) || other.price == price) &&
-            (identical(other.category, category) ||
-                other.category == category) &&
+            (identical(other.categoryOrderKey, categoryOrderKey) ||
+                other.categoryOrderKey == categoryOrderKey) &&
             (identical(other.memo, memo) || other.memo == memo));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(runtimeType, id, date, price, category, memo);
+  int get hashCode =>
+      Object.hash(runtimeType, id, date, price, categoryOrderKey, memo);
 
   @JsonKey(ignore: true)
   @override
@@ -208,7 +211,7 @@ abstract class _TorokRecord extends TorokRecord {
       {final int id,
       required final String date,
       final int price,
-      final int category,
+      final int categoryOrderKey,
       final String memo}) = _$TorokRecordImpl;
   _TorokRecord._() : super._();
 
@@ -222,7 +225,7 @@ abstract class _TorokRecord extends TorokRecord {
   @override
   int get price;
   @override
-  int get category;
+  int get categoryOrderKey;
   @override
   String get memo;
   @override

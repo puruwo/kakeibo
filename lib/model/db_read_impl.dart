@@ -180,23 +180,27 @@ Future<List<Map<String, dynamic>>> queryCrossMonthMutableRowsByBigCategory(
 
 //bigCategory指定で一ヶ月分のカテゴリーごとのレコードの取得
 //月またぎ、1月分取得(Mutable)
+// {
+//  sum_by_bigcategory:
+//  big_category_key:
+// }
 Future<List<Map<String, dynamic>>> queryCrossMonthMutableRowsByCategory(
-    int category, DateTime fromDate, DateTime toDate) async {
+    DateTime fromDate, DateTime toDate) async {
   final sql = '''
-            SELECT b.${TBL201RecordKey().categoryName}, c.sum_by_category FROM ${TBL202RecordKey().tableName} a
-            INNER JOIN ${TBL201RecordKey().tableName} b
-            INNER JOIN (SELECT SUM(${TBL001RecordKey().price}) as sum_by_category, a.${TBL001RecordKey().paymentCategoryId} 
-                        FROM ${TBL001RecordKey().tableName} a
-                        WHERE ${TBL001RecordKey().date} >= ${DateFormat('yyyyMMdd').format(fromDate)} AND ${TBL001RecordKey().date} <= ${DateFormat('yyyyMMdd').format(toDate)}  
-                        GROUP BY a.${TBL001RecordKey().paymentCategoryId}) c
+            SELECT a.${TBL202RecordKey().id}, IFNULL(b.sum_by_bigcategory, 0) as sum_by_bigcategory FROM TBL202 a
+            LEFT JOIN (SELECT SUM(price) as sum_by_bigcategory, y.${TBL201RecordKey().bigCategoryKey}
+                        FROM ${TBL001RecordKey().tableName} x
+						            INNER JOIN ${TBL201RecordKey().tableName} y
+						            ON x.${TBL001RecordKey().paymentCategoryId} = y.${TBL201RecordKey().id}
+                        WHERE date >= 20240225 AND date <= 20240325  
+                        GROUP BY y.${TBL201RecordKey().bigCategoryKey}) b
             on a.${TBL202RecordKey().id} = b.${TBL201RecordKey().bigCategoryKey}
-            AND b.${TBL201RecordKey().id}= c.${TBL001RecordKey().paymentCategoryId}
             WHERE a.${TBL202RecordKey().isDisplayed} = 1
-            AND a.${TBL202RecordKey().id} = $category
-            AND 
-            ORDER BY b.${TBL201RecordKey().id}
+            ORDER BY a.${TBL202RecordKey().displayOrder}
+            ;
             ''';
 
+  print(sql);
   final immutable = db.query(sql);
   final mutable = makeMutable(immutable);
 
@@ -267,10 +271,42 @@ Future<List<Map<String, dynamic>>> queryMonthlyCategoryBudget(
             ;
             ''';
 
+  // print(sql);
+
   final immutable = db.query(sql);
   final mutable = makeMutable(immutable);
 
   return mutable;
+}
+
+//指定したカテゴリーの過去最近の目標の取得
+// {
+//  price
+// }
+Future<int> querySpecificCategoryBudget(
+    int bigCategoryId) async {
+  final sql = '''
+            SELECT a.${TBL003RecordKey().price}
+            FROM ${TBL003RecordKey().tableName} a
+              INNER JOIN ${TBL202RecordKey().tableName} b
+              ON a.${TBL003RecordKey().bigCategoryId} = b.${TBL202RecordKey().id}
+            WHERE 
+			        b._id = $bigCategoryId
+			      AND ${TBL003RecordKey().date} = (
+              SELECT MAX(${TBL003RecordKey().date})
+              FROM ${TBL003RecordKey().tableName} a2
+              WHERE a.${TBL003RecordKey().bigCategoryId} = a2.${TBL003RecordKey().bigCategoryId}
+            )
+            ;
+            ''';
+
+  // print(sql);
+
+  final immutable = db.query(sql);
+  final mutable = await makeMutable(immutable);
+
+  // int形式にしてreturn
+  return mutable[0][TBL003RecordKey().price];
 }
 
 Future<int> getDisplaySisytCategoryNumber() async {
@@ -326,6 +362,59 @@ Future<List<Map<String,dynamic>>> getMonthIncomeSum(DateTime fromDate, DateTime 
   final mutable = makeMutable(immutable);
 
   return mutable; 
+}
+
+// 日付と大カテゴリー指定した予算取得
+// 1recordのみreturn
+Future<List<Map<String,dynamic>>> getSpecifiedDateBigCategoryBudget(String date,int bigCategory) async{
+  final sql = '''
+              SELECT * FROM ${TBL003RecordKey().tableName} a
+              WHERE a.${TBL003RecordKey().date} = $date
+              AND a.${TBL003RecordKey().bigCategoryId} = $bigCategory
+              ''';
+  print(sql);
+  final immutable = db.query(sql);
+  final mutable = await makeMutable(immutable);
+  return mutable; 
+}
+
+// (Payment)categoryIdからcategoryOrderを取得
+Future<int> getPaymentCategoryOrderKeyFromCategoryId(int categoryId) async{
+  final sql = '''
+              SELECT a.${TBL201RecordKey().smallCategoryOrderKey} FROM ${TBL201RecordKey().tableName} a
+              WHERE a.${TBL201RecordKey().id} = $categoryId
+              ''';
+  print(sql);
+  final immutable = db.query(sql);
+  final mutable = await makeMutable(immutable);
+  final smallCategoryOrderKey = mutable[0][TBL201RecordKey().smallCategoryOrderKey];
+  return smallCategoryOrderKey; 
+}
+
+// (Payment)categoryOrderからcategoryIdを取得
+Future<int> getPaymentCategoryIdFromCategoryOrder(int categoryOrder) async{
+  final sql = '''
+              SELECT a.${TBL201RecordKey().id} FROM ${TBL201RecordKey().tableName} a
+              WHERE a.${TBL201RecordKey().smallCategoryOrderKey} = $categoryOrder
+              ''';
+  print(sql);
+  final immutable = db.query(sql);
+  final mutable = await makeMutable(immutable);
+  final categoryId = mutable[0][TBL201RecordKey().id];
+  return categoryId; 
+}
+
+// (Income)categoryOrderからcategoryIdを取得
+Future<int> getIncomeCategoryIdFromCategoryOrder(int categoryOrder) async{
+  final sql = '''
+              SELECT a.${TBL211RecordKey().id} FROM ${TBL211RecordKey().tableName} a
+              WHERE a.${TBL211RecordKey().smallCategoryOrderKey} = $categoryOrder
+              ''';
+  print(sql);
+  final immutable = db.query(sql);
+  final mutable = await makeMutable(immutable);
+  final categoryId = mutable[0][TBL211RecordKey().id];
+  return categoryId; 
 }
 
 Future<List<Map<String, dynamic>>> makeMutable(

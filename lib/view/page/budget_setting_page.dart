@@ -1,255 +1,291 @@
-// /// packegeImport
-// import 'package:hooks_riverpod/hooks_riverpod.dart';
-// import 'package:flutter/material.dart';
+/// packegeImport
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-// /// localImport
-// import 'package:kakeibo/constant/colors.dart';
+/// localImport
+import 'package:kakeibo/constant/colors.dart';
+import 'package:kakeibo/model/assets_conecter/category_handler.dart';
 
-// import 'package:kakeibo/model/tbl_impl.dart';
+import 'package:kakeibo/model/db_read_impl.dart';
+import 'package:kakeibo/model/db_delete_impl.dart';
+import 'package:kakeibo/model/tableNameKey.dart';
 
-// class BedgetSettingPage extends ConsumerStatefulWidget {
-//   const BedgetSettingPage({super.key});
+import 'package:kakeibo/repository/tbl003_record/tbl003_record.dart';
+import 'package:kakeibo/view_model/provider/update_DB_count.dart';
+import 'package:kakeibo/view_model/reference_day_impl.dart';
 
-//   @override
-//   ConsumerState<ConsumerStatefulWidget> createState() =>
-//       _BedgetSettingPageState();
-// }
+class BudgetSettingPage extends ConsumerStatefulWidget {
+  const BudgetSettingPage({super.key});
 
-// class _BedgetSettingPageState extends ConsumerState<BedgetSettingPage> {
-//   final activeDt = DateTime.now();
-//   late  Future<List<Map<String, dynamic>>> monthlyCategoryBudgetListFuture; 
-//   final List<TextEditingController> controllerList = [];
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _BudgetSettingPageState();
+}
 
-//   @override
-//   Widget build(BuildContext context) {
-//     monthlyCategoryBudgetListFuture = queryMonthlyCategoryBudget(activeDt);
-//     return FutureBuilder(
-//         future: monthlyCategoryBudgetListFuture,
-//         builder: (BuildContext context,
-//             AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+class _BudgetSettingPageState extends ConsumerState<BudgetSettingPage> {
 
-          
+  final activeDt = DateTime.now();
 
-//           Widget children;
+  // 今月の予算データのリスト
+  late Future<List<Map<String, dynamic>>> monthlyCategoryBudgetListFuture;
 
-//           if (snapshot.hasData) {
-//             final monthlyCategoryBudgetList = snapshot.data!;
+  // 先月の実績データのリスト
+  late Future<List<Map<String, dynamic>>> lastMonthPaymentListFuture;
 
-//             return Expanded(
-//               child: ListView.builder(
-//                 controller: widget._scrollController,
-//                 itemCount: sortedGroupedMap.length,
-//                 itemBuilder: (BuildContext context, int index) {
-//                   String date = sortedGroupedMap.keys.elementAt(index);
-//                   List<Map> itemsInADay = sortedGroupedMap[date]!;
-//                   List<Map> descendingOrderItems =
-//                       descendingOrderSort(itemsInADay);
+  // 値段入力のコントローラ
+  final List<TextEditingController> controllerList = [];
 
-//                   final stringDate = formattedLabelDateGetter(date);
-//                   return Column(
-//                     crossAxisAlignment: CrossAxisAlignment.center,
-//                     children: [
-//                       // 日付ヘッダーの上スペース
-//                       const SizedBox(
-//                         height: 13,
-//                       ),
-//                       //日付ラベル
-//                       Row(
-//                         mainAxisAlignment: MainAxisAlignment.start,
-//                         children: [
-//                           Padding(
-//                             padding: const EdgeInsets.only(left: 14.5),
-//                             child: Text(stringDate,
-//                                 style: const TextStyle(
-//                                   fontSize: 14,
-//                                   color: MyColors.secondaryLabel,
-//                                 )),
-//                           ),
-//                           //右余白
-//                         ],
-//                       ),
+  @override
+  void dispose() {
+    controllerList.forEach((element) {
+      element.dispose();
+    });
+    super.dispose();
+  }
 
-//                       //区切り線
-//                       const Divider(
-//                         thickness: 0.25,
-//                         height: 0.25,
-//                         indent: 14.5,
-//                         color: MyColors.separater,
-//                       ),
+  @override
+  Widget build(BuildContext context) {
+    // 目標データの取得
+    // {
+    //  big_category_id
+    //  price
+    //  color_code
+    //  big_category_name
+    //  resource_path
+    // }
+    final monthlyCategoryBudgetListFuture =
+        queryMonthlyCategoryBudget(activeDt);
 
-//                       //タイル
-//                       ListView.builder(
-//                         shrinkWrap: true,
-//                         physics: const ClampingScrollPhysics(),
-//                         itemCount: descendingOrderItems.length,
-//                         itemBuilder: (BuildContext context, int index) {
-//                           final item = itemsInADay[index];
+    // 先月の実績のデータを取得
+    final toDate = getReferenceDay(activeDt);
+    final fromDate = getPreviousReferenceDay(toDate);
+    // {
+    //  sum_by_bigcategory:
+    //  big_category_key:
+    // }
+    final lastMonthPaymentListFuture =
+        queryCrossMonthMutableRowsByCategory(fromDate, toDate);
 
-//                           // アイコン
-//                           final icon = CategoryHandler().sisytIconGetter(
-//                               item[TBL001RecordKey().paymentCategoryId]);
-//                           // 大カテゴリー名
-//                           final bigCategoryName =
-//                               item[TBL202RecordKey().bigCategoryName];
-//                           // 小カテゴリー
-//                           final categoryName =
-//                               item[TBL201RecordKey().categoryName];
-//                           // メモ
-//                           final memo = item[TBL001RecordKey().memo];
-//                           // 値段ラベル
-//                           final priceLabel = formattedPriceGetter(
-//                               item[TBL001RecordKey().price]);
+    return Scaffold(
+      // ヘッダー
+      appBar: AppBar(
+        //ヘッダー右のアイコンボタン
+        actions: [
+          IconButton(
+            icon: const Icon(
+              //完了チェックマーク
+              Icons.done_rounded,
+              color: MyColors.white,
+            ),
+            onPressed: () {
+              registorBudget(monthlyCategoryBudgetListFuture);
 
-//                           return Column(
-//                             children: [
-//                               Dismissible(
-//                                 // 右から左
-//                                 direction: DismissDirection.endToStart,
-//                                 key: Key(item[TBL001RecordKey().id].toString()),
-//                                 dragStartBehavior: DragStartBehavior.start,
+              // スナックバーの表示と画面のpop
+              doneSnackBarFunc();
 
-//                                 // 右スワイプ時の背景
-//                                 background: Container(color: MyColors.black),
+              //DB更新のnotifier
+              //DBが更新されたことをグローバルなproviderに反映
+              dbUpdateNotify();
+            },
+          ),
+        ],
+      ),
 
-//                                 // 左スワイプ時の背景
-//                                 secondaryBackground: Container(
-//                                   color: MyColors.red,
-//                                   child: const Align(
-//                                       alignment: Alignment.centerRight,
-//                                       child: Padding(
-//                                         // 削除時背景のアイコンのpadding
-//                                         padding: EdgeInsets.only(right: 18.0),
-//                                         child: Icon(
-//                                           Icons.delete,
-//                                           color: MyColors.systemGray,
-//                                         ),
-//                                       )),
-//                                 ),
-//                                 child: SizedBox(
-//                                   height: 49,
-//                                   width: double.infinity,
-//                                   child: Row(
-//                                     mainAxisAlignment:
-//                                         MainAxisAlignment.spaceBetween,
-//                                     crossAxisAlignment:
-//                                         CrossAxisAlignment.center,
-//                                     children: [
-//                                       // アイコン
-//                                       Padding(
-//                                         padding: const EdgeInsets.only(
-//                                             left: 20, right: 18),
-//                                         child: icon,
-//                                       ),
+      // 本体
+      body: FutureBuilder(
+          future: Future.wait(
+              [monthlyCategoryBudgetListFuture, lastMonthPaymentListFuture]),
+          builder: (BuildContext context, snapshot) {
+            Widget children;
 
-//                                       // 大カテゴリー、小カテゴリーのColumn
-//                                       Expanded(
-//                                         child: Column(
-//                                           mainAxisAlignment:
-//                                               MainAxisAlignment.center,
-//                                           crossAxisAlignment:
-//                                               CrossAxisAlignment.start,
-//                                           children: [
-//                                             // 大カテゴリー
-//                                             Text(
-//                                               bigCategoryName,
-//                                               textAlign: TextAlign.end,
-//                                               overflow: TextOverflow.ellipsis,
-//                                               style: const TextStyle(
-//                                                 fontSize: 15,
-//                                                 color: MyColors.secondaryLabel,
-//                                               ),
-//                                             ),
+            if (snapshot.hasData) {
+              final monthlyCategoryBudgetList = snapshot.data![0];
+              final lastMonthPaymentList = snapshot.data![1];
 
-//                                             // 小カテゴリーとメモ
-//                                             Row(
-//                                               children: [
-//                                                 // 小カテゴリー
-//                                                 SizedBox(
-//                                                   width: 60,
-//                                                   child: Text(
-//                                                     ' $categoryName',
-//                                                     textAlign: TextAlign.start,
-//                                                     overflow:
-//                                                         TextOverflow.ellipsis,
-//                                                     style: const TextStyle(
-//                                                         fontSize: 12,
-//                                                         color: MyColors
-//                                                             .tirtiaryLabel),
-//                                                   ),
-//                                                 ),
-//                                                 // メモ
-//                                                 SizedBox(
-//                                                   width: 100,
-//                                                   child: Text(
-//                                                     ' $memo',
-//                                                     textAlign: TextAlign.start,
-//                                                     overflow:
-//                                                         TextOverflow.ellipsis,
-//                                                     style: const TextStyle(
-//                                                         fontSize: 12,
-//                                                         color: MyColors
-//                                                             .tirtiaryLabel),
-//                                                   ),
-//                                                 ),
-//                                               ],
-//                                             )
-//                                           ],
-//                                         ),
-//                                       ),
+              // TextEditingControllerの初期化
+              for (int i = 0; i < monthlyCategoryBudgetList.length; i++) {
+                final price = monthlyCategoryBudgetList[i]['price'].toString();
+                controllerList.add(TextEditingController(text: price));
+              }
 
-//                                       // 値段
-//                                       Padding(
-//                                         padding:
-//                                             const EdgeInsets.only(right: 22.0),
-//                                         child: Text(
-//                                           priceLabel,
-//                                           textAlign: TextAlign.end,
-//                                           overflow: TextOverflow.ellipsis,
-//                                           style: const TextStyle(
-//                                               fontSize: 19,
-//                                               color: MyColors.label),
-//                                         ),
-//                                       ),
+              return Expanded(
+                child: ListView.builder(
+                  itemCount: monthlyCategoryBudgetList.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    // 大カテゴリーのIDを取得
+                    final bigCategoryId = monthlyCategoryBudgetList[index]
+                        [TBL003RecordKey().bigCategoryId];
+                    // 大カテゴリーの予算を取得
+                    final bigCategoryBudget =
+                        monthlyCategoryBudgetList[index]['price'];
+                    // 大カテゴリーのcolorCodeを取得
+                    final bigCategoryColor = monthlyCategoryBudgetList[index]
+                        [TBL202RecordKey().colorCode];
+                    // 大カテゴリーの名前を取得
+                    final bigCategoryName = monthlyCategoryBudgetList[index]
+                        [TBL202RecordKey().bigCategoryName];
+                    // 大カテゴリーの画像パスを取得
+                    final bigCategoryResourcePath =
+                        monthlyCategoryBudgetList[index]
+                            [TBL202RecordKey().resourcePath];
 
-//                                       // nextArrowアイコン
-//                                       const Padding(
-//                                         padding: EdgeInsets.only(right: 20),
-//                                         child: Icon(
-//                                           size: 18,
-//                                           Icons.arrow_forward_ios_rounded,
-//                                           color: MyColors.white,
-//                                         ),
-//                                       )
-//                                     ],
-//                                   ),
-//                                 ),
-//                               ), //区切り線
-//                               const Divider(
-//                                 thickness: 0.25,
-//                                 height: 0.25,
-//                                 indent: 50,
-//                                 color: MyColors.separater,
-//                               )
-//                             ],
-//                           );
-//                         },
-//                       ),
-//                     ],
-//                   );
-//                 },
-//               ),
-//             );
-//           } else if (snapshot.hasError) {
-//             children = Container(
-//                 child: const Text(
-//               'データが見つかりません',
-//               style: TextStyle(color: MyColors.white),
-//             ));
-//           } else {
-//             children = const CircularProgressIndicator();
-//           }
+                    // アイコンの取得
+                    final icon = CategoryHandler()
+                        .iconGetterFromPath(bigCategoryResourcePath);
 
-//           return children;
-//         });
-//   }
-// }
+                    // 大カテゴリーの先月の実績
+                    final sumBigCategory =
+                        lastMonthPaymentList[index]['sum_by_bigcategory'];
+                    // 大カテゴリーの先月のid
+                    final bigCategoryKey =
+                        lastMonthPaymentList[index][TBL202RecordKey().id];
+
+                    return Row(
+                      children: [
+                        icon,
+                        Text(
+                          bigCategoryId.toString(),
+                          style: GoogleFonts.notoSans(
+                              fontSize: 16,
+                              color: MyColors.label,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        const Text(' '),
+                        Text(
+                          bigCategoryColor,
+                          style: GoogleFonts.notoSans(
+                              fontSize: 16,
+                              color: MyColors.label,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        const Text(' '),
+                        Text(
+                          bigCategoryName,
+                          style: GoogleFonts.notoSans(
+                              fontSize: 16,
+                              color: MyColors.label,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        const Text(' '),
+                        Text(
+                          sumBigCategory.toString(),
+                          style: GoogleFonts.notoSans(
+                              fontSize: 16,
+                              color: MyColors.label,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        const Text(' '),
+                        SizedBox(
+                          width: 150,
+                          child: TextField(
+                            controller: controllerList[index],
+                            // テキストフィールドのプロパティ
+                            textAlign: TextAlign.right,
+                            textAlignVertical: TextAlignVertical.top,
+                            style: const TextStyle(
+                                color: MyColors.white, fontSize: 17),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                            keyboardType: TextInputType.number,
+                            // //領域外をタップでproviderを更新する
+                            onTapOutside: (event) {
+                              //キーボードを閉じる
+                              FocusScope.of(context).unfocus();
+                            },
+                            onEditingComplete: () {
+                              //キーボードを閉じる
+                              FocusScope.of(context).unfocus();
+                            },
+                          ),
+                        ),
+                        Text(
+                          bigCategoryKey.toString(),
+                          style: GoogleFonts.notoSans(
+                              fontSize: 16,
+                              color: MyColors.label,
+                              fontWeight: FontWeight.w400),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              );
+            } else if (snapshot.hasError) {
+              children = Container(
+                  child: const Text(
+                'データが見つかりません',
+                style: TextStyle(color: MyColors.white),
+              ));
+            } else {
+              children = const CircularProgressIndicator();
+            }
+
+            return children;
+          }),
+    );
+  }
+
+  // 目標データの挿入
+  void registorBudget(
+      Future<List<Map<String, dynamic>>>
+          monthlyCategoryBudgetListFuture) async {
+    // DBから取得した今月の予算リスト
+    final monthlyCategoryBudgetList = await monthlyCategoryBudgetListFuture;
+
+    for (int i = 0; i < monthlyCategoryBudgetList.length; i++) {
+      final int initialPrice =
+          monthlyCategoryBudgetList[i][TBL003RecordKey().price];
+      final int inputPrice = int.parse(controllerList[i].text);
+
+      // 最初に取得した値段と入力した値段が違っており更新されれば挿入する
+      if (initialPrice != inputPrice) {
+        final int bigCategoryId =
+            monthlyCategoryBudgetList[i][TBL003RecordKey().bigCategoryId];
+        final int price = inputPrice;
+        final String date = DateFormat('yyyyMMdd').format(DateTime.now());
+
+        // 目標データのインスタンス化
+        final record =
+            TBL003Record(date: date, bigCategory: bigCategoryId, price: price);
+
+        // 日付被りのデータを一行取得
+        final listBuff =
+            await getSpecifiedDateBigCategoryBudget(date, bigCategoryId);
+        Map? deletingTargetData;
+        if (listBuff.isNotEmpty) {
+          deletingTargetData = listBuff[0];
+        }
+        
+        print('削除');
+        // 削除するべきレコードがあれば削除
+        if (deletingTargetData!= null) {
+          int deletingTargetDataId = deletingTargetData[TBL003RecordKey().id];
+          tBL003RecordDelete(deletingTargetDataId);
+        }
+
+        print('挿入');
+        // 目標データの挿入
+        record.insert();
+      }
+    }
+  }
+
+  void doneSnackBarFunc() {
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(const SnackBar(
+        content: Text('登録が完了しました'),
+        behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 2),
+      ));
+  }
+
+  void dbUpdateNotify() {
+    final notifier2 = ref.read(updateDBCountNotifierProvider.notifier);
+    notifier2.incrementState();
+  }
+}

@@ -26,7 +26,7 @@ import 'package:kakeibo/view_model/provider/active_datetime.dart';
 import 'package:kakeibo/view_model/provider/update_DB_count.dart';
 import 'package:kakeibo/view_model/reference_day_impl.dart';
 
-import 'package:kakeibo/model/tbl_impl.dart';
+import 'package:kakeibo/model/db_read_impl.dart';
 import 'package:kakeibo/model/tableNameKey.dart';
 import 'package:kakeibo/model/assets_conecter/category_handler.dart';
 
@@ -187,37 +187,59 @@ class _ExpenceHistoryAreaState extends ConsumerState<ExpenceHistoryArea> {
                             final priceLabel = yenmarkFormattedPriceGetter(
                                 item[TBL001RecordKey().price]);
 
-                            return Column(
-                              children: [
-                                Dismissible(
-                                  // 右から左
-                                  direction: DismissDirection.endToStart,
-                                  key: Key(
-                                      item[TBL001RecordKey().id].toString()),
-                                  dragStartBehavior: DragStartBehavior.start,
-
-                                  // 右スワイプ時の背景
-                                  background: Container(color: MyColors.black),
-
-                                  // 左スワイプ時の背景
-                                  secondaryBackground: Container(
-                                    color: MyColors.red,
-                                    child: const Align(
-                                        alignment: Alignment.centerRight,
-                                        child: Padding(
-                                          // 削除時背景のアイコンのpadding
-                                          padding: EdgeInsets.only(right: 18.0),
-                                          child: Icon(
-                                            Icons.delete,
-                                            color: MyColors.systemGray,
-                                          ),
-                                        )),
+                            return GestureDetector(
+                              onTap: () async {
+                                // categoryIdからcategoryOrderKeyを取得
+                                final int categoryOrderKey =
+                                    await getPaymentCategoryOrderKeyFromCategoryId(
+                                        item[SeparateLabelMapKey().category]);
+                                showCupertinoModalBottomSheet(
+                                  //sccafoldの上に出すか
+                                  useRootNavigator: true,
+                                  //縁タップで閉じる
+                                  isDismissible: true,
+                                  context: context,
+                                  builder: (_) => Torok.origin(
+                                    torokRecord: TorokRecord(
+                                        date: item[SeparateLabelMapKey().date],
+                                        id: item[SeparateLabelMapKey().id],
+                                        price:
+                                            item[SeparateLabelMapKey().price],
+                                        memo: item[SeparateLabelMapKey().memo],
+                                        categoryOrderKey: categoryOrderKey),
+                                    screenMode: 1,
                                   ),
-                                  child: Padding(
-                                    padding: EdgeInsets.only(
-                                        left: leftsidePadding,
-                                        right: leftsidePadding),
-                                    child: GestureDetector(
+                                );
+                              },
+                              child: Dismissible(
+                                // 右から左
+                                direction: DismissDirection.endToStart,
+                                key: Key(item[TBL001RecordKey().id].toString()),
+                                dragStartBehavior: DragStartBehavior.start,
+
+                                // 右スワイプ時の背景
+                                background: Container(color: MyColors.black),
+
+                                // 左スワイプ時の背景
+                                secondaryBackground: Container(
+                                  color: MyColors.red,
+                                  child: const Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Padding(
+                                        // 削除時背景のアイコンのpadding
+                                        padding: EdgeInsets.only(right: 18.0),
+                                        child: Icon(
+                                          Icons.delete,
+                                          color: MyColors.systemGray,
+                                        ),
+                                      )),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          left: leftsidePadding,
+                                          right: leftsidePadding),
                                       child: SizedBox(
                                         height: 49,
                                         width: double.infinity,
@@ -243,7 +265,8 @@ class _ExpenceHistoryAreaState extends ConsumerState<ExpenceHistoryArea> {
                                                 children: [
                                                   // 大カテゴリー
                                                   SizedBox(
-                                                    width: 153 *screenHorizontalMagnification,
+                                                    width: 153 *
+                                                        screenHorizontalMagnification,
                                                     child: Text(
                                                       bigCategoryName,
                                                       textAlign:
@@ -263,7 +286,7 @@ class _ExpenceHistoryAreaState extends ConsumerState<ExpenceHistoryArea> {
                                                     children: [
                                                       // 小カテゴリー
                                                       SizedBox(
-                                                        width: 56 ,
+                                                        width: 56,
                                                         child: Text(
                                                           ' $categoryName',
                                                           textAlign:
@@ -329,94 +352,68 @@ class _ExpenceHistoryAreaState extends ConsumerState<ExpenceHistoryArea> {
                                           ],
                                         ),
                                       ),
-                                      onTap: () {
-                                        showCupertinoModalBottomSheet(
-                                          //sccafoldの上に出すか
-                                          useRootNavigator: true,
-                                          //縁タップで閉じる
-                                          isDismissible: true,
-                                          context: context,
-                                          builder: (_) => Torok.origin(
-                                            torokRecord: TorokRecord(
-                                                date: item[
-                                                    SeparateLabelMapKey().date],
-                                                id: item[
-                                                    SeparateLabelMapKey().id],
-                                                price: item[
-                                                    SeparateLabelMapKey()
-                                                        .price],
-                                                memo: item[
-                                                    SeparateLabelMapKey().memo],
-                                                category: item[
-                                                    SeparateLabelMapKey()
-                                                        .category]),
-                                            screenMode: 1,
-                                          ),
+                                    ),
+                                    Divider(
+                                      thickness: 0.25,
+                                      height: 0.25,
+                                      indent: 50 + leftsidePadding,
+                                      endIndent: leftsidePadding,
+                                      color: MyColors.separater,
+                                    )
+                                  ],
+                                ),
+
+                                //タイルを横にスライドした時の処理
+                                confirmDismiss: (direction) async {
+                                  if (direction ==
+                                      DismissDirection.endToStart) {
+                                    return await showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text("Confirm"), // ダイアログのタイトル
+                                          content: Text(
+                                              "Are you sure you wish to delete this item?"), // ダイアログのメッセージ
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(
+                                                      false), // キャンセルボタンを押したときの処理
+                                              child: Text("CANCEL"),
+                                            ),
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(
+                                                      true), // 削除ボタンを押したときの処理
+                                              child: Text("DELETE"),
+                                            ),
+                                          ],
                                         );
                                       },
-                                    ),
-                                  ),
-
-                                  //タイルを横にスライドした時の処理
-                                  confirmDismiss: (direction) async {
-                                    if (direction ==
-                                        DismissDirection.endToStart) {
-                                      return await showDialog(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return AlertDialog(
-                                            title:
-                                                Text("Confirm"), // ダイアログのタイトル
-                                            content: Text(
-                                                "Are you sure you wish to delete this item?"), // ダイアログのメッセージ
-                                            actions: <Widget>[
-                                              TextButton(
-                                                onPressed: () =>
-                                                    Navigator.of(context).pop(
-                                                        false), // キャンセルボタンを押したときの処理
-                                                child: Text("CANCEL"),
-                                              ),
-                                              TextButton(
-                                                onPressed: () =>
-                                                    Navigator.of(context).pop(
-                                                        true), // 削除ボタンを押したときの処理
-                                                child: Text("DELETE"),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    }
-                                  },
-
-                                  //ダイアログでOKを押したら処理
-                                  onDismissed: (direction) {
-                                    final record = TBL001Record(
-                                      id: item[TBL001RecordKey().id],
-                                      category: item[
-                                          TBL001RecordKey().paymentCategoryId],
-                                      price: item[TBL001RecordKey().price],
-                                      memo: item[TBL001RecordKey().memo],
-                                      date: item[TBL001RecordKey().date],
                                     );
-                                    record.delete();
-                                    // 消す
-                                    print(
-                                        '削除されました id:${item[TBL001RecordKey().id]}'
-                                        'category:${item[TBL001RecordKey().paymentCategoryId]}'
-                                        'price:${item[TBL001RecordKey().price]}'
-                                        'memo:${item[TBL001RecordKey().memo]}'
-                                        '${item[TBL001RecordKey().date]}年');
-                                  },
-                                ), //区切り線
-                                Divider(
-                                  thickness: 0.25,
-                                  height: 0.25,
-                                  indent: 50 + leftsidePadding,
-                                  endIndent: leftsidePadding,
-                                  color: MyColors.separater,
-                                )
-                              ],
+                                  }
+                                },
+
+                                //ダイアログでOKを押したら処理
+                                onDismissed: (direction) {
+                                  final record = TBL001Record(
+                                    id: item[TBL001RecordKey().id],
+                                    category: item[
+                                        TBL001RecordKey().paymentCategoryId],
+                                    price: item[TBL001RecordKey().price],
+                                    memo: item[TBL001RecordKey().memo],
+                                    date: item[TBL001RecordKey().date],
+                                  );
+                                  record.delete();
+                                  // 消す
+                                  print(
+                                      '削除されました id:${item[TBL001RecordKey().id]}'
+                                      'category:${item[TBL001RecordKey().paymentCategoryId]}'
+                                      'price:${item[TBL001RecordKey().price]}'
+                                      'memo:${item[TBL001RecordKey().memo]}'
+                                      '${item[TBL001RecordKey().date]}年');
+                                },
+                              ),
                             );
                           },
                         ),
@@ -470,7 +467,7 @@ class _ExpenceHistoryAreaState extends ConsumerState<ExpenceHistoryArea> {
 
     return formattedDate;
   }
-  
+
   double listSmallcategoryMemoOffsetGetter(double screenWidthSize) {
     final defaultWidth = ScreenLayoutProperties().defaultWidth;
     return screenWidthSize - defaultWidth;

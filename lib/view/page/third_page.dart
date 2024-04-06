@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:kakeibo/util/util.dart';
+import 'package:kakeibo/view/atom/previous_arrow_button.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import 'package:kakeibo/constant/colors.dart';
@@ -15,7 +17,11 @@ import 'package:kakeibo/view/organism/balance_graph_syncfusion.dart';
 import 'package:kakeibo/view/organism/prediction_graph.dart';
 import 'package:kakeibo/view/organism/all_category_sum_tile.dart';
 
+import 'package:kakeibo/view/molecule/calendar_month_display.dart';
+
 import 'package:kakeibo/view_model/provider/active_datetime.dart';
+import 'package:kakeibo/view_model/provider/update_DB_count.dart';
+
 import 'package:kakeibo/view_model/category_sum_getter.dart';
 
 import 'package:kakeibo/view/page/budget_setting_page.dart';
@@ -31,6 +37,9 @@ class _ThirdState extends ConsumerState<Third> {
   @override
   Widget build(BuildContext context) {
     //状態管理---------------------------------------------------------------------------------------
+
+    // DBが更新されたらリビルドするため
+    ref.watch(updateDBCountNotifierProvider);
 
     final provider = ref.watch(activeDatetimeNotifierProvider);
 
@@ -65,48 +74,74 @@ class _ThirdState extends ConsumerState<Third> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: MyColors.jet,
-        title: const SizedBox(
-          child: Text('kakeibo'),
+        backgroundColor: Colors.transparent,
+        title: SizedBox(
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [
+          // //左矢印ボタン、押すと前の月に移動
+          // PreviousArrowButton(function: () async {
+          //   await pageController.previousPage(
+          //       duration: const Duration(milliseconds: 200),
+          //       curve: Curves.easeOutCubic);
+          // }),
+          Consumer(builder: (context, ref, _) {
+            final activeDt = ref.watch(activeDatetimeNotifierProvider);
+            final label = labelGetter(activeDt);
+            return CalendarMonthDisplay(label: label);
+          }),
+          // NextArrowButton(function: () async {
+          //   await pageController.nextPage(
+          //       duration: const Duration(milliseconds: 200),
+          //       curve: Curves.easeOutCubic);
+          // }),
+        ]),
         ),
       ),
-      // backgroundColor: MyColors.secondarySystemBackground,
       backgroundColor: MyColors.secondarySystemBackground,
       body: Center(
         child: SingleChildScrollView(
           child: Column(
             children: [
-
-              const SizedBox(height: 16,),
-
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0,right: 16.0),
-                child: Row(children: [Text(' 今月の支出と目標',style: GoogleFonts.notoSans(
-                                    fontSize: 18,
-                                    color: MyColors.white,
-                                    fontWeight: FontWeight.w400),),],),
+              const SizedBox(
+                height: 0,
               ),
 
-              const SizedBox(height: 8,),
-              
-              // TextButton(onPressed: (){showCupertinoModalBottomSheet(
-              //                           //sccafoldの上に出すか
-              //                           useRootNavigator: true,
-              //                           //縁タップで閉じる
-              //                           isDismissible: true,
-              //                           context: context,
-              //                           builder: (_) => BedgetSettingPage(),
-              //                         );}, child: const Text('予算設定')),
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      ' 今月の支出と目標',
+                      style: GoogleFonts.notoSans(
+                          fontSize: 18,
+                          color: MyColors.white,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    TextButton(
+                  onPressed: () {
+                    showCupertinoModalBottomSheet(
+                      //sccafoldの上に出すか
+                      useRootNavigator: true,
+                      //縁タップで閉じる
+                      isDismissible: true,
+                      context: context,
+                      // constで呼び出さないとリビルドがかかってtextfieldのも何度も作り直してしまう
+                      builder: (_) => const BudgetSettingPage(),
+                    );
+                  },
+                  child: const Text('予算設定',style: TextStyle(color: MyColors.linkColor),)),
+                  ],
+                ),
+              ),
 
               // グラフ部分
               FutureBuilder(
                   future: allBudgetSum,
                   builder: ((context, snapshot) {
-                    if(snapshot.hasData){
-                    return PredictionGraph(
-                      allBudgetSum: snapshot.data![0]
-                              ['budget_sum'] as int,
-                    );}else{
+                    if (snapshot.hasData) {
+                      // constで呼び出さないとリビルドがかかってグラフの挙動がおかしくなる
+                      return const PredictionGraph();
+                    } else {
                       return Container();
                     }
                   })),

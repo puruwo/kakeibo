@@ -10,7 +10,7 @@ class NextArrowButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: () => function.call(),
-      iconSize: 18,
+      iconSize: 15,
       icon: const Icon(Icons.arrow_forward_ios_rounded),
       color: MyColors.white,
     );

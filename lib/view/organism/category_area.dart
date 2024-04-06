@@ -8,7 +8,7 @@ import 'package:kakeibo/view_model/provider/torok_state/selected_segment_status.
 import 'package:kakeibo/view_model/provider/torok_state/torok_state.dart';
 
 import 'package:kakeibo/model/assets_conecter/category_handler.dart';
-import 'package:kakeibo/model/tbl_impl.dart';
+import 'package:kakeibo/model/db_read_impl.dart';
 
 import 'package:kakeibo/constant/colors.dart';
 
@@ -29,7 +29,7 @@ class _CategoryAreaState extends ConsumerState<CategoryArea> {
 //状態管理---------------------------------------------------------------------------------------
 
     final activeButtonNumberProvider = ref
-        .watch(torokRecordNotifierProvider.select((record) => record.category));
+        .watch(torokRecordNotifierProvider.select((record) => record.categoryOrderKey));
 
     final activeButtonNumberNotifier =
         ref.watch(torokRecordNotifierProvider.notifier);
