@@ -110,108 +110,98 @@ class _BudgetSettingPageState extends ConsumerState<BudgetSettingPage> {
                 controllerList.add(TextEditingController(text: price));
               }
 
-              return Expanded(
-                child: ListView.builder(
-                  itemCount: monthlyCategoryBudgetList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    // 大カテゴリーのIDを取得
-                    final bigCategoryId = monthlyCategoryBudgetList[index]
-                        [TBL003RecordKey().bigCategoryId];
-                    // 大カテゴリーの予算を取得
-                    final bigCategoryBudget =
-                        monthlyCategoryBudgetList[index]['price'];
-                    // 大カテゴリーのcolorCodeを取得
-                    final bigCategoryColor = monthlyCategoryBudgetList[index]
-                        [TBL202RecordKey().colorCode];
-                    // 大カテゴリーの名前を取得
-                    final bigCategoryName = monthlyCategoryBudgetList[index]
-                        [TBL202RecordKey().bigCategoryName];
-                    // 大カテゴリーの画像パスを取得
-                    final bigCategoryResourcePath =
-                        monthlyCategoryBudgetList[index]
-                            [TBL202RecordKey().resourcePath];
-
-                    // アイコンの取得
-                    final icon = CategoryHandler()
-                        .iconGetterFromPath(bigCategoryResourcePath);
-
-                    // 大カテゴリーの先月の実績
-                    final sumBigCategory =
-                        lastMonthPaymentList[index]['sum_by_bigcategory'];
-                    // 大カテゴリーの先月のid
-                    final bigCategoryKey =
-                        lastMonthPaymentList[index][TBL202RecordKey().id];
-
-                    return Row(
-                      children: [
-                        icon,
-                        Text(
-                          bigCategoryId.toString(),
-                          style: GoogleFonts.notoSans(
-                              fontSize: 16,
-                              color: MyColors.label,
-                              fontWeight: FontWeight.w400),
+              return ListView.builder(
+                itemCount: monthlyCategoryBudgetList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  // 大カテゴリーのIDを取得
+                  final bigCategoryId = monthlyCategoryBudgetList[index]
+                      [TBL003RecordKey().bigCategoryId];
+                  // 大カテゴリーの予算を取得
+                  final bigCategoryBudget =
+                      monthlyCategoryBudgetList[index]['price'];
+                  // 大カテゴリーのcolorCodeを取得
+                  final bigCategoryColor = monthlyCategoryBudgetList[index]
+                      [TBL202RecordKey().colorCode];
+                  // 大カテゴリーの名前を取得
+                  final bigCategoryName = monthlyCategoryBudgetList[index]
+                      [TBL202RecordKey().bigCategoryName];
+                  // 大カテゴリーの画像パスを取得
+                  final bigCategoryResourcePath =
+                      monthlyCategoryBudgetList[index]
+                          [TBL202RecordKey().resourcePath];
+              
+                  // アイコンの取得
+                  final icon = CategoryHandler()
+                      .iconGetterFromPath(bigCategoryResourcePath);
+              
+                  // 大カテゴリーの先月の実績
+                  final sumBigCategory =
+                      lastMonthPaymentList[index]['sum_by_bigcategory'];
+                  // 大カテゴリーの先月のid
+                  final bigCategoryKey =
+                      lastMonthPaymentList[index][TBL202RecordKey().id];
+              
+                  return Row(
+                    children: [
+                      icon,
+                      Text(
+                        bigCategoryId.toString(),
+                        style: GoogleFonts.notoSans(
+                            fontSize: 16,
+                            color: MyColors.label,
+                            fontWeight: FontWeight.w400),
+                      ),
+                      const Text(' '),
+                      Text(
+                        bigCategoryName,
+                        style: GoogleFonts.notoSans(
+                            fontSize: 16,
+                            color: MyColors.label,
+                            fontWeight: FontWeight.w400),
+                      ),
+                      const Text(' '),
+                      Text(
+                        sumBigCategory.toString(),
+                        style: GoogleFonts.notoSans(
+                            fontSize: 16,
+                            color: MyColors.label,
+                            fontWeight: FontWeight.w400),
+                      ),
+                      const Text(' '),
+                      SizedBox(
+                        width: 150,
+                        child: TextField(
+                          controller: controllerList[index],
+                          // テキストフィールドのプロパティ
+                          textAlign: TextAlign.right,
+                          textAlignVertical: TextAlignVertical.top,
+                          style: const TextStyle(
+                              color: MyColors.white, fontSize: 17),
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          keyboardType: TextInputType.number,
+                          // //領域外をタップでproviderを更新する
+                          onTapOutside: (event) {
+                            //キーボードを閉じる
+                            FocusScope.of(context).unfocus();
+                          },
+                          onEditingComplete: () {
+                            //キーボードを閉じる
+                            FocusScope.of(context).unfocus();
+                          },
                         ),
-                        const Text(' '),
-                        Text(
-                          bigCategoryColor,
-                          style: GoogleFonts.notoSans(
-                              fontSize: 16,
-                              color: MyColors.label,
-                              fontWeight: FontWeight.w400),
-                        ),
-                        const Text(' '),
-                        Text(
-                          bigCategoryName,
-                          style: GoogleFonts.notoSans(
-                              fontSize: 16,
-                              color: MyColors.label,
-                              fontWeight: FontWeight.w400),
-                        ),
-                        const Text(' '),
-                        Text(
-                          sumBigCategory.toString(),
-                          style: GoogleFonts.notoSans(
-                              fontSize: 16,
-                              color: MyColors.label,
-                              fontWeight: FontWeight.w400),
-                        ),
-                        const Text(' '),
-                        SizedBox(
-                          width: 150,
-                          child: TextField(
-                            controller: controllerList[index],
-                            // テキストフィールドのプロパティ
-                            textAlign: TextAlign.right,
-                            textAlignVertical: TextAlignVertical.top,
-                            style: const TextStyle(
-                                color: MyColors.white, fontSize: 17),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
-                            keyboardType: TextInputType.number,
-                            // //領域外をタップでproviderを更新する
-                            onTapOutside: (event) {
-                              //キーボードを閉じる
-                              FocusScope.of(context).unfocus();
-                            },
-                            onEditingComplete: () {
-                              //キーボードを閉じる
-                              FocusScope.of(context).unfocus();
-                            },
-                          ),
-                        ),
-                        Text(
-                          bigCategoryKey.toString(),
-                          style: GoogleFonts.notoSans(
-                              fontSize: 16,
-                              color: MyColors.label,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ],
-                    );
-                  },
-                ),
+                      ),
+                      Text(
+                        bigCategoryKey.toString(),
+                        style: GoogleFonts.notoSans(
+                            fontSize: 16,
+                            color: MyColors.label,
+                            fontWeight: FontWeight.w400),
+                      ),
+                    ],
+                  );
+                },
               );
             } else if (snapshot.hasError) {
               children = Container(
