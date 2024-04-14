@@ -195,7 +195,6 @@ Future<List<Map<String, dynamic>>> queryCrossMonthMutableRowsByCategory(
                         WHERE date >= 20240225 AND date <= 20240325  
                         GROUP BY y.${TBL201RecordKey().bigCategoryKey}) b
             on a.${TBL202RecordKey().id} = b.${TBL201RecordKey().bigCategoryKey}
-            WHERE a.${TBL202RecordKey().isDisplayed} = 1
             ORDER BY a.${TBL202RecordKey().displayOrder}
             ;
             ''';
@@ -253,11 +252,13 @@ Future<List<Map<String, dynamic>>> queryMonthlyAllBudgetSum(
 //  color_code
 //  big_category_name
 //  resource_path
+//  display_order
+//  is_displayed
 // }
 Future<List<Map<String, dynamic>>> queryMonthlyCategoryBudget(
     DateTime dt) async {
   final sql = '''
-            SELECT a.${TBL003RecordKey().bigCategoryId},a.${TBL003RecordKey().price},b.${TBL202RecordKey().colorCode},b.${TBL202RecordKey().bigCategoryName},b.${TBL202RecordKey().resourcePath}
+            SELECT a.${TBL003RecordKey().bigCategoryId},a.${TBL003RecordKey().price},b.${TBL202RecordKey().colorCode},b.${TBL202RecordKey().bigCategoryName},b.${TBL202RecordKey().resourcePath},b.${TBL202RecordKey().displayOrder},b.${TBL202RecordKey().isDisplayed}
             FROM ${TBL003RecordKey().tableName} a
               INNER JOIN ${TBL202RecordKey().tableName} b
               ON a.${TBL003RecordKey().bigCategoryId} = b.${TBL202RecordKey().id}
@@ -266,7 +267,6 @@ Future<List<Map<String, dynamic>>> queryMonthlyCategoryBudget(
               FROM ${TBL003RecordKey().tableName} a2
               WHERE a.${TBL003RecordKey().bigCategoryId} = a2.${TBL003RecordKey().bigCategoryId}
             )
-            AND b.${TBL202RecordKey().isDisplayed} = 1
             ORDER BY b.${TBL202RecordKey().displayOrder}
             ;
             ''';

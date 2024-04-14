@@ -26,7 +26,7 @@ class TBL202Record with _$TBL202Record {
   factory TBL202Record.fromJson(Map<String, dynamic> json) =>
       _$TBL202RecordFromJson(json);
 
-  //登録ボタン押下関数
+  // displayOrder指定で挿入
   insert() {
     print('id: $id,smallCategoryKey: $colorCode,bigCategoryKey: $bigCategoryName,categoryName: $resourcePath,defaultDisplayed: $displayOrder,を登録しました');
     // //データベースに格納の処理
@@ -36,6 +36,18 @@ class TBL202Record with _$TBL202Record {
       TBL202RecordKey().bigCategoryName: bigCategoryName,
       TBL202RecordKey().resourcePath: resourcePath,
       TBL202RecordKey().displayOrder: displayOrder,
+      TBL202RecordKey().isDisplayed: isDisplayed,
+    }));
+  }
+  // displayOrder指定なしで最後尾に挿入
+  insertToLast() {
+    print('id: $id,smallCategoryKey: $colorCode,bigCategoryKey: $bigCategoryName,categoryName: $resourcePath,defaultDisplayed: $displayOrder,を登録しました');
+    // //データベースに格納の処理
+    print(db.insert(TBL202RecordKey().tableName,{
+      TBL202RecordKey().id: id,
+      TBL202RecordKey().colorCode: colorCode,
+      TBL202RecordKey().bigCategoryName: bigCategoryName,
+      TBL202RecordKey().resourcePath: resourcePath,
       TBL202RecordKey().isDisplayed: isDisplayed,
     }));
   }

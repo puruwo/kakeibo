@@ -1,27 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'torok_state.dart';
+part of 'edit_mode.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$torokRecordNotifierHash() =>
-    r'b4070bf194e5e483e0ec313e4fb96593cff360c2';
+String _$editModeNotifierHash() => r'ac01efcb3a4cdd12e639ef47eb364c5bca4db91c';
 
-/// See also [TorokRecordNotifier].
-@ProviderFor(TorokRecordNotifier)
-final torokRecordNotifierProvider =
-    AutoDisposeNotifierProvider<TorokRecordNotifier, TorokRecord>.internal(
-  TorokRecordNotifier.new,
-  name: r'torokRecordNotifierProvider',
+/// See also [EditModeNotifier].
+@ProviderFor(EditModeNotifier)
+final editModeNotifierProvider =
+    AutoDisposeNotifierProvider<EditModeNotifier, bool>.internal(
+  EditModeNotifier.new,
+  name: r'editModeNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$torokRecordNotifierHash,
+      : _$editModeNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$TorokRecordNotifier = AutoDisposeNotifier<TorokRecord>;
+typedef _$EditModeNotifier = AutoDisposeNotifier<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

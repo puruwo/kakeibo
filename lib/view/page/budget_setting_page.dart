@@ -14,59 +14,55 @@ import 'package:kakeibo/model/db_delete_impl.dart';
 import 'package:kakeibo/model/tableNameKey.dart';
 
 import 'package:kakeibo/repository/tbl003_record/tbl003_record.dart';
+import 'package:kakeibo/repository/tbl202_record/tbl202_record.dart';
+
 import 'package:kakeibo/view_model/provider/update_DB_count.dart';
+import 'package:kakeibo/view_model/provider/budget_setting_page/edit_mode.dart';
+
 import 'package:kakeibo/view_model/reference_day_impl.dart';
 
 class BudgetSettingPage extends ConsumerStatefulWidget {
   const BudgetSettingPage({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _BudgetSettingPageState();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _BudgetSettingPageState();
 }
 
 class _BudgetSettingPageState extends ConsumerState<BudgetSettingPage> {
-
   final activeDt = DateTime.now();
 
   // 今月の予算データのリスト
-  late Future<List<Map<String, dynamic>>> monthlyCategoryBudgetListFuture;
+  List<Map<String, dynamic>>? monthlyCategoryBudgetList;
 
   // 先月の実績データのリスト
-  late Future<List<Map<String, dynamic>>> lastMonthPaymentListFuture;
+  List<Map<String, dynamic>>? lastMonthPaymentList;
 
-  // 値段入力のコントローラ
-  final List<TextEditingController> controllerList = [];
+  // カテゴリーの要素クラスItemのリスト
+  final List<Item> itemList = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    // 初期化が終わる前にbuildが完了してしまうのでawait&SetStateする
+    Future(() async {
+      await initialize();
+      setState(() {});
+    });
+  }
 
   @override
   void dispose() {
-    controllerList.forEach((element) {
-      element.dispose();
+    itemList.forEach((element) {
+      element.controller.dispose();
     });
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // 目標データの取得
-    // {
-    //  big_category_id
-    //  price
-    //  color_code
-    //  big_category_name
-    //  resource_path
-    // }
-    final monthlyCategoryBudgetListFuture =
-        queryMonthlyCategoryBudget(activeDt);
-
-    // 先月の実績のデータを取得
-    final toDate = getReferenceDay(activeDt);
-    final fromDate = getPreviousReferenceDay(toDate);
-    // {
-    //  sum_by_bigcategory:
-    //  big_category_key:
-    // }
-    final lastMonthPaymentListFuture =
-        queryCrossMonthMutableRowsByCategory(fromDate, toDate);
+    final editmodeProvider = ref.watch(editModeNotifierProvider);
 
     return Scaffold(
       // ヘッダー
@@ -74,166 +70,199 @@ class _BudgetSettingPageState extends ConsumerState<BudgetSettingPage> {
         //ヘッダー右のアイコンボタン
         actions: [
           IconButton(
-            icon: const Icon(
-              //完了チェックマーク
-              Icons.done_rounded,
-              color: MyColors.white,
-            ),
+            icon: editmodeProvider
+                ? const Icon(
+                    //完了チェックマーク
+                    Icons.done_rounded,
+                    color: MyColors.white,
+                  )
+                : const Text('編集'),
             onPressed: () {
-              registorBudget(monthlyCategoryBudgetListFuture);
-
-              // スナックバーの表示と画面のpop
-              doneSnackBarFunc();
+              // 登録処理
+              editmodeProvider ? registorFunction() : null;
 
               //DB更新のnotifier
               //DBが更新されたことをグローバルなproviderに反映
-              dbUpdateNotify();
+              editmodeProvider ? dbUpdateNotify() : null;
+
+              // 編集モードの状態を更新
+              final notifier = ref.read(editModeNotifierProvider.notifier);
+              notifier.updateState();
             },
           ),
         ],
       ),
 
       // 本体
-      body: FutureBuilder(
-          future: Future.wait(
-              [monthlyCategoryBudgetListFuture, lastMonthPaymentListFuture]),
-          builder: (BuildContext context, snapshot) {
-            Widget children;
+      body: editmodeProvider == true
+          ? ReorderableListView.builder(
+              // 並べ替えた時の処理
+              onReorder: (oldIndex, newIndex) {
+                setState(() {
+                  reorderFunction(oldIndex, newIndex);
+                  // 変更を加えたことを管理する状態管理する
+                });
+              },
+              itemCount: monthlyCategoryBudgetList!.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Row(
+                  key: Key('$index'),
+                  children: [
+                    // チェックボックス
+                    ElevatedButton(
+                        onPressed: () {
+                          // チェックボックスのタップ処理
+                          setState(() {
+                            final bool = itemList[index].isChecked;
+                            // チェックボックスに渡す値を更新する
+                            itemList[index].isChecked = !bool;
+                          });
+                        },
+                        child: itemList[index].isChecked
+                            ? Container(
+                                height: 20,
+                                width: 10,
+                                color: MyColors.blue,
+                              )
+                            : Container(
+                                height: 20,
+                                width: 10,
+                              )),
 
-            if (snapshot.hasData) {
-              final monthlyCategoryBudgetList = snapshot.data![0];
-              final lastMonthPaymentList = snapshot.data![1];
+                    // アイコン
+                    itemList[index].icon,
 
-              // TextEditingControllerの初期化
-              for (int i = 0; i < monthlyCategoryBudgetList.length; i++) {
-                final price = monthlyCategoryBudgetList[i]['price'].toString();
-                controllerList.add(TextEditingController(text: price));
-              }
+                    Text(
+                      itemList[index].bigCategoryId.toString(),
+                      style: GoogleFonts.notoSans(
+                          fontSize: 16,
+                          color: MyColors.label,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    const Text(' '),
+                    Text(
+                      itemList[index].bigCategoryName,
+                      style: GoogleFonts.notoSans(
+                          fontSize: 16,
+                          color: MyColors.label,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    const Text(' '),
+                    Text(
+                      itemList[index].gotDisplayOrder.toString(),
+                      style: GoogleFonts.notoSans(
+                          fontSize: 16,
+                          color: MyColors.label,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    Text(
+                      itemList[index].editedDisplayOrder.toString(),
+                      style: GoogleFonts.notoSans(
+                          fontSize: 16,
+                          color: MyColors.label,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    const Text(' '),
+                    SizedBox(
+                      width: 150,
+                      child: TextField(
+                        controller: itemList[index].controller,
+                        // テキストフィールドのプロパティ
+                        textAlign: TextAlign.right,
+                        textAlignVertical: TextAlignVertical.top,
+                        style: const TextStyle(
+                            color: MyColors.white, fontSize: 17),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        keyboardType: TextInputType.number,
+                        // //領域外をタップでproviderを更新する
+                        onTapOutside: (event) {
+                          //キーボードを閉じる
+                          FocusScope.of(context).unfocus();
+                        },
+                        onEditingComplete: () {
+                          //キーボードを閉じる
+                          FocusScope.of(context).unfocus();
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            )
+          // 非編集時
+          : ListView.builder(
+              itemCount: monthlyCategoryBudgetList!.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Row(
+                  key: Key('$index'),
+                  children: [
 
-              return ListView.builder(
-                itemCount: monthlyCategoryBudgetList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  // 大カテゴリーのIDを取得
-                  final bigCategoryId = monthlyCategoryBudgetList[index]
-                      [TBL003RecordKey().bigCategoryId];
-                  // 大カテゴリーの予算を取得
-                  final bigCategoryBudget =
-                      monthlyCategoryBudgetList[index]['price'];
-                  // 大カテゴリーのcolorCodeを取得
-                  final bigCategoryColor = monthlyCategoryBudgetList[index]
-                      [TBL202RecordKey().colorCode];
-                  // 大カテゴリーの名前を取得
-                  final bigCategoryName = monthlyCategoryBudgetList[index]
-                      [TBL202RecordKey().bigCategoryName];
-                  // 大カテゴリーの画像パスを取得
-                  final bigCategoryResourcePath =
-                      monthlyCategoryBudgetList[index]
-                          [TBL202RecordKey().resourcePath];
-              
-                  // アイコンの取得
-                  final icon = CategoryHandler()
-                      .iconGetterFromPath(bigCategoryResourcePath);
-              
-                  // 大カテゴリーの先月の実績
-                  final sumBigCategory =
-                      lastMonthPaymentList[index]['sum_by_bigcategory'];
-                  // 大カテゴリーの先月のid
-                  final bigCategoryKey =
-                      lastMonthPaymentList[index][TBL202RecordKey().id];
-              
-                  return Row(
-                    children: [
-                      icon,
-                      Text(
-                        bigCategoryId.toString(),
-                        style: GoogleFonts.notoSans(
-                            fontSize: 16,
-                            color: MyColors.label,
-                            fontWeight: FontWeight.w400),
-                      ),
-                      const Text(' '),
-                      Text(
-                        bigCategoryName,
-                        style: GoogleFonts.notoSans(
-                            fontSize: 16,
-                            color: MyColors.label,
-                            fontWeight: FontWeight.w400),
-                      ),
-                      const Text(' '),
-                      Text(
-                        sumBigCategory.toString(),
-                        style: GoogleFonts.notoSans(
-                            fontSize: 16,
-                            color: MyColors.label,
-                            fontWeight: FontWeight.w400),
-                      ),
-                      const Text(' '),
-                      SizedBox(
-                        width: 150,
-                        child: TextField(
-                          controller: controllerList[index],
-                          // テキストフィールドのプロパティ
-                          textAlign: TextAlign.right,
-                          textAlignVertical: TextAlignVertical.top,
-                          style: const TextStyle(
-                              color: MyColors.white, fontSize: 17),
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                          keyboardType: TextInputType.number,
-                          // //領域外をタップでproviderを更新する
-                          onTapOutside: (event) {
-                            //キーボードを閉じる
-                            FocusScope.of(context).unfocus();
-                          },
-                          onEditingComplete: () {
-                            //キーボードを閉じる
-                            FocusScope.of(context).unfocus();
-                          },
-                        ),
-                      ),
-                      Text(
-                        bigCategoryKey.toString(),
-                        style: GoogleFonts.notoSans(
-                            fontSize: 16,
-                            color: MyColors.label,
-                            fontWeight: FontWeight.w400),
-                      ),
-                    ],
-                  );
-                },
-              );
-            } else if (snapshot.hasError) {
-              children = Container(
-                  child: const Text(
-                'データが見つかりません',
-                style: TextStyle(color: MyColors.white),
-              ));
-            } else {
-              children = const CircularProgressIndicator();
-            }
+                    // アイコン
+                    itemList[index].icon,
 
-            return children;
-          }),
+                    Text(
+                      itemList[index].bigCategoryId.toString(),
+                      style: GoogleFonts.notoSans(
+                          fontSize: 16,
+                          color: MyColors.label,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    const Text(' '),
+                    Text(
+                      itemList[index].bigCategoryName,
+                      style: GoogleFonts.notoSans(
+                          fontSize: 16,
+                          color: MyColors.label,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    const Text(' '),
+                    Text(
+                      itemList[index].gotDisplayOrder.toString(),
+                      style: GoogleFonts.notoSans(
+                          fontSize: 16,
+                          color: MyColors.label,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    Text(
+                      itemList[index].editedDisplayOrder.toString(),
+                      style: GoogleFonts.notoSans(
+                          fontSize: 16,
+                          color: MyColors.label,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    const Text(' '),
+                    Text(
+                      itemList[index].controller.text,
+                      style: GoogleFonts.notoSans(
+                          fontSize: 16,
+                          color: MyColors.label,
+                          fontWeight: FontWeight.w400),
+                    ),
+                  ],
+                );
+              },
+            ),
     );
   }
 
   // 目標データの挿入
-  void registorBudget(
-      Future<List<Map<String, dynamic>>>
-          monthlyCategoryBudgetListFuture) async {
-    // DBから取得した今月の予算リスト
-    final monthlyCategoryBudgetList = await monthlyCategoryBudgetListFuture;
+  void registorFunction() {
+    tBL003Impl();
+    tBL202Impl();
+    // スナックバーの表示
+    doneSnackBarFunc();
+  }
 
-    for (int i = 0; i < monthlyCategoryBudgetList.length; i++) {
-      final int initialPrice =
-          monthlyCategoryBudgetList[i][TBL003RecordKey().price];
-      final int inputPrice = int.parse(controllerList[i].text);
+  void tBL003Impl() async {
+    for (int i = 0; i < itemList.length; i++) {
+      final int initialPrice = itemList[i].bigCategoryBudget;
+      final int inputPrice = int.parse(itemList[i].controller.text);
 
       // 最初に取得した値段と入力した値段が違っており更新されれば挿入する
       if (initialPrice != inputPrice) {
-        final int bigCategoryId =
-            monthlyCategoryBudgetList[i][TBL003RecordKey().bigCategoryId];
+        final int bigCategoryId = itemList[i].bigCategoryId;
         final int price = inputPrice;
         final String date = DateFormat('yyyyMMdd').format(DateTime.now());
 
@@ -248,23 +277,43 @@ class _BudgetSettingPageState extends ConsumerState<BudgetSettingPage> {
         if (listBuff.isNotEmpty) {
           deletingTargetData = listBuff[0];
         }
-        
-        print('削除');
+
         // 削除するべきレコードがあれば削除
-        if (deletingTargetData!= null) {
+        if (deletingTargetData != null) {
           int deletingTargetDataId = deletingTargetData[TBL003RecordKey().id];
           tBL003RecordDelete(deletingTargetDataId);
         }
 
-        print('挿入');
         // 目標データの挿入
         record.insert();
       }
     }
   }
 
+  void tBL202Impl() {
+    for (int i = 0; i < itemList.length; i++) {
+      tBL202RecordDelete(itemList[i].bigCategoryId);
+    }
+
+    for (int i = 0; i < itemList.length; i++) {
+      // booleanから 0 or 1 に変換
+      final isDisplayed = itemList[i].isChecked == true ? 1 : 0;
+
+      final record = TBL202Record(
+        id: itemList[i].bigCategoryId,
+        colorCode: itemList[i].bigCategoryColor,
+        bigCategoryName: itemList[i].bigCategoryName,
+        resourcePath: itemList[i].bigCategoryResourcePath,
+        displayOrder: itemList[i].editedDisplayOrder,
+        isDisplayed: isDisplayed,
+      );
+
+      record.insert();
+    }
+  }
+
   void doneSnackBarFunc() {
-    Navigator.of(context).pop();
+    // Navigator.of(context).pop();
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(const SnackBar(
@@ -275,7 +324,128 @@ class _BudgetSettingPageState extends ConsumerState<BudgetSettingPage> {
   }
 
   void dbUpdateNotify() {
-    final notifier2 = ref.read(updateDBCountNotifierProvider.notifier);
-    notifier2.incrementState();
+    final notifier = ref.read(updateDBCountNotifierProvider.notifier);
+    notifier.incrementState();
+  }
+
+  // initstate内の宣言
+  initialize() async {
+    // 目標データの取得
+    // {
+    //  big_category_id
+    //  price
+    //  color_code
+    //  big_category_name
+    //  resource_path
+    //  display_order
+    //  is_displayed
+    // }
+    monthlyCategoryBudgetList = await queryMonthlyCategoryBudget(activeDt);
+
+    // 先月の実績のデータを取得
+    final toDate = getReferenceDay(activeDt);
+    final fromDate = getPreviousReferenceDay(toDate);
+    // {
+    //  sum_by_bigcategory:
+    //  big_category_key:
+    // }
+    lastMonthPaymentList =
+        await queryCrossMonthMutableRowsByCategory(fromDate, toDate);
+
+    // itemListの初期化
+    for (int i = 0; i < monthlyCategoryBudgetList!.length; i++) {
+      final price = monthlyCategoryBudgetList![i]['price'].toString();
+      itemList.add(Item(
+        // 大カテゴリーのIDを取得
+        bigCategoryId: monthlyCategoryBudgetList![i]
+            [TBL003RecordKey().bigCategoryId],
+        // 大カテゴリーの予算を取得
+        bigCategoryBudget: monthlyCategoryBudgetList![i]['price'],
+        // 大カテゴリーのcolorCodeを取得
+        bigCategoryColor: monthlyCategoryBudgetList![i]
+            [TBL202RecordKey().colorCode],
+        // 大カテゴリーの名前を取得
+        bigCategoryName: monthlyCategoryBudgetList![i]
+            [TBL202RecordKey().bigCategoryName],
+        // 大カテゴリーの画像パスを取得
+        bigCategoryResourcePath: monthlyCategoryBudgetList![i]
+            [TBL202RecordKey().resourcePath],
+        // 大カテゴリーの先月の実績
+        sumBigCategory: lastMonthPaymentList![i]['sum_by_bigcategory'],
+        // 大カテゴリーの先月のid
+        bigCategoryKey: lastMonthPaymentList![i][TBL202RecordKey().id],
+        // 表示順
+        gotDisplayOrder: monthlyCategoryBudgetList![i]
+            [TBL202RecordKey().displayOrder],
+        // 表示非表示設定
+        isDisplayed: monthlyCategoryBudgetList![i]
+            [TBL202RecordKey().isDisplayed],
+        // コントローラー
+        controller: TextEditingController(text: price),
+      ));
+    }
+  }
+
+  void reorderFunction(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final item = itemList.removeAt(oldIndex);
+    itemList.insert(newIndex, item);
+
+    // itemの表示順を更新
+    //
+    for (int i = 0; i < itemList.length; i++) {
+      itemList[i].editedDisplayOrder = i;
+    }
+  }
+}
+
+class Item {
+  // 大カテゴリーのIDを取得
+  final int bigCategoryId;
+  // 大カテゴリーの予算を取得
+  final int bigCategoryBudget;
+  // 大カテゴリーのcolorCodeを取得
+  final String bigCategoryColor;
+  // 大カテゴリーの名前を取得
+  final String bigCategoryName;
+  // 大カテゴリーの画像パスを取得
+  final String bigCategoryResourcePath;
+  // アイコンの取得
+  late Widget icon;
+  // 大カテゴリーの先月の実績
+  final int sumBigCategory;
+  // 大カテゴリーの先月のid
+  final int bigCategoryKey;
+  // DBから取得した表示順
+  final int gotDisplayOrder;
+  // 編集後表示順
+  late int editedDisplayOrder;
+  // DBでの表示非表示設定 0 or 1
+  final int isDisplayed;
+  // 表示非表示の設定
+  late bool isChecked;
+  // コントローラー
+  late TextEditingController controller;
+
+  Item({
+    required this.bigCategoryId,
+    required this.bigCategoryBudget,
+    required this.bigCategoryColor,
+    required this.bigCategoryName,
+    required this.bigCategoryResourcePath,
+    required this.sumBigCategory,
+    required this.bigCategoryKey,
+    required this.gotDisplayOrder,
+    required this.isDisplayed,
+    required this.controller,
+  }) {
+    // アイコンの取得
+    icon = CategoryHandler().iconGetterFromPath(bigCategoryResourcePath);
+    // 表示日表示の初期化
+    isChecked = isDisplayed == 1 ? true : false;
+    // 編集後表示順の初期化
+    editedDisplayOrder = gotDisplayOrder;
   }
 }
