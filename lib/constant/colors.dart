@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MyColors {
+  static const themeColor = Color.fromARGB(255, 11, 178, 131);
+
   static const white = Colors.white;
   static const black = Colors.black;
   static const mint = Color(0xFF21D19F);

@@ -33,8 +33,8 @@ class CategoryIconButton extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color:
                         //非選択状態 or 選択状態
-                        isSelected == false ? MyColors.jet : MyColors.dimGray,
-                    borderRadius: BorderRadius.circular(10),
+                        isSelected == false ? MyColors.secondarySystemfill : MyColors.systemGray,
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: icon,
                 ),
@@ -45,7 +45,7 @@ class CategoryIconButton extends ConsumerWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: MyColors.black,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
               ),

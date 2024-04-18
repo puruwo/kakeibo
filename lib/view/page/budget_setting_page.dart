@@ -15,6 +15,7 @@ import 'package:kakeibo/model/tableNameKey.dart';
 
 import 'package:kakeibo/repository/tbl003_record/tbl003_record.dart';
 import 'package:kakeibo/repository/tbl202_record/tbl202_record.dart';
+import 'package:kakeibo/view/page/small_category_edit_page.dart';
 
 import 'package:kakeibo/view_model/provider/update_DB_count.dart';
 import 'package:kakeibo/view_model/provider/budget_setting_page/edit_mode.dart';
@@ -40,6 +41,12 @@ class _BudgetSettingPageState extends ConsumerState<BudgetSettingPage> {
 
   // カテゴリーの要素クラスItemのリスト
   final List<Item> itemList = [];
+
+  // 編集モードで予算が編集されたかどうか
+  bool isBudgetEdited = false;
+
+  // 編集モードで表示非表示が編集されたかどうか
+  bool isDefaultDisplayEdited = false;
 
   @override
   void initState() {
@@ -67,6 +74,12 @@ class _BudgetSettingPageState extends ConsumerState<BudgetSettingPage> {
     return Scaffold(
       // ヘッダー
       appBar: AppBar(
+        //ヘッダー左のアイコンボタン
+        leading: IconButton(
+            // 閉じるときはネストしているModal内のRouteではなく、root側のNavigatorを指定する必要がある
+            onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+            icon: const Icon(Icons.close)),
+
         //ヘッダー右のアイコンボタン
         actions: [
           IconButton(
@@ -88,6 +101,9 @@ class _BudgetSettingPageState extends ConsumerState<BudgetSettingPage> {
               // 編集モードの状態を更新
               final notifier = ref.read(editModeNotifierProvider.notifier);
               notifier.updateState();
+              // 編集したかどうかを初期化
+              isBudgetEdited = false;
+              isDefaultDisplayEdited = false;
             },
           ),
         ],
@@ -116,6 +132,8 @@ class _BudgetSettingPageState extends ConsumerState<BudgetSettingPage> {
                             final bool = itemList[index].isChecked;
                             // チェックボックスに渡す値を更新する
                             itemList[index].isChecked = !bool;
+                            // 編集済みフラグを立てる
+                            isDefaultDisplayEdited = true;
                           });
                         },
                         child: itemList[index].isChecked
@@ -176,6 +194,10 @@ class _BudgetSettingPageState extends ConsumerState<BudgetSettingPage> {
                           FilteringTextInputFormatter.digitsOnly
                         ],
                         keyboardType: TextInputType.number,
+                        // 編集されたら編集フラグをtrueに
+                        onChanged: (value) {
+                          isBudgetEdited = true;
+                        },
                         // //領域外をタップでproviderを更新する
                         onTapOutside: (event) {
                           //キーボードを閉じる
@@ -195,52 +217,61 @@ class _BudgetSettingPageState extends ConsumerState<BudgetSettingPage> {
           : ListView.builder(
               itemCount: monthlyCategoryBudgetList!.length,
               itemBuilder: (BuildContext context, int index) {
-                return Row(
-                  key: Key('$index'),
-                  children: [
+                return GestureDetector(
+                  onTap: () {
+                    final bigCategoryId = itemList[index].bigCategoryId;
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: ((context) => SmallCategoryEditPage(
+                                bigCategoryId: bigCategoryId))));
+                  },
+                  child: Row(
+                    key: Key('$index'),
+                    children: [
+                      // アイコン
+                      itemList[index].icon,
 
-                    // アイコン
-                    itemList[index].icon,
-
-                    Text(
-                      itemList[index].bigCategoryId.toString(),
-                      style: GoogleFonts.notoSans(
-                          fontSize: 16,
-                          color: MyColors.label,
-                          fontWeight: FontWeight.w400),
-                    ),
-                    const Text(' '),
-                    Text(
-                      itemList[index].bigCategoryName,
-                      style: GoogleFonts.notoSans(
-                          fontSize: 16,
-                          color: MyColors.label,
-                          fontWeight: FontWeight.w400),
-                    ),
-                    const Text(' '),
-                    Text(
-                      itemList[index].gotDisplayOrder.toString(),
-                      style: GoogleFonts.notoSans(
-                          fontSize: 16,
-                          color: MyColors.label,
-                          fontWeight: FontWeight.w400),
-                    ),
-                    Text(
-                      itemList[index].editedDisplayOrder.toString(),
-                      style: GoogleFonts.notoSans(
-                          fontSize: 16,
-                          color: MyColors.label,
-                          fontWeight: FontWeight.w400),
-                    ),
-                    const Text(' '),
-                    Text(
-                      itemList[index].controller.text,
-                      style: GoogleFonts.notoSans(
-                          fontSize: 16,
-                          color: MyColors.label,
-                          fontWeight: FontWeight.w400),
-                    ),
-                  ],
+                      Text(
+                        itemList[index].bigCategoryId.toString(),
+                        style: GoogleFonts.notoSans(
+                            fontSize: 16,
+                            color: MyColors.label,
+                            fontWeight: FontWeight.w400),
+                      ),
+                      const Text(' '),
+                      Text(
+                        itemList[index].bigCategoryName,
+                        style: GoogleFonts.notoSans(
+                            fontSize: 16,
+                            color: MyColors.label,
+                            fontWeight: FontWeight.w400),
+                      ),
+                      const Text(' '),
+                      Text(
+                        itemList[index].gotDisplayOrder.toString(),
+                        style: GoogleFonts.notoSans(
+                            fontSize: 16,
+                            color: MyColors.label,
+                            fontWeight: FontWeight.w400),
+                      ),
+                      Text(
+                        itemList[index].editedDisplayOrder.toString(),
+                        style: GoogleFonts.notoSans(
+                            fontSize: 16,
+                            color: MyColors.label,
+                            fontWeight: FontWeight.w400),
+                      ),
+                      const Text(' '),
+                      Text(
+                        itemList[index].controller.text,
+                        style: GoogleFonts.notoSans(
+                            fontSize: 16,
+                            color: MyColors.label,
+                            fontWeight: FontWeight.w400),
+                      ),
+                    ],
+                  ),
                 );
               },
             ),
@@ -249,52 +280,50 @@ class _BudgetSettingPageState extends ConsumerState<BudgetSettingPage> {
 
   // 目標データの挿入
   void registorFunction() {
-    tBL003Impl();
-    tBL202Impl();
-    // スナックバーの表示
-    doneSnackBarFunc();
+    if (isBudgetEdited) {
+      tBL003Impl();
+      // スナックバーの表示
+      doneSnackBarFunc();
+    }
+    if (isDefaultDisplayEdited) {
+      tBL202Impl();
+      // スナックバーの表示
+      doneSnackBarFunc();
+    }
   }
 
   void tBL003Impl() async {
     for (int i = 0; i < itemList.length; i++) {
-      final int initialPrice = itemList[i].bigCategoryBudget;
       final int inputPrice = int.parse(itemList[i].controller.text);
 
-      // 最初に取得した値段と入力した値段が違っており更新されれば挿入する
-      if (initialPrice != inputPrice) {
-        final int bigCategoryId = itemList[i].bigCategoryId;
-        final int price = inputPrice;
-        final String date = DateFormat('yyyyMMdd').format(DateTime.now());
+      final int bigCategoryId = itemList[i].bigCategoryId;
+      final int price = inputPrice;
+      final String date = DateFormat('yyyyMMdd').format(DateTime.now());
 
-        // 目標データのインスタンス化
-        final record =
-            TBL003Record(date: date, bigCategory: bigCategoryId, price: price);
+      // 目標データのインスタンス化
+      final record =
+          TBL003Record(date: date, bigCategory: bigCategoryId, price: price);
 
-        // 日付被りのデータを一行取得
-        final listBuff =
-            await getSpecifiedDateBigCategoryBudget(date, bigCategoryId);
-        Map? deletingTargetData;
-        if (listBuff.isNotEmpty) {
-          deletingTargetData = listBuff[0];
-        }
-
-        // 削除するべきレコードがあれば削除
-        if (deletingTargetData != null) {
-          int deletingTargetDataId = deletingTargetData[TBL003RecordKey().id];
-          tBL003RecordDelete(deletingTargetDataId);
-        }
-
-        // 目標データの挿入
-        record.insert();
+      // 日付被りのデータを一行取得
+      final listBuff =
+          await getSpecifiedDateBigCategoryBudget(date, bigCategoryId);
+      Map? deletingTargetData;
+      if (listBuff.isNotEmpty) {
+        deletingTargetData = listBuff[0];
       }
+
+      // 削除するべきレコードがあれば削除
+      if (deletingTargetData != null) {
+        int deletingTargetDataId = deletingTargetData[TBL003RecordKey().id];
+        tBL003RecordDelete(deletingTargetDataId);
+      }
+
+      // 目標データの挿入
+      record.insert();
     }
   }
 
   void tBL202Impl() {
-    for (int i = 0; i < itemList.length; i++) {
-      tBL202RecordDelete(itemList[i].bigCategoryId);
-    }
-
     for (int i = 0; i < itemList.length; i++) {
       // booleanから 0 or 1 に変換
       final isDisplayed = itemList[i].isChecked == true ? 1 : 0;
@@ -308,7 +337,7 @@ class _BudgetSettingPageState extends ConsumerState<BudgetSettingPage> {
         isDisplayed: isDisplayed,
       );
 
-      record.insert();
+      record.update();
     }
   }
 
@@ -427,7 +456,7 @@ class Item {
   // 表示非表示の設定
   late bool isChecked;
   // コントローラー
-  late TextEditingController controller;
+  final TextEditingController controller;
 
   Item({
     required this.bigCategoryId,

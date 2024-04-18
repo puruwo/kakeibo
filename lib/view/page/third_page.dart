@@ -76,24 +76,27 @@ class _ThirdState extends ConsumerState<Third> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         title: SizedBox(
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [
-          // //左矢印ボタン、押すと前の月に移動
-          // PreviousArrowButton(function: () async {
-          //   await pageController.previousPage(
-          //       duration: const Duration(milliseconds: 200),
-          //       curve: Curves.easeOutCubic);
-          // }),
-          Consumer(builder: (context, ref, _) {
-            final activeDt = ref.watch(activeDatetimeNotifierProvider);
-            final label = labelGetter(activeDt);
-            return CalendarMonthDisplay(label: label);
-          }),
-          // NextArrowButton(function: () async {
-          //   await pageController.nextPage(
-          //       duration: const Duration(milliseconds: 200),
-          //       curve: Curves.easeOutCubic);
-          // }),
-        ]),
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // //左矢印ボタン、押すと前の月に移動
+                // PreviousArrowButton(function: () async {
+                //   await pageController.previousPage(
+                //       duration: const Duration(milliseconds: 200),
+                //       curve: Curves.easeOutCubic);
+                // }),
+                Consumer(builder: (context, ref, _) {
+                  final activeDt = ref.watch(activeDatetimeNotifierProvider);
+                  final label = labelGetter(activeDt);
+                  return CalendarMonthDisplay(label: label);
+                }),
+                // NextArrowButton(function: () async {
+                //   await pageController.nextPage(
+                //       duration: const Duration(milliseconds: 200),
+                //       curve: Curves.easeOutCubic);
+                // }),
+              ]),
         ),
       ),
       backgroundColor: MyColors.secondarySystemBackground,
@@ -118,18 +121,26 @@ class _ThirdState extends ConsumerState<Third> {
                           fontWeight: FontWeight.w400),
                     ),
                     TextButton(
-                  onPressed: () {
-                    showCupertinoModalBottomSheet(
-                      //sccafoldの上に出すか
-                      useRootNavigator: true,
-                      //縁タップで閉じる
-                      isDismissible: true,
-                      context: context,
-                      // constで呼び出さないとリビルドがかかってtextfieldのも何度も作り直してしまう
-                      builder: (_) => const BudgetSettingPage(),
-                    );
-                  },
-                  child: const Text('予算設定',style: TextStyle(color: MyColors.linkColor),)),
+                        onPressed: () {
+                          showCupertinoModalBottomSheet(
+                            //sccafoldの上に出すか
+                            useRootNavigator: true,
+                            //縁タップで閉じる
+                            isDismissible: true,
+                            context: context,
+                            // constで呼び出さないとリビルドがかかってtextfieldのも何度も作り直してしまう
+                            builder:(context) => Navigator(
+                              onGenerateRoute: (context) =>
+                                  MaterialPageRoute<BudgetSettingPage>(
+                                builder: (context) => const BudgetSettingPage(),
+                              ),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          '予算設定',
+                          style: TextStyle(color: MyColors.linkColor),
+                        )),
                   ],
                 ),
               ),

@@ -6,7 +6,7 @@ part of 'edit_mode.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$editModeNotifierHash() => r'ac01efcb3a4cdd12e639ef47eb364c5bca4db91c';
+String _$editModeNotifierHash() => r'3e5cd28a395d5ff84c74bc2943e0d3a678dab590';
 
 /// See also [EditModeNotifier].
 @ProviderFor(EditModeNotifier)

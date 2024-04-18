@@ -14,3 +14,7 @@ void tBL003RecordDelete(int id) async {
 void tBL202RecordDelete(int id) async {
   db.delete(TBL202RecordKey().tableName,id);
 }
+
+void tBL201RecordDelete(int id) async {
+  db.delete(TBL201RecordKey().tableName,id);
+}

@@ -417,6 +417,46 @@ Future<int> getIncomeCategoryIdFromCategoryOrder(int categoryOrder) async{
   return categoryId; 
 }
 
+// {
+//  id:
+//  small_category_order_key
+//  big_category_key
+//  displayed_order_in_big
+//  category_name
+//  default_displayed
+// }
+// bigCategoryId指定でcategory情報を取得
+Future<List<Map<String,dynamic>>> getCategoryDataFromCategoryId(int bigCategoryId) async{
+  final sql = '''
+              SELECT * FROM ${TBL201RecordKey().tableName} a
+              WHERE a.${TBL201RecordKey().bigCategoryKey} = $bigCategoryId
+              ''';
+  print(sql);
+  final immutable = db.query(sql);
+  final mutable = await makeMutable(immutable);
+  return mutable; 
+}
+
+// {
+//  id:
+//  color_code
+//  big_category_name
+//  resource_path
+//  display_order
+//  is_displayed
+// }
+// bigCategoryId指定でpropertyを取得
+Future<Map<String,dynamic>> getBigCategoryProperty(int bigCategoryId) async{
+  final sql = '''
+              SELECT * FROM ${TBL202RecordKey().tableName} a
+              WHERE a.${TBL202RecordKey().id} = $bigCategoryId
+              ''';
+  print(sql);
+  final immutable = db.query(sql);
+  final mutable = await makeMutable(immutable);
+  return mutable[0]; 
+}
+
 Future<List<Map<String, dynamic>>> makeMutable(
     Future<List<Map<String, dynamic>>> mapsList) async {
   List<Map<String, dynamic>> oldList = await mapsList;

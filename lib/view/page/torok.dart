@@ -214,6 +214,7 @@ class _TorokState extends ConsumerState<Torok> {
         child: Center(
           child: Column(
             children: [
+
               const SizedBox(height: 5),
               //登録モードなら切り替えを出す
               //編集モードなら出せない
@@ -223,97 +224,173 @@ class _TorokState extends ConsumerState<Torok> {
                       height: 0,
                     ),
 
-              const SizedBox(height: 5),
+              const SizedBox(height: 8),
 
               // 値段inputField
-              InputFieldBack(
-                label: label,
-                textfield: TextField(
-                    controller: _priceInputController,
-                    //画面が開いたら自動でフォーカスされる
-                    autofocus: true,
-                    textAlign: TextAlign.right,
-                    textAlignVertical: TextAlignVertical.top,
-                    style: const TextStyle(color: MyColors.white, fontSize: 17),
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      //境界線を設定しないとアンダーラインが表示されるので透明でもいいから境界線を設定
-                      //何もしていない時の境界線
-                      enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: MyColors.jet.withOpacity(0.0),
-                          )),
-                      //入力時の境界線
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                            color: MyColors.jet.withOpacity(0.0),
-                          )),
-                      prefixIcon: SizedBox(
-                        width: 49,
-                        height: 28,
-                        child: Center(
-                          child: Text(
-                            label,
-                            style: const TextStyle(
-                                color: MyColors.white, fontSize: 17),
-                          ),
-                        ),
+              SizedBox(
+                width: 343,
+                // height: 100,
+                child: TextFormField(
+                  controller: _priceInputController,
+                  // オートフォーカスさせるか
+                  autofocus: true,
+                  // テキストの揃え(上下)
+                  textAlignVertical: TextAlignVertical.center,
+                  // テキストの揃え(左右)
+                  textAlign: TextAlign.end,
+                  // カーソルの色
+                  cursorColor: MyColors.themeColor,
+                  // カーソルの先の太さ
+                  cursorWidth: 2,
+                  // 入力するテキストのstyle
+                  style: const TextStyle(fontSize: 20),
+                  // 行数の制約
+                  minLines: 1,
+                  maxLines: 1,
+                  // 最大文字数の制約
+                  // maxLength: 20,
+
+                  // 数字のみ
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  // 数字のキーボード
+                  keyboardType: TextInputType.number,
+
+                  // 枠や背景などのデザイン
+                  decoration: InputDecoration(
+                    // なんかわからんおまじない
+                    isDense: true,
+
+                    // 背景の塗りつぶし
+                    filled: true,
+                    fillColor: MyColors.secondarySystemfill,
+
+                    // ヒントテキスト
+                    hintText: "値段を入力",
+                    hintStyle: const TextStyle(
+                      fontSize: 16,
+                    ),
+
+                    // テキストの余白
+                    contentPadding: const EdgeInsets.only(
+                        top: 16, bottom: 0, left: 40, right: 16),
+
+                    // テキスト右側のアイコン
+                    // suffixIcon: Padding(
+                    //   // contentPaddingの影響を受けないので、余白を追加
+                    //   padding: const EdgeInsets.only(right: 0),
+                    //   child: IconButton(
+                    //     // 右アイコンを押した時の処理
+                    //     onPressed: () => null,
+                    //     icon: const Icon(Icons.clear,
+                    //         size: 20, color: MyColors.blue),
+                    //   ),
+                    // ),
+
+                    // 境界線を設定しないとアンダーラインが表示されるので透明でもいいから境界線を設定
+                    // 何もしていない時の境界線
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: MyColors.jet.withOpacity(0.0),
                       ),
                     ),
-                    // //領域外をタップでproviderを更新する
-                    onTapOutside: (event) {
-                      //キーボードを閉じる
-                      FocusScope.of(context).unfocus();
-                    },
-                    onEditingComplete: () {
-                      //キーボードを閉じる
-                      FocusScope.of(context).unfocus();
-                    },
+                    // 入力時の境界線
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: MyColors.jet.withOpacity(0.0),
+                      ),
+                    ),
+                  ),
+                  // //領域外をタップでproviderを更新する
+                  onTapOutside: (event) {
+                    //キーボードを閉じる
+                    FocusScope.of(context).unfocus();
+                  },
+                  onEditingComplete: () {
+                    //キーボードを閉じる
+                    FocusScope.of(context).unfocus();
+                  },
 
-                    //0が入力されたらコントローラーを初期化する
-                    onChanged: (value) {
-                      if (value == '0') {
-                        return _priceInputController.clear();
-                      }
-                    }),
+                  //0が入力されたらコントローラーを初期化する
+                  onChanged: (value) {
+                    if (value == '0') {
+                      return _priceInputController.clear();
+                    }
+                  },
+                ),
               ),
 
-              const SizedBox(height: 4.5),
+              const SizedBox(height: 8),
 
               // メモinputField
-              InputFieldBack(
-                label: label,
-                textfield: TextField(
+              SizedBox(
+                width: 343,
+                // height: 100,
+                child: TextFormField(
                   controller: _memoInputController,
-                  textAlign: TextAlign.right,
-                  textAlignVertical: TextAlignVertical.top,
-                  style: const TextStyle(color: MyColors.white, fontSize: 17),
-                  // keyboardType: TextInputType.number,
+                  // オートフォーカスさせるか
+                  autofocus: true,
+                  // テキストの揃え(上下)
+                  textAlignVertical: TextAlignVertical.center,
+                  // テキストの揃え(左右)
+                  textAlign: TextAlign.end,
+                  // カーソルの色
+                  cursorColor: MyColors.themeColor,
+                  // カーソルの先の太さ
+                  cursorWidth: 2,
+                  // 入力するテキストのstyle
+                  style: const TextStyle(fontSize: 20),
+                  // 行数の制約
+                  minLines: 1,
+                  maxLines: 1,
+                  // 最大文字数の制約
+                  // maxLength: 20,
+
+                  // 枠や背景などのデザイン
                   decoration: InputDecoration(
-                    //境界線を設定しないとアンダーラインが表示されるので透明でもいいから境界線を設定
-                    //何もしていない時の境界線
+                    // なんかわからんおまじない
+                    isDense: true,
+
+                    // 背景の塗りつぶし
+                    filled: true,
+                    fillColor: MyColors.secondarySystemfill,
+
+                    // ヒントテキスト
+                    hintText: "メモ",
+                    hintStyle: const TextStyle(
+                      fontSize: 16,
+                    ),
+
+                    // テキストの余白
+                    contentPadding: const EdgeInsets.only(
+                        top: 16, bottom: 0, left: 40, right: 16),
+
+                    // テキスト右側のアイコン
+                    // suffixIcon: Padding(
+                    //   // contentPaddingの影響を受けないので、余白を追加
+                    //   padding: const EdgeInsets.only(right: 0),
+                    //   child: IconButton(
+                    //     // 右アイコンを押した時の処理
+                    //     onPressed: () => null,
+                    //     icon: const Icon(Icons.clear,
+                    //         size: 20, color: MyColors.blue),
+                    //   ),
+                    // ),
+
+                    // 境界線を設定しないとアンダーラインが表示されるので透明でもいいから境界線を設定
+                    // 何もしていない時の境界線
                     enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(
-                          color: MyColors.jet.withOpacity(0.0),
-                        )),
-                    //入力時の境界線
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: MyColors.jet.withOpacity(0.0),
+                      ),
+                    ),
+                    // 入力時の境界線
                     focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(
-                          color: MyColors.jet.withOpacity(0.0),
-                        )),
-                    prefixIcon: const SizedBox(
-                      width: 49,
-                      height: 28,
-                      child: Center(
-                        child: Text(
-                          'メモ',
-                          style: TextStyle(color: MyColors.white, fontSize: 17),
-                        ),
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: MyColors.jet.withOpacity(0.0),
                       ),
                     ),
                   ),
@@ -330,12 +407,13 @@ class _TorokState extends ConsumerState<Torok> {
                   },
                 ),
               ),
-              const SizedBox(height: 4.5),
+
+              const SizedBox(height: 8),
 
               // 日付選択エリア
               const DateDisplay(),
 
-              const SizedBox(height: 4.5),
+              const SizedBox(height: 8),
 
               // カテゴリー選択エリア
               const CategoryArea(),

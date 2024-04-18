@@ -45,32 +45,28 @@ class DateDisplay extends ConsumerWidget {
 
       child: Container(
         decoration: const BoxDecoration(
-          color: MyColors.jet,
+          color: MyColors.secondarySystemfill,
           borderRadius: BorderRadius.all(
             Radius.circular(8),
           ),
         ),
-        width: 332,
+        width: 343,
         height: 40,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            const Padding(
-              padding: EdgeInsets.only(left: 11.5),
-              child: Text(
-                '日付',
-                textAlign: TextAlign.right,
-                style: TextStyle(color: MyColors.white, fontSize: 17),
-              ),
-            ),
             Padding(
-              padding: const EdgeInsets.only(right: 11.5),
+              padding: const EdgeInsets.only(right: 4),
               child: Text(
                 '${provider.date.substring(0,4)}年${int.parse(provider.date.substring(4,6)).toString()}月${int.parse(provider.date.substring(6,8)).toString()}日',
                 textAlign: TextAlign.right,
                 style: const TextStyle(color: MyColors.white, fontSize: 17),
               ),
             ),
+            const Padding(
+              padding: EdgeInsets.only(right:16.0),
+              child: Icon(Icons.arrow_forward_ios_rounded,size: 14,color: MyColors.secondaryLabel,),
+            )
           ],
         ),
       ),
