@@ -7,7 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 // LocalImport
 import 'package:kakeibo/constant/colors.dart';
-import 'package:kakeibo/model/db_read_impl.dart';
+import 'package:kakeibo/model/db_read.dart';
 import 'package:kakeibo/model/tableNameKey.dart';
 import 'package:kakeibo/repository/tbl201_record/tbl201_record.dart';
 import 'package:kakeibo/repository/tbl202_record/tbl202_record.dart';

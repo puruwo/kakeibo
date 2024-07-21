@@ -15,15 +15,9 @@ import 'package:kakeibo/view_model/provider/active_datetime.dart';
 import 'package:kakeibo/view_model/provider/update_DB_count.dart';
 
 import 'package:kakeibo/view_model/calendar_builder.dart';
-import 'package:kakeibo/view_model/reference_day_impl.dart';
+import 'package:kakeibo/view_model/reference_day_getter.dart';
 
 import 'package:kakeibo/repository/torok_record/torok_record.dart';
-
-// import 'package:kakeibo/view/molecule/calendar_date_box.dart';
-import 'package:kakeibo/view/molecule/calendar_month_display.dart';
-// import 'package:kakeibo/view/atom/calendar_header.dart';
-import 'package:kakeibo/view/atom/next_arrow_button.dart';
-import 'package:kakeibo/view/atom/previous_arrow_button.dart';
 
 import 'package:kakeibo/view/page/torok.dart';
 

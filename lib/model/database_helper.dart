@@ -4,8 +4,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:kakeibo/model/sql_sentence.dart';
 
-import 'package:kakeibo/model/tableNameKey.dart';
-
 class DatabaseHelper {
   static final _databaseName = "kakeibo.db"; // DB名
   static final _databaseVersion = 5; // スキーマのバージョン指定

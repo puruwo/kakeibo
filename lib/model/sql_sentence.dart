@@ -2,6 +2,9 @@ import 'package:sqflite/sqflite.dart';
 
 import 'tableNameKey.dart';
 
+//実際のSQLの記述
+//SQLインジェクションに対応する必要がある
+
 class DataBaseHelperHandling {
   funcOnCreate(Database db) async {
     await db.execute('''

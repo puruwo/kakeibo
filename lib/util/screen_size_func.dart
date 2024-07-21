@@ -4,6 +4,8 @@ import 'dart:math';
 /// Local imports
 import 'package:kakeibo/constant/properties.dart';
 
+//レスポンシブルに表示するための画面サイズ関する処理
+
 double screenWidthGetter(){
   return ScreenLayoutProperties().defaultWidth.toDouble();
 }

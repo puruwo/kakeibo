@@ -1,13 +1,12 @@
 /// Package import
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:kakeibo/constant/colors.dart';
 
 /// Chart import
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 /// Local import
-import 'package:kakeibo/model/db_read_impl.dart';
+import 'package:kakeibo/model/db_read.dart';
 
 class LineChartA extends StatefulWidget {
   const LineChartA({super.key});

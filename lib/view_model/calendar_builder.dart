@@ -1,6 +1,6 @@
-import 'package:kakeibo/model/db_read_impl.dart';
+import 'package:kakeibo/model/db_read.dart';
 import 'package:kakeibo/model/tableNameKey.dart';
-import 'package:kakeibo/view_model/reference_day_impl.dart';
+import 'package:kakeibo/view_model/reference_day_getter.dart';
 
 class CalendarBuilder {
   /// [date]が表す日が所属する月のカレンダーを生成します
@@ -12,7 +12,6 @@ class CalendarBuilder {
     final calendar = <List<Map<String, dynamic>>>[];
 
     //設定会計周期スタート日、デフォルトは25日に設定
-    const startDay = 25;
 
     //基準日
     final referenceDay = getReferenceDay(dt);

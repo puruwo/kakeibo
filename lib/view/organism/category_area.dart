@@ -8,7 +8,7 @@ import 'package:kakeibo/view_model/provider/torok_state/selected_segment_status.
 import 'package:kakeibo/view_model/provider/torok_state/torok_state.dart';
 
 import 'package:kakeibo/model/assets_conecter/category_handler.dart';
-import 'package:kakeibo/model/db_read_impl.dart';
+import 'package:kakeibo/model/db_read.dart';
 
 import 'package:kakeibo/constant/colors.dart';
 

@@ -1,7 +1,3 @@
-/// Dart imports
-import 'dart:math';
-import 'dart:ui' as ui;
-
 /// Package imports
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -9,8 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:kakeibo/view_model/category_sum_getter.dart';
 import 'package:kakeibo/view_model/provider/active_datetime.dart';
-import 'package:kakeibo/view_model/reference_day_impl.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:kakeibo/view_model/reference_day_getter.dart';
 
 /// Chart import
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -20,9 +15,7 @@ import 'package:kakeibo/constant/colors.dart';
 
 import 'package:kakeibo/util/util.dart';
 
-import 'package:kakeibo/view_model/provider/update_DB_count.dart';
-
-import 'package:kakeibo/model/db_read_impl.dart';
+import 'package:kakeibo/model/db_read.dart';
 
 class PredictionGraph extends ConsumerStatefulWidget {
   const PredictionGraph({super.key});

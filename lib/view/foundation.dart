@@ -8,7 +8,6 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import 'package:kakeibo/view_model/provider/navigation_bar.dart';
 import 'package:kakeibo/view_model/provider/initial_open.dart';
-import 'package:kakeibo/view_model/provider/update_DB_count.dart';
 
 import 'package:kakeibo/view/page/torok.dart';
 import 'package:kakeibo/view/page/home.dart';

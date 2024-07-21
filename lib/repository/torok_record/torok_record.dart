@@ -1,7 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:kakeibo/model/database_helper.dart';
-import 'package:kakeibo/model/tableNameKey.dart';
-import 'package:kakeibo/model/db_read_impl.dart';
 
 //Freezedで生成されるデータクラス
 part 'torok_record.freezed.dart';

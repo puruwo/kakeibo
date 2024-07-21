@@ -5,6 +5,8 @@ import 'package:kakeibo/model/tableNameKey.dart';
 //DatabaseHelperの初期化
 DatabaseHelper db = DatabaseHelper.instance;
 
+//SQLのread文を書くファイル
+
 //Paymentの操作
 class TBL001Impl {
 

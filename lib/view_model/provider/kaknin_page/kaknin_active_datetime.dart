@@ -1,5 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:kakeibo/view_model/reference_day_impl.dart';
+import 'package:kakeibo/view_model/reference_day_getter.dart';
 
 part 'kaknin_active_datetime.g.dart';
 

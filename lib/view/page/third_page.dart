@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:kakeibo/util/util.dart';
-import 'package:kakeibo/view/atom/previous_arrow_button.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import 'package:kakeibo/constant/colors.dart';
@@ -12,8 +11,6 @@ import 'package:kakeibo/model/tableNameKey.dart';
 
 /// Local imports
 import 'package:kakeibo/view/organism/category_sum_tile.dart';
-import 'package:kakeibo/view/organism/balance_graph.dart';
-import 'package:kakeibo/view/organism/balance_graph_syncfusion.dart';
 import 'package:kakeibo/view/organism/prediction_graph.dart';
 import 'package:kakeibo/view/organism/all_category_sum_tile.dart';
 

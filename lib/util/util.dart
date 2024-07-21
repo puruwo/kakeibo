@@ -1,9 +1,6 @@
-import 'package:intl/intl.dart';
-import 'package:kakeibo/view_model/reference_day_impl.dart';
+import 'package:kakeibo/view_model/reference_day_getter.dart';
 
-
-// 値段をカンマ区切りフォーマットで出力する処理
-
+// 値段をカンマ区切りフォーマットで出力する処理ßß
 String formattedPriceGetter(int price) {
   mathFunc(Match match) => '${match[1]},';
   RegExp reg = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
@@ -25,6 +22,9 @@ String yenFormattedPriceGetter(int price) {
   String result = stringPrice.replaceAllMapped(reg, mathFunc);
   return '$result 円';
 }
+
+
+
 
 labelGetter(DateTime activeDt) {
     final referenceDay = getReferenceDay(activeDt);

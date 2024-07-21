@@ -1,11 +1,6 @@
-import 'package:kakeibo/model/assets_conecter/category_handler.dart';
+import 'package:kakeibo/model/db_read.dart';
 
-import 'package:kakeibo/model/tableNameKey.dart';
-import 'package:kakeibo/model/db_read_impl.dart';
-
-import 'package:kakeibo/view_model/reference_day_impl.dart';
-import 'package:kakeibo/view_model/provider/kaknin_page/kaknin_active_datetime.dart';
-
+import 'package:kakeibo/view_model/reference_day_getter.dart';
 
 class BigCategorySumMapGetter{
   Future<List<Map<String,dynamic>>>build(DateTime dt){

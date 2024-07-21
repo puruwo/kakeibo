@@ -1,5 +1,5 @@
 import 'package:intl/intl.dart';
-import 'package:kakeibo/model/db_read_impl.dart';
+import 'package:kakeibo/model/db_read.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:kakeibo/repository/tbl001_record/tbl001_record.dart';
 import 'package:kakeibo/repository/tbl002_record/tbl002_record.dart';

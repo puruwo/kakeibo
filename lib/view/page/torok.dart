@@ -3,11 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:kakeibo/constant/colors.dart';
-import 'package:kakeibo/repository/tbl001_record/tbl001_record.dart';
 import 'package:kakeibo/repository/torok_record/torok_record.dart';
 import 'package:flutter/services.dart';
-
-import 'package:kakeibo/view/organism/input_field_back.dart';
 import 'package:kakeibo/view/organism/category_area.dart';
 import 'package:kakeibo/view/organism/torok_selected_segment.dart';
 import 'package:kakeibo/view_model/provider/torok_state/selected_segment_status.dart';

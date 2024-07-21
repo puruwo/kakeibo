@@ -2,10 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kakeibo/model/assets_conecter/category_handler.dart';
 
 import 'package:kakeibo/constant/colors.dart';
-import 'package:kakeibo/view/page/third_page.dart';
 
 class CategoryIconButton extends ConsumerWidget {
   final int buttonInfo;
