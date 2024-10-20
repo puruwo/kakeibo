@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "507100052744",
+    "project_id": "kakeibo-memo",
+    "storage_bucket": "kakeibo-memo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:507100052744:android:ec1dd2a3d3e2d56f5380bd",
+        "android_client_info": {
+          "package_name": "com.example.kakeibo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCeYbSWo5rLTIQ_-ZbTp7PFPvqKNipvGFw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
